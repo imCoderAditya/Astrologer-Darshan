@@ -12,8 +12,13 @@ import 'package:astrology/app/routes/app_pages.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:astrology/components/global_loader.dart';
 import 'package:astrology/components/snack_bar_view.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get_rx/get_rx.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+// import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 const String APPID = "25747e4b1b9c43d8a8b7cde83abddf45";
@@ -202,7 +207,7 @@ class HostController extends GetxController {
       isEngineReady.value = true;
     } catch (e) {
       debugPrint('Error initializing Host Agora: $e');
-      Get.snackbar('Error', 'Failed to initialize live stream: $e');
+      SnackBarUiView.showError(message: 'Failed to initialize live stream: $e');
     }
   }
 
@@ -448,7 +453,8 @@ class HostController extends GetxController {
   }
 
   Future<void> _initTokenAndEngine() async {
-    await generateToken(channelName:"abcd1423544fffdf65", userName: "Astrologer");
+   await goLiveAPI();
+    // await generateToken(channelName:"abcd1423544fffdf67", userName: "Astrologer");
   }
 
   // Go Live API integrate  it given below
@@ -457,7 +463,19 @@ class HostController extends GetxController {
     try {
       final res = await BaseClient.post(
         api: EndPoint.goLive,
-        data: {
+          formData:FormData.fromMap({
+
+            "AstrologerID": 28,
+            "Title": "Live Astrology Q&A",
+            "Description": "Ask me anything live!",
+            "Category": "Horoscope",
+            // 'ThumbnailFile': await MultipartFile.fromFile(
+            //   'D:/aditya_new/Astrologer-Darshan/assets/images/astro.png',
+            //   filename: 'astro.png',
+            // ),
+
+          })
+       /* data: {
           "AstrologerID": userId,
           "Title": "Live Astrology Q&A",
           "Description": "Ask me anything live!",
@@ -469,10 +487,13 @@ class HostController extends GetxController {
           "MaxViewers": 10,
           "IsPublic": true,
           "IsFeatured": false,
-        },
+        },*/
       );
       if (res != null && res.statusCode == 200) {
-        LoggerUtils.debug("Response: ${res.data}");
+        LoggerUtils.debug("Response------------:-- ${res.data}" ,tag: 'goLiveAPI');
+        var streamkey = res.data['data'];
+        await generateToken(channelName:streamkey['StreamKey']??'', userName: streamkey['Title']??'');
+
       } else {
         LoggerUtils.error("Error:${res.data}");
       }
