@@ -2,6 +2,7 @@
 // ignore_for_file: deprecated_member_use, constant_identifier_names
 
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:agora_token_generator/agora_token_generator.dart';
@@ -12,8 +13,13 @@ import 'package:astrology/app/routes/app_pages.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:astrology/components/global_loader.dart';
 import 'package:astrology/components/snack_bar_view.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get_rx/get_rx.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+// import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 const String APPID = "25747e4b1b9c43d8a8b7cde83abddf45";
@@ -106,7 +112,8 @@ class HostController extends GetxController {
   @override
   void onClose() {
     _liveTimer?.cancel();
-    stopLive();
+    // stopLive();
+    endLiveStram();
     super.onClose();
   }
 
@@ -202,7 +209,7 @@ class HostController extends GetxController {
       isEngineReady.value = true;
     } catch (e) {
       debugPrint('Error initializing Host Agora: $e');
-      Get.snackbar('Error', 'Failed to initialize live stream: $e');
+      SnackBarUiView.showError(message: 'Failed to initialize live stream: $e');
     }
   }
 
@@ -447,8 +454,10 @@ class HostController extends GetxController {
     super.onInit();
   }
 
+  int? liveStramId;
   Future<void> _initTokenAndEngine() async {
-    await generateToken(channelName:"abcd1423544fffdf65", userName: "Astrologer");
+    await goLiveAPI();
+    // await generateToken(channelName:"abcd1423544fffdf67", userName: "Astrologer");
   }
 
   // Go Live API integrate  it given below
@@ -457,27 +466,60 @@ class HostController extends GetxController {
     try {
       final res = await BaseClient.post(
         api: EndPoint.goLive,
-        data: {
-          "AstrologerID": userId,
+        formData: FormData.fromMap({
+          "AstrologerID": 28,
           "Title": "Live Astrology Q&A",
           "Description": "Ask me anything live!",
-          "StreamKey": "abcd1423544fffdf65",
-          "StreamURL": "https://mystreamingurl.com/stream",
-          "ThumbnailURL": "https://example.com/thumb.jpg",
           "Category": "Horoscope",
-          "Status": "Live",
-          "MaxViewers": 10,
-          "IsPublic": true,
-          "IsFeatured": false,
-        },
+
+          // 'ThumbnailFile': await MultipartFile.fromFile(
+          //   'D:/aditya_new/Astrologer-Darshan/assets/images/astro.png',
+          //   filename: 'astro.png',
+          // ),
+        }),
       );
       if (res != null && res.statusCode == 200) {
-        LoggerUtils.debug("Response: ${res.data}");
+        LoggerUtils.debug(
+          "Response------------:-- ${res.data}",
+          tag: 'goLiveAPI',
+        );
+        var streamkey = res.data['data'];
+        liveStramId = streamkey["LiveSessionID"];
+        log("LiveStramId $liveStramId");
+        await generateToken(
+          channelName: streamkey['StreamKey'] ?? '',
+          userName: streamkey['Title'] ?? '',
+        );
       } else {
         LoggerUtils.error("Error:${res.data}");
       }
     } catch (e) {
       LoggerUtils.error("Error:$e");
+    } finally {
+      update();
+    }
+  }
+
+  Future<void> endLiveStram() async {
+    GlobalLoader.show();
+    try {
+      final res = await BaseClient.post(
+        api: EndPoint.liveSessionUpdateStatus,
+        data: {"LiveSessionID": liveStramId, "NewStatus": "Ended"},
+      );
+
+      if (res != null && res.statusCode == 200) {
+        await stopLive();
+        Get.back();
+        GlobalLoader.hide();
+        LoggerUtils.debug("Response : ${res.data}");
+      } else {
+        GlobalLoader.hide();
+        LoggerUtils.debug("Failed : ${res?.data}");
+      }
+    } catch (e) {
+      GlobalLoader.hide();
+      LoggerUtils.error("Error: $e");
     }
   }
 }

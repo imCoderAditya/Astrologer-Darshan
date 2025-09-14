@@ -3,6 +3,9 @@
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart'
     show AppTextStyles;
+import 'package:astrology/app/core/config/theme/theme_controller.dart';
+import 'package:astrology/app/routes/app_pages.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -16,7 +19,7 @@ class LoginView extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    final themeController = Get.put(ThemeController());
     return GetBuilder<LoginController>(
       init: LoginController(),
       builder: (controller) {
@@ -86,46 +89,6 @@ class LoginView extends GetView<LoginController> {
                         Colors.transparent,
                       ],
                     ),
-                  ),
-                ),
-              ),
-
-              // Theme toggle button
-              Positioned(
-                top: 60.h,
-                right: 16.w,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color:
-                        isDark
-                            ? Colors.white.withOpacity(0.1)
-                            : Colors.black.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(50),
-                    border: Border.all(
-                      color:
-                          isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : Colors.black.withOpacity(0.1),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      isDark ? Icons.light_mode : Icons.dark_mode,
-                      color: isDark ? Colors.white : Colors.black,
-                      size: 20.sp,
-                    ),
-                    onPressed: () {
-                      Get.changeThemeMode(
-                        Get.isDarkMode ? ThemeMode.light : ThemeMode.dark,
-                      );
-                    },
                   ),
                 ),
               ),
@@ -414,7 +377,27 @@ class LoginView extends GetView<LoginController> {
                         ),
                       ),
                     ),
-
+                    SizedBox(height: 16.h),
+                    RichText(
+                      text: TextSpan(
+                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                        children: [
+                          const TextSpan(text: "Don't have an account? "),
+                          TextSpan(
+                            text: 'Sign up',
+                            style: TextStyle(
+                              color: AppColors.primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Get.toNamed(Routes.SIGN);
+                                  },
+                          ),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 64.h),
 
                     // Enhanced Terms and Privacy with better design
@@ -483,6 +466,44 @@ class LoginView extends GetView<LoginController> {
 
                     SizedBox(height: 32.h),
                   ],
+                ),
+              ),
+
+              // Theme toggle button
+              Positioned(
+                top: 60.h,
+                right: 16.w,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color:
+                        isDark
+                            ? Colors.white.withOpacity(0.1)
+                            : Colors.black.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                      color:
+                          isDark
+                              ? Colors.white.withOpacity(0.1)
+                              : Colors.black.withOpacity(0.1),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      isDark ? Icons.light_mode : Icons.dark_mode,
+                      color: isDark ? Colors.white : Colors.black,
+                      size: 20.sp,
+                    ),
+                    onPressed: () {
+                      themeController.toggleTheme();
+                    },
+                  ),
                 ),
               ),
             ],

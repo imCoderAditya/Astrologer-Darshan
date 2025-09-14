@@ -9,8 +9,9 @@ import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
   Rxn<ProfileModel> profileModel = Rxn<ProfileModel>();
-  final userId = LocalStorageService.getUserId();
+
   Future<void> getProfile() async {
+    final userId = LocalStorageService.getUserId();
     try {
       final res = await BaseClient.get(
         api: "${EndPoint.fetchProfile}?userId=$userId",

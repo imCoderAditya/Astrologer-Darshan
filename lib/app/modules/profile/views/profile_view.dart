@@ -214,7 +214,7 @@ class ProfileView extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  text: profileData?.bio,
+                                  text: profileData?.bio ?? "",
                                   style: AppTextStyles.caption().copyWith(
                                     color: AppColors.white.withOpacity(0.8),
                                     fontSize: 10.sp,
@@ -361,7 +361,7 @@ class ProfileView extends StatelessWidget {
                               Icons.cake,
                               "Birth Date",
                               AppDateUtils.extractDate(
-                                profileData?.dateOfBirth,
+                                profileData?.dateOfBirth ?? "",
                                 5,
                               ),
                               textColor,

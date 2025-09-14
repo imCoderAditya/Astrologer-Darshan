@@ -1,4 +1,6 @@
 import 'package:astrology/app/core/config/theme/app_colors.dart';
+import 'package:astrology/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,6 +12,10 @@ import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
+   await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await GetStorage.init();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(

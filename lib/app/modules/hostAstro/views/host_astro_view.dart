@@ -28,7 +28,11 @@ class HostView extends GetView<HostController> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0xFF0A0E27), Color(0xFF1A1F3A), Color(0xFF2A2F4A)],
+                    colors: [
+                      Color(0xFF0A0E27),
+                      Color(0xFF1A1F3A),
+                      Color(0xFF2A2F4A),
+                    ],
                   ),
                 ),
               ),
@@ -84,10 +88,17 @@ class HostView extends GetView<HostController> {
             SizedBox(height: 24),
             Text(
               'Preparing live stream...',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             SizedBox(height: 8),
-            Text('Setting up your broadcast', style: TextStyle(color: Colors.white60, fontSize: 14)),
+            Text(
+              'Setting up your broadcast',
+              style: TextStyle(color: Colors.white60, fontSize: 14),
+            ),
           ],
         ),
       ),
@@ -99,7 +110,13 @@ class HostView extends GetView<HostController> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(0),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(0),
@@ -115,11 +132,19 @@ class HostView extends GetView<HostController> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.live_tv, color: Color(0xFFFF6B6B), size: 80),
+                        const Icon(
+                          Icons.live_tv,
+                          color: Color(0xFFFF6B6B),
+                          size: 80,
+                        ),
                         const SizedBox(height: 16),
                         const Text(
                           'Ready to go live?',
-                          style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         const Text(
@@ -130,11 +155,19 @@ class HostView extends GetView<HostController> {
                         ElevatedButton.icon(
                           onPressed: controller.startLive,
                           icon: const Icon(Icons.live_tv, color: Colors.white),
-                          label: const Text('Go Live', style: TextStyle(color: Colors.white, fontSize: 18)),
+                          label: const Text(
+                            'Go Live',
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFFF6B6B),
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25),
+                            ),
                           ),
                         ),
                       ],
@@ -158,7 +191,10 @@ class HostView extends GetView<HostController> {
         children: [
           // Back button
           Container(
-            decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), borderRadius: BorderRadius.circular(20)),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: IconButton(
               onPressed: () => _showEndLiveDialog(),
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -169,20 +205,33 @@ class HostView extends GetView<HostController> {
           if (controller.isRecording.value)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.fiber_manual_record, color: Colors.white, size: 8),
                   SizedBox(width: 4),
-                  Text('REC', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                  Text(
+                    'REC',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
 
           // Settings button
           Container(
-            decoration: BoxDecoration(color: Colors.black.withOpacity(0.3), borderRadius: BorderRadius.circular(20)),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: IconButton(
               onPressed: () => _showSettingsDialog(),
               icon: const Icon(Icons.settings, color: Colors.white),
@@ -218,10 +267,16 @@ class HostView extends GetView<HostController> {
 
             // Camera Toggle Button
             _buildControlButton(
-              icon: controller.isCameraOff.value ? Icons.videocam_off : Icons.videocam,
+              icon:
+                  controller.isCameraOff.value
+                      ? Icons.videocam_off
+                      : Icons.videocam,
               isActive: !controller.isCameraOff.value,
               onPressed: controller.toggleCamera,
-              tooltip: controller.isCameraOff.value ? 'Turn on camera' : 'Turn off camera',
+              tooltip:
+                  controller.isCameraOff.value
+                      ? 'Turn on camera'
+                      : 'Turn off camera',
             ),
 
             // End Live Button
@@ -229,12 +284,24 @@ class HostView extends GetView<HostController> {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: controller.isLive.value ? Colors.red : const Color(0xFFFF6B6B),
+                color:
+                    controller.isLive.value
+                        ? Colors.red
+                        : const Color(0xFFFF6B6B),
                 borderRadius: BorderRadius.circular(28),
-                boxShadow: [BoxShadow(color: Colors.red.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 4))],
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.red.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: IconButton(
-                onPressed: controller.isLive.value ? () => _showEndLiveDialog() : controller.startLive,
+                onPressed:
+                    controller.isLive.value
+                        ? () => _showEndLiveDialog()
+                        : controller.startLive,
                 icon: Icon(
                   controller.isLive.value ? Icons.stop : Icons.live_tv,
                   color: Colors.white,
@@ -282,18 +349,30 @@ class HostView extends GetView<HostController> {
 
           // Screen share button
           _buildSideButton(
-            icon: controller.isScreenSharing.value ? Icons.stop_screen_share : Icons.screen_share,
+            icon:
+                controller.isScreenSharing.value
+                    ? Icons.stop_screen_share
+                    : Icons.screen_share,
             onPressed: controller.toggleScreenShare,
-            tooltip: controller.isScreenSharing.value ? 'Stop sharing' : 'Share screen',
+            tooltip:
+                controller.isScreenSharing.value
+                    ? 'Stop sharing'
+                    : 'Share screen',
             isActive: controller.isScreenSharing.value,
           ),
           const SizedBox(height: 12),
 
           // Recording button
           _buildSideButton(
-            icon: controller.isRecording.value ? Icons.stop : Icons.radio_button_checked,
+            icon:
+                controller.isRecording.value
+                    ? Icons.stop
+                    : Icons.radio_button_checked,
             onPressed: controller.toggleRecording,
-            tooltip: controller.isRecording.value ? 'Stop recording' : 'Start recording',
+            tooltip:
+                controller.isRecording.value
+                    ? 'Stop recording'
+                    : 'Start recording',
             isActive: controller.isRecording.value,
           ),
           const SizedBox(height: 12),
@@ -317,7 +396,8 @@ class HostView extends GetView<HostController> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: controller.isLive.value ? const Color(0xFFFF6B6B) : Colors.grey,
+          color:
+              controller.isLive.value ? const Color(0xFFFF6B6B) : Colors.grey,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.2)),
         ),
@@ -325,13 +405,25 @@ class HostView extends GetView<HostController> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (controller.isLive.value)
-              const Icon(Icons.fiber_manual_record, color: Colors.white, size: 14)
+              const Icon(
+                Icons.fiber_manual_record,
+                color: Colors.white,
+                size: 14,
+              )
             else
-              const Icon(Icons.radio_button_unchecked, color: Colors.white, size: 14),
+              const Icon(
+                Icons.radio_button_unchecked,
+                color: Colors.white,
+                size: 14,
+              ),
             const SizedBox(width: 6),
             Text(
               controller.isLive.value ? 'LIVE' : 'OFFLINE',
-              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -345,7 +437,10 @@ class HostView extends GetView<HostController> {
       left: 16,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -354,7 +449,11 @@ class HostView extends GetView<HostController> {
             Obx(
               () => Text(
                 controller.liveDuration.value,
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -369,7 +468,10 @@ class HostView extends GetView<HostController> {
       left: 16,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(color: Colors.black.withOpacity(0.6), borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -399,13 +501,25 @@ class HostView extends GetView<HostController> {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFFF6B6B) : Colors.white.withOpacity(0.2),
+          color:
+              isActive
+                  ? const Color(0xFFFF6B6B)
+                  : Colors.white.withOpacity(0.2),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: isActive ? const Color(0xFFFF6B6B) : Colors.white.withOpacity(0.3)),
+          border: Border.all(
+            color:
+                isActive
+                    ? const Color(0xFFFF6B6B)
+                    : Colors.white.withOpacity(0.3),
+          ),
         ),
         child: IconButton(
           onPressed: onPressed,
-          icon: Icon(icon, color: isActive ? Colors.white : Colors.white70, size: 24),
+          icon: Icon(
+            icon,
+            color: isActive ? Colors.white : Colors.white70,
+            size: 24,
+          ),
         ),
       ),
     );
@@ -423,11 +537,17 @@ class HostView extends GetView<HostController> {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFFF6B6B) : Colors.black.withOpacity(0.6),
+          color:
+              isActive
+                  ? const Color(0xFFFF6B6B)
+                  : Colors.black.withOpacity(0.6),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: Colors.white.withOpacity(0.2)),
         ),
-        child: IconButton(onPressed: onPressed, icon: Icon(icon, color: Colors.white, size: 20)),
+        child: IconButton(
+          onPressed: onPressed,
+          icon: Icon(icon, color: Colors.white, size: 20),
+        ),
       ),
     );
   }
@@ -436,18 +556,26 @@ class HostView extends GetView<HostController> {
     Get.dialog(
       AlertDialog(
         backgroundColor: const Color(0xFF1A1F3A),
-        title: const Text('End Live Stream', style: TextStyle(color: Colors.white)),
-        content: const Text('Are you sure you want to end your live stream?', style: TextStyle(color: Colors.white70)),
+        title: const Text(
+          'End Live Stream',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'Are you sure you want to end your live stream?',
+          style: TextStyle(color: Colors.white70),
+        ),
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Get.back();
-              controller.stopLive();
-              Get.back();
+              await controller.endLiveStram();
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('End Live', style: TextStyle(color: Colors.white)),
+            child: const Text(
+              'End Live',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -468,14 +596,32 @@ class HostView extends GetView<HostController> {
               width: 40,
               height: 4,
               margin: const EdgeInsets.only(top: 12),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
             const Padding(
               padding: EdgeInsets.all(20),
-              child: Text('Live Settings', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+              child: Text(
+                'Live Settings',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            _buildSettingsItem('Video Quality', Icons.hd, () => _showVideoQualityDialog()),
-            _buildSettingsItem('Audio Settings', Icons.volume_up, () => _showAudioSettingsDialog()),
+            _buildSettingsItem(
+              'Video Quality',
+              Icons.hd,
+              () => _showVideoQualityDialog(),
+            ),
+            _buildSettingsItem(
+              'Audio Settings',
+              Icons.volume_up,
+              () => _showAudioSettingsDialog(),
+            ),
             // _buildSettingsItem('Network Info', Icons.network_check, () => controller.runNetworkTest()),
             _buildSettingsItem('Help & Support', Icons.help, () {}),
             const SizedBox(height: 20),
@@ -508,22 +654,41 @@ class HostView extends GetView<HostController> {
               width: 40,
               height: 4,
               margin: const EdgeInsets.only(top: 12),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
             const Padding(
               padding: EdgeInsets.all(20),
               child: Text(
                 'More Options',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            _buildSettingsItem('Beauty Filter', Icons.face_retouching_natural, () {
-              controller.toggleBeautyFilter();
-            }),
-            _buildSettingsItem('Noise Suppression', Icons.noise_control_off, () {
-              controller.toggleNoiseSuppression();
-            }),
-            _buildSettingsItem('Voice Effects', Icons.record_voice_over, () => _showVoiceEffectsDialog()),
+            _buildSettingsItem(
+              'Beauty Filter',
+              Icons.face_retouching_natural,
+              () {
+                controller.toggleBeautyFilter();
+              },
+            ),
+            _buildSettingsItem(
+              'Noise Suppression',
+              Icons.noise_control_off,
+              () {
+                controller.toggleNoiseSuppression();
+              },
+            ),
+            _buildSettingsItem(
+              'Voice Effects',
+              Icons.record_voice_over,
+              () => _showVoiceEffectsDialog(),
+            ),
             _buildSettingsItem('Virtual Background', Icons.image, () {
               controller.toggleVirtualBackground();
             }),
@@ -539,7 +704,10 @@ class HostView extends GetView<HostController> {
     Get.dialog(
       AlertDialog(
         backgroundColor: const Color(0xFF1A1F3A),
-        title: const Text('Video Quality', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Video Quality',
+          style: TextStyle(color: Colors.white),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -556,18 +724,20 @@ class HostView extends GetView<HostController> {
   }
 
   Widget _buildQualityOption(String title, String value) {
-    return Obx(() => RadioListTile<String>(
-      title: Text(title, style: const TextStyle(color: Colors.white)),
-      value: value,
-      groupValue: controller.videoResolution.value,
-      onChanged: (String? newValue) {
-        if (newValue != null) {
-          controller.setVideoResolution(newValue);
-          Get.back();
-        }
-      },
-      activeColor: const Color(0xFFFF6B6B),
-    ));
+    return Obx(
+      () => RadioListTile<String>(
+        title: Text(title, style: const TextStyle(color: Colors.white)),
+        value: value,
+        groupValue: controller.videoResolution.value,
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            controller.setVideoResolution(newValue);
+            Get.back();
+          }
+        },
+        activeColor: const Color(0xFFFF6B6B),
+      ),
+    );
   }
 
   void _showAudioSettingsDialog() {
@@ -575,20 +745,25 @@ class HostView extends GetView<HostController> {
     Get.dialog(
       AlertDialog(
         backgroundColor: const Color(0xFF1A1F3A),
-        title: const Text('Audio Settings', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Audio Settings',
+          style: TextStyle(color: Colors.white),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Audio Volume', style: TextStyle(color: Colors.white)),
-            Obx(() => Slider(
-              value: controller.audioVolume.value.toDouble(),
-              min: 0,
-              max: 100,
-              divisions: 10,
-              label: '${controller.audioVolume.value}%',
-              activeColor: const Color(0xFFFF6B6B),
-              onChanged: (double value) => controller.setAudioVolume(value),
-            )),
+            Obx(
+              () => Slider(
+                value: controller.audioVolume.value.toDouble(),
+                min: 0,
+                max: 100,
+                divisions: 10,
+                label: '${controller.audioVolume.value}%',
+                activeColor: const Color(0xFFFF6B6B),
+                onChanged: (double value) => controller.setAudioVolume(value),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -613,16 +788,38 @@ class HostView extends GetView<HostController> {
               width: 40,
               height: 4,
               margin: const EdgeInsets.only(top: 12),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
             const Padding(
               padding: EdgeInsets.all(20),
-              child: Text('Voice Effects', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
+              child: Text(
+                'Voice Effects',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            _buildVoiceEffectItem('None', VoiceBeautifierPreset.voiceBeautifierOff),
-            _buildVoiceEffectItem('Magnetic', VoiceBeautifierPreset.chatBeautifierMagnetic),
-            _buildVoiceEffectItem('Fresh', VoiceBeautifierPreset.chatBeautifierFresh),
-            _buildVoiceEffectItem('Vitality', VoiceBeautifierPreset.chatBeautifierVitality),
+            _buildVoiceEffectItem(
+              'None',
+              VoiceBeautifierPreset.voiceBeautifierOff,
+            ),
+            _buildVoiceEffectItem(
+              'Magnetic',
+              VoiceBeautifierPreset.chatBeautifierMagnetic,
+            ),
+            _buildVoiceEffectItem(
+              'Fresh',
+              VoiceBeautifierPreset.chatBeautifierFresh,
+            ),
+            _buildVoiceEffectItem(
+              'Vitality',
+              VoiceBeautifierPreset.chatBeautifierVitality,
+            ),
             const SizedBox(height: 20),
           ],
         ),

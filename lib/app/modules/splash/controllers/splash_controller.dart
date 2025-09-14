@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/routes/app_pages.dart';
+import 'package:astrology/app/services/firebase/firebase_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,6 +30,7 @@ class SplashController extends GetxController
   @override
   void onInit() {
     super.onInit();
+    FirebaseServices.firebaseToken();
     _initializeAnimations();
     _startSplashSequence();
   }

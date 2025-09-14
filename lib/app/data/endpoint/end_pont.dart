@@ -15,4 +15,6 @@ class EndPoint {
   static const astrologerWallet = "$baseurl/Wallet/Astrologer_Wallet";
   // Notification 
   static const notifiaction = "$baseurl/Notification/GetUnread";
+  //LiveSession/UpdateStatus
+  static const liveSessionUpdateStatus = "$baseurl/LiveSession/UpdateStatus";
 }

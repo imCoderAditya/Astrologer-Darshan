@@ -82,5 +82,14 @@
 <key>NSDocumentsFolderUsageDescription</key>
 <string>This app stores prescription documents in your device storage.</string>
 
+<key>UIBackgroundModes</key>
+<array>
+  <string>remote-notification</string>
+</array>
+
+<key>FirebaseAppDelegateProxyEnabled</key>
+<true/>
+
+
 </dict>
 </plist>
