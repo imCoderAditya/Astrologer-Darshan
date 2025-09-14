@@ -1,7 +1,7 @@
 class StorageKeys {
   static const String isDarkMode = 'isDarkMode';
   static const String userId = 'userId';
-  static const String userPatientId = 'userPatientId';
+  static const String userAstrologerId = 'userAstrologerId';
   static const String isLoggedIn = 'isLoggedIn';
   static const String userName = 'userName';
   static const String onboardingSeen = 'onboardingSeen';

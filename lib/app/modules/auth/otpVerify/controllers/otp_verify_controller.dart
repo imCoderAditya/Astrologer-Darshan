@@ -96,8 +96,10 @@ class OtpVerifyController extends GetxController {
         log(json.encode(otpVerifyModel.value));
         if (otpVerifyModel.value?.status == true) {
           final userId = otpVerifyModel.value?.user?.userId.toString() ?? "";
-          LocalStorageService.saveLogin(userId: userId);
+          final astrologerId = otpVerifyModel.value?.user?.astrologerId;
+          LocalStorageService.saveLogin(userId: userId,userAstrologerId: astrologerId);
           debugPrint("UserId ===>$userId");
+          debugPrint("UserId ===>$astrologerId");
           Get.offAllNamed(Routes.NAV);
         }
       } else {

@@ -56,6 +56,8 @@ class User {
     final String? placeOfBirth;
     final String? timeOfBirth;
     final String? fcm;
+    final int? astrologerId;
+    final dynamic customerId;
 
     User({
         this.userId,
@@ -70,6 +72,8 @@ class User {
         this.placeOfBirth,
         this.timeOfBirth,
         this.fcm,
+        this.astrologerId,
+        this.customerId,
     });
 
     User copyWith({
@@ -85,6 +89,8 @@ class User {
         String? placeOfBirth,
         String? timeOfBirth,
         String? fcm,
+        int? astrologerId,
+        dynamic customerId,
     }) => 
         User(
             userId: userId ?? this.userId,
@@ -99,6 +105,8 @@ class User {
             placeOfBirth: placeOfBirth ?? this.placeOfBirth,
             timeOfBirth: timeOfBirth ?? this.timeOfBirth,
             fcm: fcm ?? this.fcm,
+            astrologerId: astrologerId ?? this.astrologerId,
+            customerId: customerId ?? this.customerId,
         );
 
     factory User.fromJson(Map<String, dynamic> json) => User(
@@ -114,6 +122,8 @@ class User {
         placeOfBirth: json["PlaceOfBirth"],
         timeOfBirth: json["TimeOfBirth"],
         fcm: json["fcm"],
+        astrologerId: json["AstrologerID"],
+        customerId: json["CustomerID"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -129,5 +139,7 @@ class User {
         "PlaceOfBirth": placeOfBirth,
         "TimeOfBirth": timeOfBirth,
         "fcm": fcm,
+        "AstrologerID": astrologerId,
+        "CustomerID": customerId,
     };
 }

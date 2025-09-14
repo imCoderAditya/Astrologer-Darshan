@@ -8,13 +8,14 @@ class AppTheme {
     primaryColor: AppColors.primaryColor,
     scaffoldBackgroundColor: AppColors.lightBackground,
     appBarTheme: const AppBarTheme(
+
       surfaceTintColor: Colors.transparent,
       backgroundColor: AppColors.lightBackground,
       elevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
-      iconTheme: IconThemeData(color: AppColors.lightTextPrimary,),
+      iconTheme: IconThemeData(color: AppColors.lightBackground,),
       titleTextStyle: TextStyle(
-        color: AppColors.lightTextPrimary,
+        color: AppColors.lightBackground,
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),

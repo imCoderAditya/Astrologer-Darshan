@@ -40,15 +40,9 @@ class HomeView extends StatelessWidget {
           Stack(
             children: [
               IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.chat_bubble_outline, color: AppColors.white),
-              ),
-            ],
-          ),
-          Stack(
-            children: [
-              IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Get.toNamed(Routes.NOTIFICATION);
+                },
                 icon: Icon(Icons.notifications_none, color: AppColors.white),
               ),
               Positioned(
@@ -71,21 +65,6 @@ class HomeView extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          Container(
-            margin: EdgeInsets.all(8),
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              "₹ 582",
-              style: AppTextStyles.body().copyWith(
-                color: AppColors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
           ),
         ],
       ),
@@ -169,6 +148,7 @@ class HomeView extends StatelessWidget {
                   textColor: textColor,
                   isDark: isDark,
                 ),
+
                 _buildServiceCard(
                   onTap: () {
                     userRequestController.fetchUserRequest(sessionType: "Call");
@@ -182,13 +162,25 @@ class HomeView extends StatelessWidget {
                   isDark: isDark,
                 ),
                 _buildServiceCard(
-                  icon: Icons.assignment,
-                  title: "Report Request",
-                  color: AppColors.accentColor,
+                  onTap: () {
+                    // userRequestController.fetchUserRequest(sessionType: "Call");
+                    Get.toNamed(Routes.HOST_ASTRO);
+                  },
+                  icon: Icons.live_tv,
+                  title: "Go Live",
+                  color: AppColors.red,
                   cardColor: cardColor,
                   textColor: textColor,
                   isDark: isDark,
                 ),
+                // _buildServiceCard(
+                //   icon: Icons.assignment,
+                //   title: "Report Request",
+                //   color: AppColors.accentColor,
+                //   cardColor: cardColor,
+                //   textColor: textColor,
+                //   isDark: isDark,
+                // ),
                 _buildServiceCard(
                   icon: Icons.wb_sunny_outlined,
                   title: "Daily Horoscope",
@@ -213,30 +205,30 @@ class HomeView extends StatelessWidget {
                   textColor: textColor,
                   isDark: isDark,
                 ),
-                _buildServiceCard(
-                  icon: Icons.temple_hindu,
-                  title: "My Puja",
-                  color: AppColors.secondaryPrimary,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
-                _buildServiceCard(
-                  icon: Icons.play_circle_outline,
-                  title: "Get Course",
-                  color: AppColors.red,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
-                _buildServiceCard(
-                  icon: Icons.school_outlined,
-                  title: "My Courses",
-                  color: AppColors.primaryColor,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
+                // _buildServiceCard(
+                //   icon: Icons.temple_hindu,
+                //   title: "My Puja",
+                //   color: AppColors.secondaryPrimary,
+                //   cardColor: cardColor,
+                //   textColor: textColor,
+                //   isDark: isDark,
+                // ),
+                // _buildServiceCard(
+                //   icon: Icons.play_circle_outline,
+                //   title: "Get Course",
+                //   color: AppColors.red,
+                //   cardColor: cardColor,
+                //   textColor: textColor,
+                //   isDark: isDark,
+                // ),
+                // _buildServiceCard(
+                //   icon: Icons.school_outlined,
+                //   title: "My Courses",
+                //   color: AppColors.primaryColor,
+                //   cardColor: cardColor,
+                //   textColor: textColor,
+                //   isDark: isDark,
+                // ),
                 _buildServiceCard(
                   icon: Icons.people_outline,
                   title: "My Followers",
@@ -245,15 +237,19 @@ class HomeView extends StatelessWidget {
                   textColor: textColor,
                   isDark: isDark,
                 ),
+                // _buildServiceCard(
+                //   icon: Icons.inventory_2_outlined,
+                //   title: "Products",
+                //   color: AppColors.sucessPrimary,
+                //   cardColor: cardColor,
+                //   textColor: textColor,
+                //   isDark: isDark,
+                // ),
                 _buildServiceCard(
-                  icon: Icons.inventory_2_outlined,
-                  title: "Products",
-                  color: AppColors.sucessPrimary,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
-                _buildServiceCard(
+                  onTap: () {
+                    // userRequestController.fetchUserRequest(sessionType: "Call");
+                    Get.toNamed(Routes.WALLET);
+                  },
                   icon: Icons.account_balance_wallet_outlined,
                   title: "Wallet Transactions",
                   color: AppColors.primaryColor,
@@ -261,34 +257,23 @@ class HomeView extends StatelessWidget {
                   textColor: textColor,
                   isDark: isDark,
                 ),
-                _buildServiceCard(
-                  onTap: () {
-                    // userRequestController.fetchUserRequest(sessionType: "Call");
-                    Get.toNamed(Routes.HOST_ASTRO);
-                  },
-                  icon: Icons.live_tv,
-                  title: "Go Live",
-                  color: AppColors.red,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
-                _buildServiceCard(
-                  icon: Icons.history,
-                  title: "History",
-                  color: AppColors.primaryColor,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
-                _buildServiceCard(
-                  icon: Icons.rate_review_outlined,
-                  title: "Customer Review",
-                  color: AppColors.accentColor,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
+
+                // _buildServiceCard(
+                //   icon: Icons.history,
+                //   title: "History",
+                //   color: AppColors.primaryColor,
+                //   cardColor: cardColor,
+                //   textColor: textColor,
+                //   isDark: isDark,
+                // ),
+                // _buildServiceCard(
+                //   icon: Icons.rate_review_outlined,
+                //   title: "Customer Review",
+                //   color: AppColors.accentColor,
+                //   cardColor: cardColor,
+                //   textColor: textColor,
+                //   isDark: isDark,
+                // ),
               ],
             ),
 

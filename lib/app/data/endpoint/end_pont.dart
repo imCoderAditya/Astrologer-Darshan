@@ -10,4 +10,9 @@ class EndPoint {
   static const otpVerify = "$baseurl/Login/LoginUser";
   static const fetchProfile = "$baseurl/Profile/UserProfile";
   static const goLive = "$baseurl/LiveSession/Create";
+
+  //Wallet Astrologer
+  static const astrologerWallet = "$baseurl/Wallet/Astrologer_Wallet";
+  // Notification 
+  static const notifiaction = "$baseurl/Notification/GetUnread";
 }

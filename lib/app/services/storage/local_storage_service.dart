@@ -31,15 +31,21 @@ class LocalStorageService {
   static bool isLoggedIn() => read<bool>(StorageKeys.isLoggedIn) ?? false;
 
   static String? getUserId() => read<String>(StorageKeys.userId);
+  static int? getAstrologerId() =>
+      read<int>(StorageKeys.userAstrologerId);
 
-  static Future<void> saveLogin({required String userId}) async {
+  static Future<void> saveLogin({
+    required String userId,
+    int? userAstrologerId,
+  }) async {
     await write(StorageKeys.userId, userId);
+    await write(StorageKeys.userAstrologerId, userAstrologerId);
     await write(StorageKeys.isLoggedIn, true);
   }
 
   static Future<void> logout() async {
     await remove(StorageKeys.userId);
+    await remove(StorageKeys.userAstrologerId);
     await write(StorageKeys.isLoggedIn, false);
-   
   }
 }

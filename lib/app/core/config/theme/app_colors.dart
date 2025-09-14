@@ -33,6 +33,7 @@ class AppColors {
   static const Color red = Color.fromARGB(255, 252, 2, 2);
   static const Color white = Colors.white;
   static const Color black = Colors.black;
+  static const Color yellow = Colors.yellow;
 
   // Dark Mode Colors
   static const Color backgroundDark = Color(0xFF121212);
