@@ -10,6 +10,7 @@ import 'package:astrology/app/services/firebase/firebase_services.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:astrology/components/Global_toast.dart';
 import 'package:astrology/components/global_loader.dart';
+import 'package:astrology/components/snack_bar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -110,6 +111,9 @@ class OtpVerifyController extends GetxController {
           debugPrint("UserId ===>$userId");
           debugPrint("UserId ===>$astrologerId");
           Get.offAllNamed(Routes.NAV);
+        } else {
+          SnackBarUiView.showError(message: response.data["message"] ?? "");
+          errorMessage.value = response.data["message"] ?? "";
         }
       } else {
         errorMessage.value = 'Invalid verification code. Please try again.';

@@ -5,7 +5,6 @@ import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/data/endpoint/end_pont.dart';
 import 'package:astrology/app/routes/app_pages.dart';
 import 'package:astrology/app/services/firebase/firebase_services.dart';
-import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:astrology/components/snack_bar_view.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -116,11 +115,11 @@ class SignController extends GetxController {
         LoggerUtils.error("Register :- ${res.data}");
         final userId = res.data["userId"].toString();
         final astrologerId = res.data["astrologerId"];
-        LocalStorageService.saveLogin(
-          userId: userId,
-          userAstrologerId: astrologerId,
-        );
-        Get.offAllNamed(Routes.NAV);
+        // LocalStorageService.saveLogin(
+        //   userId: userId,
+        //   userAstrologerId: astrologerId,
+        // );
+        Get.offNamed(Routes.LOGIN);
         debugPrint("UserId ===>$userId");
         debugPrint("UserId ===>$astrologerId");
       } else {

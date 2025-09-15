@@ -3,7 +3,11 @@
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/core/config/theme/theme_controller.dart';
+import 'package:astrology/app/modules/profile/controllers/profile_controller.dart';
+import 'package:astrology/app/routes/app_pages.dart';
+import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
 // --- DrawerController (unchanged, but good to include for completeness) ---
@@ -11,11 +15,31 @@ class DrawerController extends GetxController {
   var selectedIndex = 0.obs;
 
   final List<DrawerItem> drawerItems = [
-    DrawerItem(icon: Icons.space_dashboard_outlined, title: "Dashboard", route: "/dashboard"),
-    DrawerItem(icon: Icons.calendar_today_outlined, title: "My Readings", route: "/readings"),
-    DrawerItem(icon: Icons.article_outlined, title: "Saved Articles", route: "/articles"),
-    DrawerItem(icon: Icons.groups_outlined, title: "Consult Experts", route: "/experts"),
-    DrawerItem(icon: Icons.settings_input_component_outlined, title: "Settings", route: "/settings"),
+    DrawerItem(
+      icon: Icons.space_dashboard_outlined,
+      title: "Dashboard",
+      route: "/dashboard",
+    ),
+    // DrawerItem(
+    //   icon: Icons.calendar_today_outlined,
+    //   title: "My Readings",
+    //   route: "/readings",
+    // ),
+    // DrawerItem(
+    //   icon: Icons.article_outlined,
+    //   title: "Saved Articles",
+    //   route: "/articles",
+    // ),
+    // DrawerItem(
+    //   icon: Icons.groups_outlined,
+    //   title: "Consult Experts",
+    //   route: "/experts",
+    // ),
+    // DrawerItem(
+    //   icon: Icons.settings_input_component_outlined,
+    //   title: "Settings",
+    //   route: "/settings",
+    // ),
   ];
 
   void selectItem(int index) {
@@ -23,6 +47,11 @@ class DrawerController extends GetxController {
     // You might want to navigate here as well, or keep it in _onItemTap
   }
 }
+
+final profileController =
+    Get.isRegistered<ProfileController>()
+        ? Get.find<ProfileController>()
+        : Get.put(ProfileController());
 
 class DrawerItem {
   final IconData icon;
@@ -44,24 +73,36 @@ class AppDrawer extends StatelessWidget {
 
     return Obx(() {
       final isDark = themeController.isDarkMode.value;
-      final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
-      final textColor = isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-      final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+      final bgColor =
+          isDark ? AppColors.darkBackground : AppColors.lightBackground;
+      final textColor =
+          isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+      final secondaryColor =
+          isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
       // Adjusted highlight color logic for better contrast in both themes
       final highlightColor =
-          isDark ? AppColors.primaryColor.withOpacity(0.35) : AppColors.primaryColor.withOpacity(0.18);
+          isDark
+              ? AppColors.primaryColor.withOpacity(0.35)
+              : AppColors.primaryColor.withOpacity(0.18);
 
-      final highlightTextColor = isDark ? AppColors.white : AppColors.primaryColor;
+      final highlightTextColor =
+          isDark ? AppColors.white : AppColors.primaryColor;
 
       return Drawer(
-        clipBehavior: Clip.none, // Keep this if you want overflow outside the drawer boundary
+        clipBehavior:
+            Clip.none, // Keep this if you want overflow outside the drawer boundary
         backgroundColor: bgColor,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topRight: Radius.circular(25), bottomRight: Radius.circular(25)),
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(30),
+            // bottomRight: Radius.circular(20),
+          ),
         ),
         elevation: 16, // Added elevation to the drawer itself
-        shadowColor: AppColors.primaryColor.withOpacity(0.3), // Shadow color for the drawer
+        shadowColor: AppColors.primaryColor.withOpacity(
+          0.3,
+        ), // Shadow color for the drawer
         child: SingleChildScrollView(
           // <--- Main scrollable content
           child: Column(
@@ -72,7 +113,12 @@ class AppDrawer extends StatelessWidget {
               // Branded App Name with Animation
               _buildBrandSection(highlightTextColor),
 
-              const Divider(thickness: 1, indent: 25, endIndent: 25, height: 30),
+              const Divider(
+                thickness: 1,
+                indent: 25,
+                endIndent: 25,
+                height: 30,
+              ),
 
               // Main Navigation Section
               _buildSectionHeader("Main Navigation", textColor),
@@ -94,12 +140,24 @@ class AppDrawer extends StatelessWidget {
                 },
               ),
 
-              const Divider(thickness: 1, indent: 25, endIndent: 25, height: 30),
+              const Divider(
+                thickness: 1,
+                indent: 25,
+                endIndent: 25,
+                height: 30,
+              ),
 
               // Theme Toggle (moved out of _buildAnimatedNavItem as it's a special case)
-              _buildThemeToggle(themeController, textColor, highlightColor, highlightTextColor, secondaryColor, isDark),
+              SizedBox(height: 150.h),
+              _buildThemeToggle(
+                themeController,
+                textColor,
+                highlightColor,
+                highlightTextColor,
+                secondaryColor,
+                isDark,
+              ),
 
-              // Logout and Footer
               _buildFooterSection(context, textColor, secondaryColor, isDark),
             ],
           ),
@@ -111,6 +169,7 @@ class AppDrawer extends StatelessWidget {
   // --- Helper Widgets (Refined) ---
 
   Widget _buildGradientHeader(bool isDark, Color highlightTextColor) {
+    final profile = profileController.profileModel.value?.data;
     return Container(
       padding: const EdgeInsets.fromLTRB(25, 80, 20, 35),
       decoration: BoxDecoration(
@@ -120,14 +179,21 @@ class AppDrawer extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         boxShadow: [
-          BoxShadow(color: AppColors.primaryColor.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: AppColors.primaryColor.withOpacity(0.4),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Row(
         children: [
           // Enhanced Avatar with Pulse Animation
           TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0.0, end: 1.0), // Start from 0 to avoid initial overshooting scale
+            tween: Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ), // Start from 0 to avoid initial overshooting scale
             duration: const Duration(milliseconds: 1200),
             curve: Curves.elasticOut,
             builder: (context, value, child) {
@@ -140,7 +206,9 @@ class AppDrawer extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.accentColor.withOpacity(value.clamp(0.0, 1.0)), // Clamping here
+                        color: AppColors.accentColor.withOpacity(
+                          value.clamp(0.0, 1.0),
+                        ), // Clamping here
                         blurRadius: 20.0 * value,
                         spreadRadius: 4.0 * value,
                       ),
@@ -150,14 +218,23 @@ class AppDrawer extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 3),
-                      gradient: RadialGradient(colors: [Colors.white, Colors.white.withOpacity(0.8)]),
+                      gradient: RadialGradient(
+                        colors: [Colors.white, Colors.white.withOpacity(0.8)],
+                      ),
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 38,
                       backgroundColor: Colors.transparent,
                       child: CircleAvatar(
                         radius: 35,
-                        backgroundImage: NetworkImage('https://i.pravatar.cc/300?img=68'),
+                        backgroundImage: NetworkImage(
+                          profileController
+                                  .profileModel
+                                  .value
+                                  ?.data
+                                  ?.profilePicture ??
+                              "",
+                        ),
                       ),
                     ),
                   ),
@@ -180,7 +257,7 @@ class AppDrawer extends StatelessWidget {
                       child: Opacity(
                         opacity: value.clamp(0.0, 1.0), // Clamp opacity here
                         child: Text(
-                          "Sharthak Sharma",
+                          "${profile?.firstName ?? ""} ${profile?.lastName ?? ""}",
                           style: AppTextStyles.headlineMedium().copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -188,7 +265,9 @@ class AppDrawer extends StatelessWidget {
                             shadows: [
                               Shadow(
                                 blurRadius: 4.0,
-                                color: Colors.black.withOpacity(0.5), // No clamp needed here
+                                color: Colors.black.withOpacity(
+                                  0.5,
+                                ), // No clamp needed here
                                 offset: const Offset(1, 2),
                               ),
                             ],
@@ -209,9 +288,11 @@ class AppDrawer extends StatelessWidget {
                       child: Opacity(
                         opacity: value.clamp(0.0, 1.0), // Clamp opacity here
                         child: Text(
-                          "sharthak.j@example.com",
+                          profile?.email ?? "",
                           style: AppTextStyles.caption().copyWith(
-                            color: Colors.white.withOpacity(0.9), // No clamp needed here
+                            color: Colors.white.withOpacity(
+                              0.9,
+                            ), // No clamp needed here
                             fontSize: 14,
                           ),
                         ),
@@ -245,10 +326,16 @@ class AppDrawer extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: highlightTextColor.withOpacity(0.1), // No clamp needed here
+                      color: highlightTextColor.withOpacity(
+                        0.1,
+                      ), // No clamp needed here
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(Icons.auto_awesome, color: highlightTextColor, size: 24),
+                    child: Icon(
+                      Icons.auto_awesome,
+                      color: highlightTextColor,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -299,7 +386,9 @@ class AppDrawer extends StatelessWidget {
   }) {
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0), // Start from 0
-      duration: Duration(milliseconds: 300 + (index * 70)), // Slightly adjusted duration for cascade effect
+      duration: Duration(
+        milliseconds: 300 + (index * 70),
+      ), // Slightly adjusted duration for cascade effect
       curve: Curves.easeOutBack,
       builder: (context, value, child) {
         return Transform.translate(
@@ -315,7 +404,10 @@ class AppDrawer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border:
                     isSelected
-                        ? Border.all(color: highlightTextColor.withOpacity(0.3), width: 1) // No clamp needed here
+                        ? Border.all(
+                          color: highlightTextColor.withOpacity(0.3),
+                          width: 1,
+                        ) // No clamp needed here
                         : null,
                 boxShadow:
                     isSelected
@@ -323,8 +415,12 @@ class AppDrawer extends StatelessWidget {
                           BoxShadow(
                             color:
                                 isDark
-                                    ? highlightColor.withOpacity(0.6) // No clamp needed here
-                                    : highlightColor.withOpacity(0.2), // No clamp needed here
+                                    ? highlightColor.withOpacity(
+                                      0.6,
+                                    ) // No clamp needed here
+                                    : highlightColor.withOpacity(
+                                      0.2,
+                                    ), // No clamp needed here
                             blurRadius: 15,
                             spreadRadius: 1,
                             offset: const Offset(0, 6),
@@ -337,10 +433,17 @@ class AppDrawer extends StatelessWidget {
                 child: InkWell(
                   onTap: onTap,
                   borderRadius: BorderRadius.circular(16),
-                  splashColor: highlightColor.withOpacity(0.3), // No clamp needed here
-                  highlightColor: highlightColor.withOpacity(0.1), // No clamp needed here
+                  splashColor: highlightColor.withOpacity(
+                    0.3,
+                  ), // No clamp needed here
+                  highlightColor: highlightColor.withOpacity(
+                    0.1,
+                  ), // No clamp needed here
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Row(
                       children: [
                         AnimatedContainer(
@@ -349,13 +452,18 @@ class AppDrawer extends StatelessWidget {
                           decoration: BoxDecoration(
                             color:
                                 isSelected
-                                    ? highlightTextColor.withOpacity(0.15) // No clamp needed here
+                                    ? highlightTextColor.withOpacity(
+                                      0.15,
+                                    ) // No clamp needed here
                                     : Colors.transparent,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
                             item.icon,
-                            color: isSelected ? highlightTextColor : AppColors.accentColor,
+                            color:
+                                isSelected
+                                    ? highlightTextColor
+                                    : AppColors.accentColor,
                             size: 24,
                           ),
                         ),
@@ -364,8 +472,12 @@ class AppDrawer extends StatelessWidget {
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             style: AppTextStyles.body().copyWith(
-                              color: isSelected ? highlightTextColor : textColor,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color:
+                                  isSelected ? highlightTextColor : textColor,
+                              fontWeight:
+                                  isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                               fontSize: 16,
                             ),
                             child: Text(item.title),
@@ -378,10 +490,16 @@ class AppDrawer extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: highlightTextColor.withOpacity(0.2), // No clamp needed here
+                                color: highlightTextColor.withOpacity(
+                                  0.2,
+                                ), // No clamp needed here
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: Icon(Icons.check, color: highlightTextColor, size: 16),
+                              child: Icon(
+                                Icons.check,
+                                color: highlightTextColor,
+                                size: 16,
+                              ),
                             ),
                           ),
                       ],
@@ -418,9 +536,13 @@ class AppDrawer extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Icon(
-                    isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                    isDark
+                        ? Icons.light_mode_outlined
+                        : Icons.dark_mode_outlined,
                     color: AppColors.accentColor,
                     size: 24,
                   ),
@@ -429,7 +551,11 @@ class AppDrawer extends StatelessWidget {
                 Expanded(
                   child: Text(
                     "Dark Mode",
-                    style: AppTextStyles.body().copyWith(color: textColor, fontWeight: FontWeight.w500, fontSize: 16),
+                    style: AppTextStyles.body().copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 AnimatedContainer(
@@ -438,15 +564,26 @@ class AppDrawer extends StatelessWidget {
                   height: 28,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
-                    color: isDark ? AppColors.accentColor : secondaryColor.withOpacity(0.3), // No clamp needed here
+                    color:
+                        isDark
+                            ? AppColors.accentColor
+                            : secondaryColor.withOpacity(
+                              0.3,
+                            ), // No clamp needed here
                     border: Border.all(
-                      color: isDark ? AppColors.accentColor : secondaryColor.withOpacity(0.5), // No clamp needed here
+                      color:
+                          isDark
+                              ? AppColors.accentColor
+                              : secondaryColor.withOpacity(
+                                0.5,
+                              ), // No clamp needed here
                       width: 1,
                     ),
                   ),
                   child: AnimatedAlign(
                     duration: const Duration(milliseconds: 300),
-                    alignment: isDark ? Alignment.centerRight : Alignment.centerLeft,
+                    alignment:
+                        isDark ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
                       width: 24,
                       height: 24,
@@ -456,7 +593,9 @@ class AppDrawer extends StatelessWidget {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2), // No clamp needed here
+                            color: Colors.black.withOpacity(
+                              0.2,
+                            ), // No clamp needed here
                             blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
@@ -478,12 +617,16 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildFooterSection(BuildContext context, Color textColor, Color secondaryColor, bool isDark) {
+  Widget _buildFooterSection(
+    BuildContext context,
+    Color textColor,
+    Color secondaryColor,
+    bool isDark,
+  ) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Column(
         children: [
-          const SizedBox(height: 20),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 4),
             decoration: BoxDecoration(
@@ -496,16 +639,31 @@ class AppDrawer extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () => _confirmLogout(context, textColor, secondaryColor, isDark),
+                onTap:
+                    () => _confirmLogout(
+                      context,
+                      textColor,
+                      secondaryColor,
+                      isDark,
+                    ),
                 borderRadius: BorderRadius.circular(16),
-                splashColor: AppColors.red.withOpacity(0.1), // No clamp needed here
+                splashColor: AppColors.red.withOpacity(
+                  0.1,
+                ), // No clamp needed here
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(2),
-                        child: Icon(Icons.logout_rounded, color: AppColors.red, size: 24),
+                        child: Icon(
+                          Icons.logout_rounded,
+                          color: AppColors.red,
+                          size: 24,
+                        ),
                       ),
                       const SizedBox(width: 20),
                       Expanded(
@@ -550,7 +708,9 @@ class AppDrawer extends StatelessWidget {
       "Navigation",
       "Navigated to ${item.title}",
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.primaryColor.withOpacity(0.9), // No clamp needed here
+      backgroundColor: AppColors.primaryColor.withOpacity(
+        0.9,
+      ), // No clamp needed here
       colorText: Colors.white,
       duration: const Duration(seconds: 2),
       margin: const EdgeInsets.all(16),
@@ -558,7 +718,12 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  void _confirmLogout(BuildContext context, Color textColor, Color secondaryColor, bool isDark) {
+  void _confirmLogout(
+    BuildContext context,
+    Color textColor,
+    Color secondaryColor,
+    bool isDark,
+  ) {
     Get.back(); // Close drawer first
     Get.defaultDialog(
       title: "",
@@ -584,7 +749,10 @@ class AppDrawer extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               "Confirm Logout",
-              style: AppTextStyles.headlineMedium().copyWith(color: textColor, fontWeight: FontWeight.bold),
+              style: AppTextStyles.headlineMedium().copyWith(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
@@ -601,37 +769,42 @@ class AppDrawer extends StatelessWidget {
                     onPressed: () => Get.back(),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: AppColors.primaryColor, width: 2),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: Text("Cancel", style: AppTextStyles.button.copyWith(color: AppColors.primaryColor)),
+                    child: Text(
+                      "Cancel",
+                      style: AppTextStyles.button.copyWith(
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Get.back();
-                      Get.snackbar(
-                        "Logged Out",
-                        "You have been successfully logged out.",
-                        backgroundColor: AppColors.red,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: const Duration(seconds: 2),
-                        margin: const EdgeInsets.all(16),
-                        borderRadius: 12,
-                      );
+                      await LocalStorageService.logout().then((value) {
+                        Get.offAllNamed(Routes.LOGIN);
+                      });
                       // Implement your actual logout logic here
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.red,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       elevation: 8,
                     ),
-                    child: Text("Logout", style: AppTextStyles.button.copyWith(color: Colors.white)),
+                    child: Text(
+                      "Logout",
+                      style: AppTextStyles.button.copyWith(color: Colors.white),
+                    ),
                   ),
                 ),
               ],
