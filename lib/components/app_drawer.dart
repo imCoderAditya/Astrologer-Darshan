@@ -94,6 +94,8 @@ class AppDrawer extends StatelessWidget {
 
 // Even simpler version
 class SimpleAppDrawer extends StatelessWidget {
+  const SimpleAppDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(

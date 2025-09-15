@@ -8,6 +8,8 @@ import '../modules/auth/sign/bindings/sign_binding.dart';
 import '../modules/auth/sign/views/sign_view.dart';
 import '../modules/chat/bindings/chat_binding.dart';
 import '../modules/chat/views/chat_view.dart';
+import '../modules/games/bindings/games_binding.dart';
+import '../modules/games/views/games_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/hostAstro/bindings/host_astro_binding.dart';
@@ -96,6 +98,11 @@ class AppPages {
       name: _Paths.OTP_VERIFY,
       page: () => const OtpVerifyView(),
       binding: OtpVerifyBinding(),
+    ),
+    GetPage(
+      name: _Paths.GAMES,
+      page: () => const GamesView(),
+      binding: GamesBinding(),
     ),
   ];
 }

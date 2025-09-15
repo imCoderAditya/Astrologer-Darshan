@@ -1,6 +1,5 @@
 // ignore_for_file: deprecated_member_use, library_private_types_in_public_api
 
-import 'dart:ui';
 
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
@@ -35,7 +34,7 @@ class HomeView extends StatelessWidget {
         backgroundColor: AppColors.primaryColor,
         elevation: 0,
         centerTitle: false,
-        leading: Icon(Icons.menu, color: AppColors.white),
+      
         title: Text(
           "Astro Darshan Astrologer",
           style: AppTextStyles.headlineMedium().copyWith(
@@ -497,10 +496,10 @@ class AnimatedOnlineStatus extends StatefulWidget {
   final bool isDark;
 
   const AnimatedOnlineStatus({
-    Key? key,
+    super.key,
     required this.cardColor,
     required this.isDark,
-  }) : super(key: key);
+  });
 
   @override
   _AnimatedOnlineStatusState createState() => _AnimatedOnlineStatusState();

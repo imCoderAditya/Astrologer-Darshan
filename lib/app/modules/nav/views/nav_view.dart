@@ -3,6 +3,7 @@
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/core/config/theme/theme_controller.dart';
+import 'package:astrology/app/modules/games/views/games_view.dart';
 import 'package:astrology/app/modules/home/views/home_view.dart';
 import 'package:astrology/app/modules/nav/controllers/nav_controller.dart';
 import 'package:astrology/app/modules/profile/views/profile_view.dart';
@@ -17,7 +18,7 @@ class NavView extends StatelessWidget {
   Widget build(BuildContext context) {
     final NavController navController = Get.put(NavController());
     final isDark = themeController.isDarkMode.value;
-    final pages = [HomeView(), Scaffold(), ProfileView()];
+    final pages = [HomeView(), GamesView(), ProfileView()];
 
     return GetBuilder<NavController>(
       init: NavController(),

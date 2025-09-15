@@ -20,6 +20,7 @@ abstract class Routes {
   static const LOGIN = _Paths.LOGIN;
   static const SIGN = _Paths.SIGN;
   static const OTP_VERIFY = _Paths.OTP_VERIFY;
+  static const GAMES = _Paths.GAMES;
 }
 
 abstract class _Paths {
@@ -41,4 +42,5 @@ abstract class _Paths {
   static const LOGIN = '/login';
   static const SIGN = '/sign';
   static const OTP_VERIFY = '/otp-verify';
+  static const GAMES = '/games';
 }
