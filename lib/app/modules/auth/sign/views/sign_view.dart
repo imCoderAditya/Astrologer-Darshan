@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/theme_controller.dart';
+import 'package:astrology/app/core/utils/date_utils.dart';
+import 'package:astrology/app/core/utils/validator_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:phone_form_field/phone_form_field.dart';
 import '../controllers/sign_controller.dart';
 
 class SignView extends GetView<SignController> {
@@ -222,6 +224,7 @@ class SignView extends GetView<SignController> {
                             icon: Icons.person_outline,
                             controller: controller.firstNameController,
                             isDark: isDark,
+                            inputFormatters: [CapitalizeFirstTextFormatter()],
                           ),
                           SizedBox(height: 20.h),
                           _buildInputField(
@@ -229,6 +232,7 @@ class SignView extends GetView<SignController> {
                             icon: Icons.person_outline,
                             controller: controller.lastNameController,
                             isDark: isDark,
+                            inputFormatters: [CapitalizeFirstTextFormatter()],
                           ),
 
                           SizedBox(height: 20.h),
@@ -247,6 +251,16 @@ class SignView extends GetView<SignController> {
                           // Phone Number Field
                           _buildPhoneField(isDark, controller),
 
+                          SizedBox(height: 20.h),
+                          _buildInputField(
+                            label: 'OTP',
+                            icon: Icons.email_outlined,
+                            maxLength: 6,
+                            controller: controller.otpController,
+                            keyboardType: TextInputType.phone,
+
+                            isDark: isDark,
+                          ),
                           SizedBox(height: 20.h),
 
                           // Date of Birth
@@ -277,8 +291,19 @@ class SignView extends GetView<SignController> {
                             icon: Icons.location_on_outlined,
                             controller: controller.placeOfBirthController,
                             isDark: isDark,
+                            inputFormatters: [CapitalizeFirstTextFormatter()],
                           ),
+                          SizedBox(height: 20.h),
 
+                          // Place of Birth
+                          _buildInputField(
+                            label: 'Bio',
+                            icon: Icons.location_on_outlined,
+                            controller: controller.bioController,
+                            isDark: isDark,
+
+                            inputFormatters: [CapitalizeFirstTextFormatter()],
+                          ),
                           SizedBox(height: 20.h),
 
                           // Gender Selection
@@ -307,7 +332,7 @@ class SignView extends GetView<SignController> {
                         onPressed:
                             controller.isLoading.value
                                 ? null
-                                : controller.registerAstrologer,
+                                : controller.validation,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
                           shadowColor: Colors.transparent,
@@ -551,6 +576,8 @@ class SignView extends GetView<SignController> {
     required IconData icon,
     required TextEditingController controller,
     required bool isDark,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
     TextInputType? keyboardType,
   }) {
     return Column(
@@ -593,11 +620,15 @@ class SignView extends GetView<SignController> {
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
+            maxLength: maxLength,
+
             style: TextStyle(
               color: isDark ? Colors.white : Colors.black,
               fontSize: 16.sp,
             ),
+            inputFormatters: inputFormatters,
             decoration: InputDecoration(
+              counter: SizedBox(),
               hintText: 'Enter $label',
               hintStyle: TextStyle(
                 color:
@@ -660,10 +691,11 @@ class SignView extends GetView<SignController> {
               width: 1.5,
             ),
           ),
-          child: PhoneFormField(
-            initialValue: PhoneNumber.parse('+91'),
-            onChanged: (phoneNumber) {
-              controller.phoneNumber.value = phoneNumber;
+          child: TextField(
+            controller: controller.phoneController,
+            keyboardType: TextInputType.phone,
+            onChanged: (value) {
+              controller.phoneController.text = value;
             },
             decoration: InputDecoration(
               hintText: 'Enter phone number',
@@ -679,6 +711,10 @@ class SignView extends GetView<SignController> {
                 horizontal: 16.w,
                 vertical: 16.h,
               ),
+            ),
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black,
+              fontSize: 16.sp,
             ),
           ),
         ),
@@ -736,19 +772,29 @@ class SignView extends GetView<SignController> {
               ),
             ),
             child: Obx(
-              () => Text(
-                selectedDate.value != null
-                    ? "${selectedDate.value!.day}/${selectedDate.value!.month}/${selectedDate.value!.year}"
-                    : 'Select date',
-                style: TextStyle(
-                  color:
-                      selectedDate.value != null
-                          ? (isDark ? Colors.white : Colors.black)
-                          : (isDark
-                              ? AppColors.white.withOpacity(0.5)
-                              : AppColors.black.withOpacity(0.5)),
-                  fontSize: 16.sp,
-                ),
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedDate.value != null
+                        ? AppDateUtils.extractDate(
+                          selectedDate.value?.toIso8601String(),
+                          14,
+                        )
+                        : 'Select date',
+                    style: TextStyle(
+                      color:
+                          selectedDate.value != null
+                              ? (isDark ? Colors.white : Colors.black)
+                              : (isDark
+                                  ? AppColors.white.withOpacity(0.5)
+                                  : AppColors.black.withOpacity(0.5)),
+                      fontSize: 16.sp,
+                    ),
+                  ),
+
+                  Icon(Icons.calendar_month),
+                ],
               ),
             ),
           ),
@@ -806,19 +852,26 @@ class SignView extends GetView<SignController> {
               ),
             ),
             child: Obx(
-              () => Text(
-                selectedTime.value != null
-                    ? selectedTime.value!.format(Get.context!)
-                    : 'Select time',
-                style: TextStyle(
-                  color:
-                      selectedTime.value != null
-                          ? (isDark ? Colors.white : Colors.black)
-                          : (isDark
-                              ? AppColors.white.withOpacity(0.5)
-                              : AppColors.black.withOpacity(0.5)),
-                  fontSize: 16.sp,
-                ),
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedTime.value != null
+                        ? selectedTime.value!.format(Get.context!)
+                        : 'Select time',
+                    style: TextStyle(
+                      color:
+                          selectedTime.value != null
+                              ? (isDark ? Colors.white : Colors.black)
+                              : (isDark
+                                  ? AppColors.white.withOpacity(0.5)
+                                  : AppColors.black.withOpacity(0.5)),
+                      fontSize: 16.sp,
+                    ),
+                  ),
+
+                  Icon(Icons.timer_outlined),
+                ],
               ),
             ),
           ),

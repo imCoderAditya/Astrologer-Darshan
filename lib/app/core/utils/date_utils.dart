@@ -5,10 +5,10 @@ import 'package:intl/intl.dart';
 
 class AppDateUtils {
   /// Format a DateTime to yyyy-MM-dd
-  static String formatToYMD(DateTime date) {
-    return "${date.year.toString().padLeft(4, '0')}-"
-        "${date.month.toString().padLeft(2, '0')}-"
-        "${date.day.toString().padLeft(2, '0')}";
+  static String formatToYMD(DateTime? date) {
+    return "${date?.year.toString().padLeft(4, '0')}-"
+        "${date?.month.toString().padLeft(2, '0')}-"
+        "${date?.day.toString().padLeft(2, '0')}";
   }
 
   /// Format a DateTime to dd/MM/yyyy
@@ -35,7 +35,11 @@ class AppDateUtils {
     try {
       final parts = date.split('-');
       if (parts.length != 3) return null;
-      return DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+      return DateTime(
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+        int.parse(parts[2]),
+      );
     } catch (_) {
       return null;
     }
@@ -91,7 +95,9 @@ class AppDateUtils {
         case 13:
           // Short Date (06-19-2025)
           return DateFormat('yyyy-MM-dd').format(parsed);
-
+        case 14:
+          // Short Date (06-19-2025)
+          return DateFormat('dd MMMM yyyy').format(parsed);
         case 15:
           // Long Date (Thursday, June 19, 2025)
           return DateFormat('EEEE, MMMM d, y h:mm a').format(parsed);
@@ -134,7 +140,9 @@ class AppDateUtils {
       case 13:
         return DateFormat('yyyy-MM-dd').format(dateTime); // yyyy-MM-dd
       case 15:
-        return DateFormat('EEEE, MMMM d, y h:mm a').format(dateTime); // long date+time
+        return DateFormat(
+          'EEEE, MMMM d, y h:mm a',
+        ).format(dateTime); // long date+time
       default:
         return "Unknown format option.";
     }

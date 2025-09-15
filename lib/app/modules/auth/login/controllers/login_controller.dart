@@ -41,18 +41,24 @@ class LoginController extends GetxController {
       isLoading.value = true;
       final response = await BaseClient.post(
         api: EndPoint.sendOTP,
-        data: {"PhoneNumber": phoneController.value.nsn},
+        data: {
+          "PhoneNumber": phoneController.value.nsn,
+          "usertype": "Astrologer",
+        },
       );
 
       if (response != null && response.statusCode == 200) {
-        if (response.data["Status"] == true) {
+        if (response.data["Type"] == "Registered") {
           SnackBarUiView.showSuccess(message: response.data["Message"] ?? "");
           Get.toNamed(
             Routes.OTP_VERIFY,
             arguments: {"phoneNumber": phoneController.value.nsn},
           );
         } else {
-          LoggerUtils.error("Login Failed API");
+          Get.toNamed(
+            Routes.SIGN,
+            arguments: {"phoneNumber": phoneController.value.nsn},
+          );
         }
       } else {
         SnackBarUiView.showSuccess(message: response.data["Message"] ?? "");

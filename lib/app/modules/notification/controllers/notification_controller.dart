@@ -11,6 +11,7 @@ class NotificationController extends GetxController {
   final userId = LocalStorageService.getUserId();
   var isLoading = false.obs;
   Rxn<NotificationModel> notificationModel = Rxn<NotificationModel>();
+
   Future<void> fetchNotification() async {
     isLoading.value = true;
     try {
@@ -31,5 +32,30 @@ class NotificationController extends GetxController {
       isLoading.value = false;
       update();
     }
+  }
+
+  Future<void> readNotification() async {
+    isLoading.value = true;
+    try {
+      final res = await BaseClient.post(
+        api: "${EndPoint.readNotification}?userid=$userId",
+      );
+      if (res != null && res.statusCode == 200) {
+        LoggerUtils.debug("Response ${res.data}");
+      } else {
+        LoggerUtils.error("Failed ${res?.data}");
+      }
+    } catch (e) {
+      LoggerUtils.error("Error: $e");
+    } finally {
+      isLoading.value = false;
+      update();
+    }
+  }
+
+  @override
+  void onInit() {
+    fetchNotification();
+    super.onInit();
   }
 }

@@ -6,6 +6,7 @@ import 'package:astrology/app/data/endpoint/end_pont.dart';
 import 'package:astrology/app/data/models/auth/otp_verify_model.dart';
 import 'package:astrology/app/modules/auth/login/controllers/login_controller.dart';
 import 'package:astrology/app/routes/app_pages.dart';
+import 'package:astrology/app/services/firebase/firebase_services.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:astrology/components/Global_toast.dart';
 import 'package:astrology/components/global_loader.dart';
@@ -34,17 +35,23 @@ class OtpVerifyController extends GetxController {
   Timer? _timer;
 
   bool? isUserExist;
-
+  String? fmcToken;
   @override
   void onInit() {
     super.onInit();
+
     // Get phone number from arguments if passed
     phoneNumber.value = Get.arguments?['phoneNumber'] ?? '';
     debugPrint('Phone Number: ${phoneNumber.value}');
 
+    getToken();
     // Start the resend timer
     startResendTimer();
     update();
+  }
+
+  void getToken() async {
+    fmcToken = await FirebaseServices.firebaseToken();
   }
 
   @override
@@ -85,10 +92,9 @@ class OtpVerifyController extends GetxController {
         data: {
           "PhoneNumber": phoneNumber.value,
           "Otp": int.parse(otp.value),
-          "Fcm": "",
+          "Fcm": fmcToken,
         },
       );
-
       if (response != null) {
         otpVerifyModel.value = otpVerifyModelFromJson(
           json.encode(response.data),
@@ -97,7 +103,10 @@ class OtpVerifyController extends GetxController {
         if (otpVerifyModel.value?.status == true) {
           final userId = otpVerifyModel.value?.user?.userId.toString() ?? "";
           final astrologerId = otpVerifyModel.value?.user?.astrologerId;
-          LocalStorageService.saveLogin(userId: userId,userAstrologerId: astrologerId);
+          LocalStorageService.saveLogin(
+            userId: userId,
+            userAstrologerId: astrologerId,
+          );
           debugPrint("UserId ===>$userId");
           debugPrint("UserId ===>$astrologerId");
           Get.offAllNamed(Routes.NAV);

@@ -13,17 +13,29 @@ String notificationModelToJson(NotificationModel data) =>
 class NotificationModel {
   final bool? status;
   final String? message;
+  final int? unreadCount;
+  final int? totalCount;
   final List<NotificationData>? data;
 
-  NotificationModel({this.status, this.message, this.data});
+  NotificationModel({
+    this.status,
+    this.message,
+    this.data,
+    this.unreadCount,
+    this.totalCount,
+  });
 
   NotificationModel copyWith({
     bool? status,
     String? message,
+    int? unreadCount,
+    int? totalCount,
     List<NotificationData>? data,
   }) => NotificationModel(
     status: status ?? this.status,
     message: message ?? this.message,
+    unreadCount: unreadCount ?? this.unreadCount,
+    totalCount: totalCount ?? this.totalCount,
     data: data ?? this.data,
   );
 
@@ -31,6 +43,8 @@ class NotificationModel {
       NotificationModel(
         status: json["status"],
         message: json["message"],
+        unreadCount: json["unreadCount"],
+        totalCount: json["totalCount"],
         data:
             json["data"] == null
                 ? []
@@ -88,17 +102,20 @@ class NotificationData {
     createdAt: createdAt ?? this.createdAt,
   );
 
-  factory NotificationData.fromJson(Map<String, dynamic> json) => NotificationData(
-    notificationId: json["notificationId"],
-    userId: json["userId"],
-    title: json["title"],
-    message: json["message"],
-    type: json["type"],
-    isRead: json["isRead"],
-    actionUrl: json["actionUrl"],
-    createdAt:
-        json["createdAt"] == null ? null : DateTime.parse(json["createdAt"]),
-  );
+  factory NotificationData.fromJson(Map<String, dynamic> json) =>
+      NotificationData(
+        notificationId: json["notificationId"],
+        userId: json["userId"],
+        title: json["title"],
+        message: json["message"],
+        type: json["type"],
+        isRead: json["isRead"],
+        actionUrl: json["actionUrl"],
+        createdAt:
+            json["createdAt"] == null
+                ? null
+                : DateTime.parse(json["createdAt"]),
+      );
 
   Map<String, dynamic> toJson() => {
     "notificationId": notificationId,

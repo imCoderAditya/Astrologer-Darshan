@@ -392,7 +392,7 @@ class LoginView extends GetView<LoginController> {
                             recognizer:
                                 TapGestureRecognizer()
                                   ..onTap = () {
-                                    Get.toNamed(Routes.SIGN);
+                                    Get.offNamed(Routes.LOGIN);
                                   },
                           ),
                         ],

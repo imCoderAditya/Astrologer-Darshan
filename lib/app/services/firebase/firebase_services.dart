@@ -1,16 +1,21 @@
+import 'dart:io';
+
 import 'package:astrology/app/core/utils/logger_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class FirebaseServices {
-  static Future<void> firebaseToken() async {
+  static Future<String?> firebaseToken() async {
     try {
       // Request notification permission (Provisional for iOS)
       final notificationSettings = await FirebaseMessaging.instance
           .requestPermission(
-            provisional: true,
             alert: true,
+            announcement: false,
             badge: true,
+            carPlay: false,
+            criticalAlert: false,
+            provisional: false,
             sound: true,
           );
 
@@ -22,35 +27,26 @@ class FirebaseServices {
         );
 
         // Optional: Log APNs token (iOS only)
-        final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        LoggerUtils.debug("APNs token: $apnsToken");
+
+        if (Platform.isIOS) {
+          final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          LoggerUtils.debug("APNs token: $apnsToken");
+          // You might want to handle cases where apnsToken is null
+        }
 
         // Get FCM token (for all platforms)
         final fcmToken = await FirebaseMessaging.instance.getToken();
         LoggerUtils.debug("FCM token: $fcmToken");
+        return fcmToken;
       } else {
         LoggerUtils.debug('User declined notification permissions');
         await openAppSettings();
+        return null;
       }
       // You can now send this FCM token to your backend if needed
     } catch (e) {
       LoggerUtils.error("Error:$e");
+      return null;
     }
   }
-
-  // static Future<void> firebaseToken() async {
-  //   // Request permission on iOS before trying to get the token
-  //   NotificationSettings settings = await FirebaseMessaging.instance
-  //       .requestPermission(alert: true, badge: true, sound: true);
-
-  //   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-  //     final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-  //     print('APNs Token: $apnsToken');
-
-  //     String? deviceToken = await FirebaseMessaging.instance.getToken();
-  //     print('FCM Token: $deviceToken');
-  //   } else {
-  //     print('User declined notification permissions');
-  //   }
-  // }
 }

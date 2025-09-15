@@ -13,8 +13,13 @@ class EndPoint {
 
   //Wallet Astrologer
   static const astrologerWallet = "$baseurl/Wallet/Astrologer_Wallet";
-  // Notification 
+  // Notification
   static const notifiaction = "$baseurl/Notification/GetUnread";
+  static const readNotification = "$baseurl/Notification/MarkAsRead";
   //LiveSession/UpdateStatus
   static const liveSessionUpdateStatus = "$baseurl/LiveSession/UpdateStatus";
+
+  // Register Astrologer
+
+  static const registerAstrologer = "$baseurl/AstroReg/RegisterAstrologer1";
 }

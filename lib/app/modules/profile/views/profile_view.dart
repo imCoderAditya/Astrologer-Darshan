@@ -133,10 +133,10 @@ class ProfileView extends StatelessWidget {
 
                                     // Zodiac sign indicator
                                     Positioned(
-                                      bottom: 5,
-                                      right: 5,
+                                      bottom: 8.h,
+                                      right: 5.h,
                                       child: Container(
-                                        padding: const EdgeInsets.all(4),
+                                        padding: EdgeInsets.all(2.h),
                                         decoration: BoxDecoration(
                                           color: AppColors.primaryColor,
                                           shape: BoxShape.circle,
@@ -145,12 +145,12 @@ class ProfileView extends StatelessWidget {
                                             width: 2,
                                           ),
                                         ),
-                                        child: Text(
-                                          "♌", // Leo symbol as example
-                                          style: TextStyle(
-                                            color: AppColors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+                                        child: Container(
+                                          height: 16.h,
+                                          width: 16.w,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: AppColors.green,
                                           ),
                                         ),
                                       ),
@@ -182,17 +182,16 @@ class ProfileView extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 8),
+                          // const SizedBox(height: 8),
 
                           // Astrologer designation
-                          Text(
-                            profileData?.specializations ?? "",
-                            style: AppTextStyles.caption().copyWith(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-
+                          // Text(
+                          //   profileData?.specializations ?? "",
+                          //   style: AppTextStyles.caption().copyWith(
+                          //     color: AppColors.white,
+                          //     fontWeight: FontWeight.w500,
+                          //   ),
+                          // ),
                           const SizedBox(height: 6),
 
                           Text(
@@ -232,71 +231,6 @@ class ProfileView extends StatelessWidget {
 
               SliverList(
                 delegate: SliverChildListDelegate([
-                  const SizedBox(height: 20),
-
-                  // Astrology Stats Card
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                isDark
-                                    ? AppColors.black.withOpacity(0.3)
-                                    : AppColors.lightDivider.withOpacity(0.2),
-                            spreadRadius: 2,
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          children: [
-                            Text(
-                              "Astrological Profile",
-                              style: AppTextStyles.body().copyWith(
-                                color: textColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                _buildStatItem(
-                                  "♌",
-                                  "Leo",
-                                  "Sun Sign",
-                                  textColor,
-                                  secondaryTextColor,
-                                ),
-                                _buildStatItem(
-                                  "♋",
-                                  "Cancer",
-                                  "Moon Sign",
-                                  textColor,
-                                  secondaryTextColor,
-                                ),
-                                _buildStatItem(
-                                  "♍",
-                                  "Virgo",
-                                  "Rising",
-                                  textColor,
-                                  secondaryTextColor,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
                   const SizedBox(height: 20),
 
                   // Personal Info Card with enhanced design
@@ -377,20 +311,20 @@ class ProfileView extends StatelessWidget {
 
                   // Account Settings Section
                   _buildSectionTitle("Account Settings", textColor),
-                  _buildSettingsTile(
-                    Icons.lock_outline,
-                    "Change Password",
-                    textColor: textColor,
-                    onTap:
-                        () => Get.snackbar(
-                          "Action",
-                          "Change Password Tapped",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.primaryColor,
-                          colorText: AppColors.white,
-                        ),
-                  ),
 
+                  // _buildSettingsTile(
+                  //   Icons.lock_outline,
+                  //   "Change Password",
+                  //   textColor: textColor,
+                  //   onTap:
+                  //       () => Get.snackbar(
+                  //         "Action",
+                  //         "Change Password Tapped",
+                  //         snackPosition: SnackPosition.BOTTOM,
+                  //         backgroundColor: AppColors.primaryColor,
+                  //         colorText: AppColors.white,
+                  //       ),
+                  // ),
                   _buildSettingsTile(
                     Icons.notifications_none,
                     "Notifications",
@@ -410,20 +344,6 @@ class ProfileView extends StatelessWidget {
                       inactiveThumbColor: secondaryTextColor,
                       inactiveTrackColor: dividerColor,
                     ),
-                  ),
-
-                  _buildSettingsTile(
-                    Icons.auto_awesome,
-                    "Daily Horoscope Settings",
-                    textColor: textColor,
-                    onTap:
-                        () => Get.snackbar(
-                          "Action",
-                          "Horoscope Settings Tapped",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.primaryColor,
-                          colorText: AppColors.white,
-                        ),
                   ),
 
                   _buildSettingsTile(
@@ -554,36 +474,6 @@ class ProfileView extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  // Helper method for astrology stats
-  Widget _buildStatItem(
-    String symbol,
-    String sign,
-    String type,
-    Color textColor,
-    Color secondaryTextColor,
-  ) {
-    return Column(
-      children: [
-        Text(
-          symbol,
-          style: TextStyle(fontSize: 28, color: AppColors.primaryColor),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          sign,
-          style: AppTextStyles.small().copyWith(
-            color: textColor,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        Text(
-          type,
-          style: AppTextStyles.caption().copyWith(color: secondaryTextColor),
-        ),
-      ],
     );
   }
 
