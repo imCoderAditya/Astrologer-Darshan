@@ -274,12 +274,13 @@ class LoginView extends GetView<LoginController> {
                               ),
                               decoration: InputDecoration(
                                 hintText: 'Enter your phone number',
+                                
                                 hintStyle: TextStyle(
                                   color:
                                       isDark
                                           ? Colors.white.withOpacity(0.5)
                                           : Colors.black.withOpacity(0.5),
-                                  fontSize: 16.sp,
+                                  fontSize: 13.sp,
                                 ),
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
@@ -377,27 +378,27 @@ class LoginView extends GetView<LoginController> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 16.h),
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                        children: [
-                          const TextSpan(text: "Don't have an account? "),
-                          TextSpan(
-                            text: 'Sign up',
-                            style: TextStyle(
-                              color: AppColors.primaryColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            recognizer:
-                                TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Get.offNamed(Routes.LOGIN);
-                                  },
-                          ),
-                        ],
-                      ),
-                    ),
+                    // SizedBox(height: 16.h),
+                    // RichText(
+                    //   text: TextSpan(
+                    //     style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                    //     children: [
+                    //       const TextSpan(text: "Don't have an account? "),
+                    //       TextSpan(
+                    //         text: 'Sign up',
+                    //         style: TextStyle(
+                    //           color: AppColors.primaryColor,
+                    //           fontWeight: FontWeight.w600,
+                    //         ),
+                    //         recognizer:
+                    //             TapGestureRecognizer()
+                    //               ..onTap = () {
+                    //                 Get.offNamed(Routes.LOGIN);
+                    //               },
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     SizedBox(height: 64.h),
 
                     // Enhanced Terms and Privacy with better design

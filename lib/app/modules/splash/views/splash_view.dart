@@ -208,7 +208,7 @@ class SplashView extends StatelessWidget {
           child: Opacity(
             opacity: (controller.fadeAnimation.value * 0.8).clamp(0.0, 1.0),
             child: const Text(
-              "Tagline -AstroDarshan ho saath, toh fikr ki kya baat!",
+              "AstroDarshan ho saath, toh fikr ki kya baat!",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -238,9 +238,9 @@ class SplashView extends StatelessWidget {
                 controller.loadingText.value,
                 key: ValueKey(controller.loadingText.value),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style:  TextStyle(
                   color: Colors.white70,
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   letterSpacing: 1,
                 ),
               ),

@@ -454,6 +454,8 @@ class HostController extends GetxController {
     super.onInit();
   }
 
+  final astrologerId = LocalStorageService.getAstrologerId();
+
   int? liveStramId;
   Future<void> _initTokenAndEngine() async {
     await goLiveAPI();
@@ -467,7 +469,7 @@ class HostController extends GetxController {
       final res = await BaseClient.post(
         api: EndPoint.goLive,
         formData: FormData.fromMap({
-          "AstrologerID": 28,
+          "AstrologerID": astrologerId,
           "Title": "Live Astrology Q&A",
           "Description": "Ask me anything live!",
           "Category": "Horoscope",

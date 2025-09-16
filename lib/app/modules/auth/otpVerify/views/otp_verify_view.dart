@@ -141,7 +141,7 @@ class OtpVerifyView extends GetView<OtpVerifyController> {
               ),
               children: [
                 const TextSpan(
-                  text: 'We\'ve sent a 5-digit verification code to\n',
+                  text: 'We\'ve sent a 6-digit verification code to\n',
                 ),
                 TextSpan(
                   text:
