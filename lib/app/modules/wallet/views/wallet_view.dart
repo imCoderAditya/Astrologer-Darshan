@@ -14,7 +14,7 @@ class WalletView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-
+    
     final Color backgroundColor =
         isDark ? AppColors.darkBackground : AppColors.lightBackground;
     final Color cardColor =
@@ -29,17 +29,14 @@ class WalletView extends StatelessWidget {
     return GetBuilder<WalletController>(
       init: WalletController(),
       builder: (controller) {
-    
         final wallet = controller.walletModel.value;
-        
+
         // Loading state
         if (controller.isLoading.value) {
           return Scaffold(
             backgroundColor: backgroundColor,
             appBar: _buildAppBar(isDark),
-            body: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
@@ -49,26 +46,162 @@ class WalletView extends StatelessWidget {
             backgroundColor: backgroundColor,
             appBar: _buildAppBar(isDark),
             body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 64,
-                    color: secondaryTextColor,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    wallet?.message ?? 'Something went wrong',
-                    style: AppTextStyles.body().copyWith(color: textColor),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => controller.fetchWallet(),
-                    child: const Text('Retry'),
-                  ),
-                ],
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Animated Container with gradient background
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 800),
+                      builder: (context, value, child) {
+                        return Transform.scale(
+                          scale: value,
+                          child: Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.accentColor.withOpacity(0.2),
+                                  AppColors.accentColor.withOpacity(0.1),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.accentColor.withOpacity(0.3),
+                                  blurRadius: 20,
+                                  spreadRadius: 2,
+                                  offset: const Offset(0, 8),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.search_off_rounded,
+                              size: 64,
+                              color: AppColors.accentColor,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Animated title
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 600),
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: Text(
+                              'No Wallet Data',
+                              style: AppTextStyles.headlineLarge().copyWith(
+                                color: AppColors.primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Animated subtitle
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 800),
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: Container(
+                              constraints: const BoxConstraints(maxWidth: 280),
+                              child: Text(
+                                'We couldn\'t find any wallet information. Check your connection and try again.',
+                                style: AppTextStyles.body().copyWith(
+                                  color: AppColors.primaryColor.withOpacity(
+                                    0.7,
+                                  ),
+                                  height: 1.5,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Animated retry button
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 1000),
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 30 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primaryColor.withOpacity(
+                                      0.3,
+                                    ),
+                                    blurRadius: 12,
+                                    spreadRadius: 1,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryColor,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                onPressed: () => controller.fetchWallet(),
+                                icon: const Icon(
+                                  Icons.refresh_rounded,
+                                  size: 20,
+                                  color: AppColors.white,
+                                ),
+                                label: const Text(
+                                  'Retry',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -141,17 +274,18 @@ class WalletView extends StatelessWidget {
       ),
       centerTitle: true,
       backgroundColor: AppColors.primaryColor,
-      flexibleSpace: isDark
-          ? null
-          : Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: AppColors.headerGradientColors,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+      flexibleSpace:
+          isDark
+              ? null
+              : Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: AppColors.headerGradientColors,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
               ),
-            ),
       elevation: 0,
     );
   }
@@ -165,24 +299,26 @@ class WalletView extends StatelessWidget {
   ) {
     final summary = wallet?.summary;
     final transactions = wallet?.transactions;
-    
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(25),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: isDark
-              ? [AppColors.darkSurface, AppColors.darkSurface]
-              : [AppColors.primaryColor, AppColors.accentColor],
+          colors:
+              isDark
+                  ? [AppColors.darkSurface, AppColors.darkSurface]
+                  : [AppColors.primaryColor, AppColors.accentColor],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.black.withOpacity(0.5)
-                : Colors.grey.withOpacity(0.3),
+            color:
+                isDark
+                    ? Colors.black.withOpacity(0.5)
+                    : Colors.grey.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 10,
             offset: const Offset(0, 5),
@@ -195,9 +331,10 @@ class WalletView extends StatelessWidget {
           Text(
             "Current Balance",
             style: AppTextStyles.caption().copyWith(
-              color: isDark
-                  ? secondaryTextColor
-                  : AppColors.white.withOpacity(0.8),
+              color:
+                  isDark
+                      ? secondaryTextColor
+                      : AppColors.white.withOpacity(0.8),
             ),
           ),
           const SizedBox(height: 8),
@@ -216,7 +353,8 @@ class WalletView extends StatelessWidget {
                   "${summary?.availableBalance?.toStringAsFixed(2) ?? "0.00"}",
                   style: AppTextStyles.headlineLarge().copyWith(
                     fontSize: 48,
-                    color: isDark ? AppColors.secondaryPrimary : AppColors.white,
+                    color:
+                        isDark ? AppColors.secondaryPrimary : AppColors.white,
                     fontWeight: FontWeight.bold,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -230,9 +368,10 @@ class WalletView extends StatelessWidget {
             child: Text(
               "Last updated: ${_getLastUpdateTime(transactions)}",
               style: AppTextStyles.small().copyWith(
-                color: isDark
-                    ? secondaryTextColor
-                    : AppColors.white.withOpacity(0.7),
+                color:
+                    isDark
+                        ? secondaryTextColor
+                        : AppColors.white.withOpacity(0.7),
               ),
             ),
           ),
@@ -330,9 +469,10 @@ class WalletView extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.black.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.2),
+            color:
+                isDark
+                    ? Colors.black.withOpacity(0.3)
+                    : Colors.grey.withOpacity(0.2),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -458,7 +598,8 @@ class WalletView extends StatelessWidget {
     }
 
     // Adjust colors based on status
-    if (status.toLowerCase() == 'cancelled' || status.toLowerCase() == 'failed') {
+    if (status.toLowerCase() == 'cancelled' ||
+        status.toLowerCase() == 'failed') {
       iconColor = iconColor.withOpacity(0.5);
       amountColor = amountColor.withOpacity(0.5);
     } else if (status.toLowerCase() == 'pending') {
@@ -534,10 +675,14 @@ class WalletView extends StatelessWidget {
                     color: secondaryTextColor,
                   ),
                 ),
-                if (status.toLowerCase() != 'completed' && status.toLowerCase() != 'success') ...[
+                if (status.toLowerCase() != 'completed' &&
+                    status.toLowerCase() != 'success') ...[
                   const SizedBox(height: 2),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: _getStatusColor(status).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -581,9 +726,7 @@ class WalletView extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Your transaction history will appear here once you start using your wallet.',
-            style: AppTextStyles.body().copyWith(
-              color: secondaryTextColor,
-            ),
+            style: AppTextStyles.body().copyWith(color: secondaryTextColor),
             textAlign: TextAlign.center,
           ),
         ],
@@ -623,8 +766,8 @@ class WalletView extends StatelessWidget {
       case 'transfer':
         return 'Money Transfer';
       default:
-        return transactionType.split('').first.toUpperCase() + 
-               transactionType.substring(1).toLowerCase();
+        return transactionType.split('').first.toUpperCase() +
+            transactionType.substring(1).toLowerCase();
     }
   }
 

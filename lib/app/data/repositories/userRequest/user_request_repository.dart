@@ -8,7 +8,7 @@ abstract class UserRequestRepository {
 }
 
 class UserRequestReposites extends UserRequestRepository {
-  final userId = LocalStorageService.getUserId();
+  final userId = LocalStorageService.getAstrologerId();
   @override
   Future<dynamic> fetchUserRequest({String? status,String? sessionType}) async {
     try {

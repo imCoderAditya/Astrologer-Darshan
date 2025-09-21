@@ -4,6 +4,7 @@ import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/data/models/message/message_model.dart';
 import 'package:astrology/app/data/models/userRequest/user_request_model.dart';
 import 'package:astrology/app/modules/chat/controllers/chat_controller.dart';
+import 'package:astrology/app/modules/userRequest/controllers/user_request_controller.dart';
 import 'package:astrology/app/services/timerService/timer_services.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -46,12 +47,21 @@ class _ChatViewState extends State<ChatView> {
   //     },
   //   );
   // }
-
+  final callcontroller =
+      Get.isRegistered<UserRequestController>()
+          ? Get.find<UserRequestController>()
+          : Get.put(UserRequestController());
   @override
   void dispose() {
     controller.webSocketService?.disconnect();
     controller.showEmojiPicker.value = false;
     timerService.stopTimer();
+    callcontroller.statusUpdate("Completed", controller.sessionID).then((
+      value,
+    ) async {
+      debugPrint("complete API call :${controller.sessionID}");
+    });
+
     super.dispose();
   }
 
@@ -60,21 +70,27 @@ class _ChatViewState extends State<ChatView> {
     final controller = Get.put(ChatController());
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF0B141A) : const Color(0xFFE3DAC7),
-      appBar: _buildAppBar(controller, isDark),
-      body: Column(
-        children: [
-          Obx(
-            () =>
-                controller.webSocketService?.isConnected.value == false
-                    ? _buildConnectionStatus(controller)
-                    : SizedBox(),
-          ),
-          Expanded(child: _buildMessagesList(controller)),
-          _buildMessageInput(controller, isDark),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        final shouldClose = await _showExitConfirmationDialog();
+        return shouldClose;
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? const Color(0xFF0B141A) : const Color(0xFFE3DAC7),
+        appBar: _buildAppBar(controller, isDark),
+        body: Column(
+          children: [
+            Obx(
+              () =>
+                  controller.webSocketService?.isConnected.value == false
+                      ? _buildConnectionStatus(controller)
+                      : SizedBox(),
+            ),
+            Expanded(child: _buildMessagesList(controller)),
+            _buildMessageInput(controller, isDark),
+          ],
+        ),
       ),
     );
   }
@@ -116,8 +132,13 @@ class _ChatViewState extends State<ChatView> {
           isDark ? const Color(0xFF1F2C34) : const Color(0xFF075E54),
       elevation: 1,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => Get.back(),
+        icon: Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () async {
+          bool shouldClose = await _showExitConfirmationDialog();
+          if (shouldClose) {
+            Get.back();
+          }
+        },
       ),
       title: Row(
         children: [
@@ -568,5 +589,112 @@ class _ChatViewState extends State<ChatView> {
       case MessageStatus.read:
         return Icons.done_all;
     }
+  }
+
+  // Add this method to your _ChatViewState class
+  Future<bool> _showExitConfirmationDialog() async {
+    return await showDialog<bool>(
+          context: context,
+          barrierDismissible: false, // Prevents dismissing by tapping outside
+          builder: (BuildContext context) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+
+            return AlertDialog(
+              backgroundColor: isDark ? const Color(0xFF1F2C34) : Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8.r),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.warning_rounded,
+                      color: Colors.red,
+                      size: 24.r,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Text(
+                      'End Chat Session?',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                'Are you sure you want to close this chat? This action will end the current session and cannot be undone.',
+                style: GoogleFonts.openSans(
+                  fontSize: 14.sp,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  height: 1.4,
+                ),
+              ),
+              actions: [
+                // Cancel Button
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(
+                      context,
+                    ).pop(false); // Return false (don't close)
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 10.h,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.white70 : Colors.grey[600],
+                    ),
+                  ),
+                ),
+
+                // Proceed Button
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // Return true (close chat)
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20.w,
+                      vertical: 10.h,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'End Chat',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Return false if dialog is dismissed
   }
 }

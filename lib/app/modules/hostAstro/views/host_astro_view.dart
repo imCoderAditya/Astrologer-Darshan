@@ -2,6 +2,10 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:astrology/app/core/config/theme/app_colors.dart';
+import 'package:astrology/app/core/config/theme/app_text_styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../controllers/host_astro_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -377,13 +381,13 @@ class HostView extends GetView<HostController> {
           ),
           const SizedBox(height: 12),
 
-          // Virtual background button
-          _buildSideButton(
-            icon: Icons.image,
-            onPressed: controller.toggleVirtualBackground,
-            tooltip: 'Virtual background',
-            isActive: controller.virtualBackgroundEnabled.value,
-          ),
+          // // Virtual background button
+          // _buildSideButton(
+          //   icon: Icons.image,
+          //   onPressed: controller.toggleVirtualBackground,
+          //   tooltip: 'Virtual background',
+          //   isActive: controller.virtualBackgroundEnabled.value,
+          // ),
         ],
       ),
     );
@@ -433,7 +437,7 @@ class HostView extends GetView<HostController> {
 
   Widget _buildLiveTimer() {
     return Positioned(
-      top: 120,
+      top: 120.h,
       left: 16,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -464,8 +468,8 @@ class HostView extends GetView<HostController> {
 
   Widget _buildViewerCount() {
     return Positioned(
-      bottom: 120,
-      left: 16,
+      top: 70.h,
+      right: 16.h,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -553,32 +557,162 @@ class HostView extends GetView<HostController> {
   }
 
   void _showEndLiveDialog() {
+    final isDark = Theme.of(Get.context!).brightness == Brightness.dark;
+
     Get.dialog(
       AlertDialog(
-        backgroundColor: const Color(0xFF1A1F3A),
-        title: const Text(
-          'End Live Stream',
-          style: TextStyle(color: Colors.white),
+        backgroundColor: isDark ? AppColors.darkBackground : AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
         ),
-        content: const Text(
-          'Are you sure you want to end your live stream?',
-          style: TextStyle(color: Colors.white70),
+        title: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.live_tv_rounded,
+                color: AppColors.primaryColor,
+                size: 24.r,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Text(
+                'End Live Stream',
+                style: GoogleFonts.poppins(
+                  color:
+                      isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.lightTextPrimary,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Are you sure you want to end your live stream?',
+              style: GoogleFonts.openSans(
+                color:
+                    isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+                fontSize: 14.sp,
+                height: 1.4,
+              ),
+            ),
+            SizedBox(height: 12.h),
+            Container(
+              padding: EdgeInsets.all(12.r),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.warning_rounded,
+                    color: AppColors.primaryColor,
+                    size: 16.r,
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Text(
+                      'This will disconnect all viewers',
+                      style: GoogleFonts.openSans(
+                        color: AppColors.primaryColor,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              await controller.endLiveStram();
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text(
-              'End Live',
-              style: TextStyle(color: Colors.white),
+          // Cancel Button
+          TextButton(
+            onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
+            child: Text(
+              'Cancel',
+              style: AppTextStyles.button.copyWith(
+                color:
+                    isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+              ),
+            ),
+          ),
+
+          // End Live Button
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primaryColor, AppColors.accentColor],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(8.r),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                Get.back();
+                await controller.endLiveStram();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: AppColors.white,
+                shadowColor: Colors.transparent,
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+              icon: Icon(
+                Icons.stop_rounded,
+                size: 16.r,
+                color: AppColors.white,
+              ),
+              label: Text(
+                'End Live',
+                style: AppTextStyles.button.copyWith(
+                  color: AppColors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
       ),
+      barrierDismissible: false,
     );
   }
 

@@ -327,12 +327,12 @@ class HostController extends GetxController {
       } else {
         await engine.stopScreenCapture();
       }
-      SnackBarUiView.showSuccess(
-        message:
-            isScreenSharing.value
-                ? 'Screen sharing started'
-                : 'Screen sharing stopped',
-      );
+      // SnackBarUiView.showSuccess(
+      //   message:
+      //       isScreenSharing.value
+      //           ? 'Screen sharing started'
+      //           : 'Screen sharing stopped',
+      // );
     } catch (e) {
       debugPrint('Screen share error: $e');
       isScreenSharing.value = false;

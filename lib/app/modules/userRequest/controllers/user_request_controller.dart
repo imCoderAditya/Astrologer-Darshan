@@ -5,6 +5,7 @@ import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/data/endpoint/end_pont.dart';
 import 'package:astrology/app/data/models/userRequest/user_request_model.dart';
 import 'package:astrology/app/data/repositories/userRequest/user_request_repository.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class UserRequestController extends GetxController {
@@ -37,6 +38,7 @@ class UserRequestController extends GetxController {
 
   Future<void> statusUpdate(String? status, int? sessionId) async {
     try {
+      debugPrint(" sessionId ::::$sessionId");
       final res = await BaseClient.post(
         api: EndPoint.statusUpdate,
         data: {"SessionId": sessionId, "Status": status},

@@ -425,13 +425,13 @@ class ProfileView extends StatelessWidget {
                               borderRadius: BorderRadius.circular(15),
                               gradient: LinearGradient(
                                 colors: [
-                                  AppColors.red.withOpacity(0.8),
-                                  AppColors.red,
+                                  AppColors.primaryColor.withOpacity(0.8),
+                                  AppColors.primaryColor,
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.red.withOpacity(0.3),
+                                  color: AppColors.primaryColor.withOpacity(0.3),
                                   spreadRadius: 2,
                                   blurRadius: 10,
                                   offset: const Offset(0, 5),

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/utils/date_utils.dart';
@@ -8,6 +10,7 @@ import 'package:astrology/app/modules/voiceCall/views/voice_call_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../controllers/user_request_controller.dart';
 
@@ -167,7 +170,7 @@ class UserRequestView extends GetView<UserRequestController> {
               color: AppColors.primaryColor,
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(Icons.request_page, color: Colors.white, size: 24.w),
+            child: Icon(Icons.remove_from_queue_rounded, color: Colors.white, size: 24.w),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -212,6 +215,12 @@ class UserRequestView extends GetView<UserRequestController> {
         child: InkWell(
           borderRadius: BorderRadius.circular(16.r),
           onTap: () async {
+            if (session?.status?.toLowerCase() == "completed") {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _showSessionCompletedDialog();
+              });
+              return;
+            }
             if (session?.status?.toLowerCase() == "pending") {
               controller.statusUpdate("Active", session?.sessionId);
             }
@@ -434,6 +443,119 @@ class UserRequestView extends GetView<UserRequestController> {
           ],
         ],
       ),
+    );
+  }
+
+  // Add this method to your _ChatViewState class
+  void _showSessionCompletedDialog() {
+    final isDark = Theme.of(Get.context!).brightness == Brightness.dark;
+
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false, // Cannot dismiss by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: isDark ? AppColors.darkBackground : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8.r),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.info_rounded,
+                  color: AppColors.primaryColor,
+                  size: 24.r,
+                ),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  'Session Completed',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Your chat session has been completed. You can no longer interact with the customer.',
+                style: GoogleFonts.openSans(
+                  fontSize: 14.sp,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  height: 1.4,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              Container(
+                padding: EdgeInsets.all(12.r),
+                decoration: BoxDecoration(
+                  color:
+                      (isDark
+                          ? AppColors.primaryColor.withValues(alpha: 0.2)
+                          : AppColors.lightBackground),
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline,
+                      color: AppColors.primaryColor,
+                      size: 18.r,
+                    ),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        'Session marked as completed',
+                        style: GoogleFonts.openSans(
+                          fontSize: 12.sp,
+                          color: isDark ? Colors.white60 : Colors.black45,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Get.back(); // Go back to previous screen
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'OK',
+                style: GoogleFonts.poppins(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

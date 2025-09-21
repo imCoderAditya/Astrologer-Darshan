@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:astrology/app/core/utils/logger_utils.dart';
 import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/data/endpoint/end_pont.dart';
@@ -9,6 +8,7 @@ import 'package:get/get.dart';
 
 class WalletController extends GetxController {
   int? astrologerId = LocalStorageService.getAstrologerId();
+  String? userId = LocalStorageService.getUserId();
   var isLoading = false.obs;
   Rxn<WalletModel> walletModel = Rxn<WalletModel>();
 
@@ -17,7 +17,7 @@ class WalletController extends GetxController {
     try {
       final res = await BaseClient.get(
         api:
-            "${EndPoint.astrologerWallet}?userId=$astrologerId&transactionType=All&status=All",
+            "${EndPoint.astrologerWallet}?userId=$userId&transactionType=All&status=All",
       );
       if (res != null && res.statusCode == 200) {
         walletModel.value = walletModelFromJson(json.encode(res.data));
