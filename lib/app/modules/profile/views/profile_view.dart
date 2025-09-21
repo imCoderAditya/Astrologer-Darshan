@@ -34,11 +34,13 @@ class ProfileView extends StatelessWidget {
       builder: (controller) {
         ProfileData? profileData = controller.profileModel.value?.data;
         return Scaffold(
+          
           backgroundColor: background,
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
-                expandedHeight: 280.0,
+                leading: IconButton(onPressed: ()=>Get.back(), icon: Icon(Icons.arrow_back_ios)),
+                expandedHeight: 310.0,
                 backgroundColor: AppColors.primaryColor,
                 floating: false,
                 pinned: false,

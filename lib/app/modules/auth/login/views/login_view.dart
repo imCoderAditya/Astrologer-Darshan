@@ -4,7 +4,7 @@ import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart'
     show AppTextStyles;
 import 'package:astrology/app/core/config/theme/theme_controller.dart';
-import 'package:astrology/app/routes/app_pages.dart';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

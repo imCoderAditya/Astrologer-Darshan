@@ -99,7 +99,7 @@ class SplashController extends GetxController
 
     final isLogin = await BaseClient.isAuthenticated();
     if (isLogin == true) {
-      Get.offNamed(Routes.NAV);
+      Get.offNamed(Routes.HOME);
     } else {
       Get.offNamed(Routes.LOGIN);
     }

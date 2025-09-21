@@ -8,10 +8,8 @@ import 'package:http/http.dart' as http;
 
 class AppColors {
   // Branding Colors
-  static Color primaryColor = hexToColor("#f56642");
-  static Color accentColor = hexToColor("#fc8365");
-  // static const Color primaryColor = Color(0xFF1976D2); // Doctor Blue
-  // static const Color accentColor = Color(0xFF00ACC1); // Cyan
+  static Color primaryColor = hexToColor("#c40294"); // light pink
+  static Color accentColor = hexToColor("#5e0247"); // medium pink
   // Success & Alerts
   static Color secondaryPrimary = hexToColor("#e3770b"); // Golden Yellow
   static const Color sucessPrimary = Color(0xFF4CAF50); // Medical Green
@@ -49,7 +47,10 @@ class AppColors {
   static const Color textSecondaryLight = Color(0xFF757575);
   static const Color dividerLight = Color(0xFFE0E0E0);
 
-  static List<Color> get headerGradientColors => [AppColors.primaryColor, AppColors.accentColor];
+  static List<Color> get headerGradientColors => [
+    AppColors.primaryColor,
+    AppColors.accentColor,
+  ];
 }
 
 Color hexToColor(String hexString) {
@@ -69,7 +70,9 @@ Future<Color> getDominantColorFromUrl(String imageUrl) async {
     final Uint8List bytes = response.bodyBytes;
     final ui.Image image = await decodeImageFromList(bytes);
 
-    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    final ByteData? byteData = await image.toByteData(
+      format: ui.ImageByteFormat.rawRgba,
+    );
     if (byteData == null) return Colors.grey;
 
     final Uint8List pixels = byteData.buffer.asUint8List();
@@ -99,7 +102,8 @@ Future<Color> getDominantColorFromUrl(String imageUrl) async {
     if (colorCount.isEmpty) return Colors.grey;
 
     // Find the most frequent color
-    final dominantColor = colorCount.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+    final dominantColor =
+        colorCount.entries.reduce((a, b) => a.value > b.value ? a : b).key;
 
     // Convert back to full RGB values
     final r = ((dominantColor >> 16) & 0xFF) * 16;
@@ -124,7 +128,9 @@ Future<Color> getAverageColorFromUrl(String imageUrl) async {
     final Uint8List bytes = response.bodyBytes;
     final ui.Image image = await decodeImageFromList(bytes);
 
-    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+    final ByteData? byteData = await image.toByteData(
+      format: ui.ImageByteFormat.rawRgba,
+    );
     if (byteData == null) return Colors.grey;
 
     final Uint8List pixels = byteData.buffer.asUint8List();

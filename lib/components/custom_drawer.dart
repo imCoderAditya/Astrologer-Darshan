@@ -20,6 +20,7 @@ class DrawerController extends GetxController {
       title: "Dashboard",
       route: "/dashboard",
     ),
+    DrawerItem(icon: Icons.person, title: "Profile", route: Routes.PROFILE),
     // DrawerItem(
     //   icon: Icons.calendar_today_outlined,
     //   title: "My Readings",
@@ -684,7 +685,7 @@ class AppDrawer extends StatelessWidget {
           ),
           const SizedBox(height: 25),
           Text(
-            "v1.0.0 • © 2025 Astro Insights",
+            "v1.0.0 • © 2025 Astro Darshan",
             style: AppTextStyles.small().copyWith(
               color: secondaryColor.withOpacity(0.6), // No clamp needed here
               fontSize: 12,
@@ -698,24 +699,16 @@ class AppDrawer extends StatelessWidget {
 
   void _onItemTap(int index, DrawerController drawerController) {
     drawerController.selectItem(index);
-    Get.back(); // Close drawer
 
-    final item = drawerController.drawerItems[index];
+    Get.back(); // Close drawer
+    if (index == 0) {
+    } else if (index == 1){
+      Get.toNamed(Routes.PROFILE);
+    }
+
+    // final item = drawerController.drawerItems[index];
     // Implement your actual navigation here
     // Get.toNamed(item.route);
-
-    Get.snackbar(
-      "Navigation",
-      "Navigated to ${item.title}",
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: AppColors.primaryColor.withOpacity(
-        0.9,
-      ), // No clamp needed here
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.all(16),
-      borderRadius: 12,
-    );
   }
 
   void _confirmLogout(

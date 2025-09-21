@@ -535,7 +535,7 @@ class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
         ),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.sucessPrimary.withOpacity(0.25),
+          color: AppColors.primaryColor.withOpacity(0.25),
           width: 1.5,
         ),
         boxShadow: [
@@ -543,7 +543,7 @@ class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
             color:
                 widget.isDark
                     ? AppColors.black.withOpacity(0.6)
-                    : AppColors.sucessPrimary.withOpacity(0.12),
+                    : AppColors.primaryColor.withOpacity(0.12),
             spreadRadius: 0,
             blurRadius: 20,
             offset: Offset(0, 6),
@@ -566,18 +566,18 @@ class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  AppColors.sucessPrimary.withOpacity(0.15),
-                  AppColors.sucessPrimary.withOpacity(0.05),
+                  AppColors.primaryColor.withOpacity(0.15),
+                  AppColors.primaryColor.withOpacity(0.05),
                 ],
               ),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: AppColors.sucessPrimary.withOpacity(0.3),
+                color: AppColors.primaryColor.withOpacity(0.3),
                 width: 1,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.sucessPrimary.withOpacity(0.2),
+                  color: AppColors.primaryColor.withOpacity(0.2),
                   spreadRadius: 0,
                   blurRadius: 8,
                   offset: Offset(0, 2),
@@ -586,7 +586,7 @@ class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
             ),
             child: Icon(
               Icons.wifi_rounded,
-              color: AppColors.sucessPrimary,
+              color: AppColors.primaryColor,
               size: 22,
             ),
           ),
@@ -597,7 +597,7 @@ class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
             child: Text(
               "You are Currently Online",
               style: AppTextStyles.body().copyWith(
-                color: AppColors.sucessPrimary,
+                color: AppColors.primaryColor,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.4,
                 height: 1.2,
@@ -614,7 +614,7 @@ class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
                   Text(
                     "Online",
                     style: AppTextStyles.body().copyWith(
-                      color: AppColors.sucessPrimary,
+                      color: AppColors.primaryColor,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.6,
                     ),
@@ -637,11 +637,11 @@ class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
                         width: 12,
                         height: 12,
                         decoration: BoxDecoration(
-                          color: AppColors.sucessPrimary,
+                          color: AppColors.primaryColor,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.sucessPrimary.withOpacity(0.7),
+                              color: AppColors.primaryColor.withOpacity(0.7),
                               spreadRadius: 0,
                               blurRadius: 8,
                               offset: Offset(0, 0),

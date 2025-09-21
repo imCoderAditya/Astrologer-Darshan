@@ -110,7 +110,7 @@ class OtpVerifyController extends GetxController {
           );
           debugPrint("UserId ===>$userId");
           debugPrint("UserId ===>$astrologerId");
-          Get.offAllNamed(Routes.NAV);
+          Get.offAllNamed(Routes.HOME);
         } else {
           SnackBarUiView.showError(message: response.data["message"] ?? "");
           errorMessage.value = response.data["message"] ?? "";
