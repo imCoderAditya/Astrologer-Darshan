@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:astrology/app/core/config/theme/app_colors.dart';
+import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/data/models/message/message_model.dart';
 import 'package:astrology/app/data/models/userRequest/user_request_model.dart';
 import 'package:astrology/app/modules/chat/controllers/chat_controller.dart';
@@ -28,40 +29,50 @@ class _ChatViewState extends State<ChatView> {
 
   final timerService = TimerService();
 
+  String? timerValue;
   @override
   void initState() {
-    // _timerStart();
+    if (controller.isDisable.value == false) {
+      _timerStart();
+    }
     super.initState();
   }
 
-  // _timerStart() {
-  //   timerService.startTimer(
-  //     endTimeInMinutes: 2, // कितने minute तक timer चलना है
-  //     onTick: (remaining) {
-  //       debugPrint(
-  //         "Remaining: ${remaining.inMinutes}:${remaining.inSeconds % 60}",
-  //       );
-  //     },
-  //     onComplete: () {
-  //       debugPrint("Time completed!");
-  //     },
-  //   );
-  // }
+  _timerStart() {
+    timerService.startTimer(
+      countUp: true,
+      onTick: (elapsed) {
+        debugPrint(
+          "Time elapsed: ${elapsed.inMinutes} : ${elapsed.inSeconds % 60}",
+        );
+        setState(() {
+          timerValue = "${elapsed.inMinutes} : ${elapsed.inSeconds % 60}";
+        });
+      },
+      onComplete: () {}, // Won't be called for count-up
+    );
+  }
+
   final callcontroller =
       Get.isRegistered<UserRequestController>()
           ? Get.find<UserRequestController>()
           : Get.put(UserRequestController());
   @override
   void dispose() {
+    if (controller.isDisable.value == false) {
+      controller.sendMessage(message: "Disconnect");
+    }
+    Future.delayed(Duration(microseconds: 200));
     controller.webSocketService?.disconnect();
     controller.showEmojiPicker.value = false;
+
     timerService.stopTimer();
     callcontroller.statusUpdate("Completed", controller.sessionID).then((
       value,
     ) async {
       debugPrint("complete API call :${controller.sessionID}");
     });
-
+    controller.isDisable.value = false;
     super.dispose();
   }
 
@@ -72,8 +83,12 @@ class _ChatViewState extends State<ChatView> {
 
     return WillPopScope(
       onWillPop: () async {
-        final shouldClose = await _showExitConfirmationDialog();
-        return shouldClose;
+        if (controller.isDisable.value == false) {
+          final shouldClose = await _showExitConfirmationDialog();
+          return shouldClose;
+        } else {
+          return true;
+        }
       },
       child: Scaffold(
         backgroundColor:
@@ -88,7 +103,33 @@ class _ChatViewState extends State<ChatView> {
                       : SizedBox(),
             ),
             Expanded(child: _buildMessagesList(controller)),
-            _buildMessageInput(controller, isDark),
+            Obx(() {
+              return controller.isDisable.value == true
+                  ? Padding(
+                    padding: const EdgeInsets.only(bottom: 30),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.offline_bolt,
+                          color: Colors.red,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Chat Disconnected",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red.shade700,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                  : _buildMessageInput(controller, isDark);
+            }),
           ],
         ),
       ),
@@ -134,12 +175,17 @@ class _ChatViewState extends State<ChatView> {
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: Colors.white),
         onPressed: () async {
-          bool shouldClose = await _showExitConfirmationDialog();
-          if (shouldClose) {
+          if (controller.isDisable.value == false) {
+            bool shouldClose = await _showExitConfirmationDialog();
+            if (shouldClose) {
+              Get.back();
+            }
+          } else {
             Get.back();
           }
         },
       ),
+
       title: Row(
         children: [
           Hero(
@@ -207,10 +253,15 @@ class _ChatViewState extends State<ChatView> {
                 Obx(
                   () => Text(
                     controller.webSocketService?.isConnected.value ?? false
-                        ? controller.lastSeen.value
+                        ? controller.isDisable.value
+                            ? "Offline"
+                            : controller.lastSeen.value
                         : 'Connecting...',
                     style: GoogleFonts.openSans(
-                      color: Colors.white70,
+                      color:
+                          controller.isDisable.value
+                              ? AppColors.red
+                              : AppColors.white,
                       fontSize: 12.sp,
                     ),
                   ),
@@ -221,6 +272,14 @@ class _ChatViewState extends State<ChatView> {
         ],
       ),
       actions: [
+        Obx(() {
+          return controller.isDisable.value
+              ? SizedBox()
+              : Padding(
+                padding: const EdgeInsets.only(right: 20),
+                child: Text("$timerValue", style: AppTextStyles.body()),
+              );
+        }),
         // IconButton(
         //   icon: const Icon(Icons.videocam, color: Colors.white),
         //   onPressed: () {},
@@ -669,7 +728,8 @@ class _ChatViewState extends State<ChatView> {
                 // Proceed Button
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(true); // Return true (close chat)
+                    Get.back();
+                    Get.back();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,

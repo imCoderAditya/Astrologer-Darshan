@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
-
 enum MessageStatus { sending, sent, delivered, read }
 
 enum MessageType { text, image, voice }
@@ -38,6 +37,7 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
   // Current user ID
   int? currentUserID;
   int? sessionID;
+  RxBool isDisable = false.obs;
 
   Future<void> setData({int? sessionId}) async {
     final userId_ = LocalStorageService.getUserId();
@@ -113,6 +113,10 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
         currentUserID ?? 0,
       );
 
+      if (incomingMessage.text.toLowerCase() == "disconnect") {
+        isDisable.value = true;
+      }
+
       LoggerUtils.debug(
         "📋 Processed message - SenderID: ${incomingMessage.senderID}, CurrentUserID: $currentUserID, Text: ${incomingMessage.text}",
       );
@@ -175,10 +179,10 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
     }
   }
 
-  void sendMessage() {
-    if (messageController.text.trim().isEmpty) return;
+  void sendMessage({String? message}) {
+    // if (messageController.text.trim().isEmpty) return;
 
-    final messageText = messageController.text.trim();
+    final messageText = message ?? messageController.text.trim();
     final localId = DateTime.now().millisecondsSinceEpoch.toString();
 
     // ✅ Create local message for immediate UI update (NO messageID)
@@ -244,6 +248,7 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
   @override
   void onClose() {
     // Cancel subscription
+
     _wsSubscription?.cancel();
     _wsSubscription = null;
 
@@ -254,5 +259,4 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
 
     super.onClose();
   }
-
 }

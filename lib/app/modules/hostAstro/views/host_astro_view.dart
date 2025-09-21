@@ -1,6 +1,9 @@
 // host_view.dart - UI for Astrologer (Broadcasting Live)
 // ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
+
+
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
@@ -16,6 +19,17 @@ class HostView extends GetView<HostController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HostController());
+    controller.liveWebSocketService?.sendMessage({
+      "liveSessionID": 16,
+      "userID": 800,
+      "Username": "Honey",
+      "message": "Hello, this is a test message!",
+      "messageType": "Text",
+      "profile_Url": "c://upload/abc.png",
+      "amount": 0,
+      "isVisible": true,
+    });
+   debugPrint("==>${json.encode(controller.messages)}");
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E27),
       body: SafeArea(

@@ -9,13 +9,16 @@ import 'package:agora_token_generator/agora_token_generator.dart';
 import 'package:astrology/app/core/utils/logger_utils.dart';
 import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/data/endpoint/end_pont.dart';
+import 'package:astrology/app/data/models/message/message_model.dart';
 import 'package:astrology/app/routes/app_pages.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
+import 'package:astrology/app/services/webshoket/live_websoket_services.dart';
 import 'package:astrology/components/global_loader.dart';
 import 'package:astrology/components/snack_bar_view.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
@@ -76,10 +79,102 @@ class HostController extends GetxController {
     LoggerUtils.debug('🎯Host Channel: $channelName');
     LoggerUtils.debug('🎯Host Token: $etcToken');
     await initAgora();
+
     update();
     return true;
   }
 
+  // WebSocket service
+   LiveWebsoketServices? liveWebSocketService;
+  StreamSubscription? _wsSubscription;
+  int? currentUserID;
+  List<Message> messages = [];
+
+  Future<void> initializeWebSocket({String? sessionId}) async {
+    // Init service
+    if (Get.isRegistered<LiveWebsoketServices>()) {
+      liveWebSocketService = Get.find<LiveWebsoketServices>();
+    } else {
+      liveWebSocketService = Get.put(LiveWebsoketServices());
+    }
+
+    // Connect if not already connected
+    if (!(liveWebSocketService?.isConnected.value == true)) {
+      await liveWebSocketService?.connect(sessionId: sessionId);
+    }
+
+    // Cancel previous subscription before listening again
+    await _wsSubscription?.cancel();
+
+    // Listen to incoming messages
+    _wsSubscription = liveWebSocketService?.messageStream.listen((message) {
+      log("📨 Incoming WebSocket: $message");
+      handleIncomingMessage(message);
+    });
+  }
+
+  void handleIncomingMessage(Map<String, dynamic> messageData) {
+    LoggerUtils.debug("📨 Received message: $messageData");
+
+    if (messageData['type'] == 'chat_message') {
+      final incomingMessage = Message.fromWebSocket(
+        messageData,
+        currentUserID ?? 0,
+      );
+
+      LoggerUtils.debug(
+        "📋 Processed message - SenderID: ${incomingMessage.senderID}, CurrentUserID: $currentUserID, Text: ${incomingMessage.text}",
+      );
+
+      // Same sender (self)
+      if (incomingMessage.senderID == currentUserID) {
+        LoggerUtils.debug("🔄 This is our own message coming back from server");
+
+        final localMessageIndex = messages.indexWhere(
+          (message) =>
+              message.isSentByMe &&
+              message.text == incomingMessage.text &&
+              message.senderID == currentUserID &&
+              message.messageID == null,
+        );
+
+        if (localMessageIndex != -1) {
+          messages.removeAt(localMessageIndex);
+          messages.insert(localMessageIndex, incomingMessage);
+          LoggerUtils.debug("✅ Replaced local message with server message");
+        } else {
+          final existingIndex = messages.indexWhere(
+            (m) => m.messageID == incomingMessage.messageID,
+          );
+
+          if (existingIndex == -1) {
+            messages.add(incomingMessage);
+            scrollToBottom();
+            LoggerUtils.debug("✅ Added own message as new");
+          }
+        }
+      } else {
+        // Another user
+        LoggerUtils.debug("👤 Message from another user");
+
+        final existingIndex = messages.indexWhere(
+          (m) => m.messageID == incomingMessage.messageID,
+        );
+
+        if (existingIndex == -1) {
+          messages.add(incomingMessage);
+          scrollToBottom();
+          LoggerUtils.debug("✅ Added new message from other user");
+        } else {
+          LoggerUtils.debug("⚠️ Duplicate message skipped");
+        }
+      }
+    }
+  }
+
+  void scrollToBottom() {
+    // implement your scroll handling
+  }
   Future<void> generateToken({String? channelName, String? userName}) async {
     GlobalLoader.show();
     const String appId = APPID;
@@ -451,6 +546,7 @@ class HostController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _initTokenAndEngine();
     });
+
     super.onInit();
   }
 
@@ -492,6 +588,7 @@ class HostController extends GetxController {
           channelName: streamkey['StreamKey'] ?? '',
           userName: streamkey['Title'] ?? '',
         );
+        await initializeWebSocket();
       } else {
         LoggerUtils.error("Error:${res.data}");
       }
@@ -523,5 +620,18 @@ class HostController extends GetxController {
       GlobalLoader.hide();
       LoggerUtils.error("Error: $e");
     }
+  }
+
+  @override
+  void dispose() {
+       // Cancel subscription
+    _wsSubscription?.cancel();
+    _wsSubscription = null;
+
+    // Dispose controllers
+    // messageController.dispose();
+    // scrollController.dispose();
+    // animationController.dispose();
+    super.dispose();
   }
 }
