@@ -8,6 +8,7 @@ import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:get/get.dart';
 
 class NotificationController extends GetxController {
+  
   final userId = LocalStorageService.getUserId();
   var isLoading = false.obs;
   Rxn<NotificationModel> notificationModel = Rxn<NotificationModel>();
