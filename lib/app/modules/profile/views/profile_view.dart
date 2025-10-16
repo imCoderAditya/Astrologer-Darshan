@@ -5,6 +5,7 @@ import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/core/utils/date_utils.dart';
 import 'package:astrology/app/data/models/profile/profile_model.dart';
 import 'package:astrology/app/modules/profile/controllers/profile_controller.dart';
+import 'package:astrology/app/modules/webview/views/webview_view.dart';
 import 'package:astrology/app/routes/app_pages.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:flutter/material.dart';
@@ -33,13 +34,16 @@ class ProfileView extends StatelessWidget {
       init: ProfileController(),
       builder: (controller) {
         ProfileData? profileData = controller.profileModel.value?.data;
+
         return Scaffold(
-          
           backgroundColor: background,
           body: CustomScrollView(
             slivers: [
               SliverAppBar(
-                leading: IconButton(onPressed: ()=>Get.back(), icon: Icon(Icons.arrow_back_ios)),
+                leading: IconButton(
+                  onPressed: () => Get.back(),
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
                 expandedHeight: 310.0,
                 backgroundColor: AppColors.primaryColor,
                 floating: false,
@@ -121,14 +125,65 @@ class ProfileView extends StatelessWidget {
                                       ),
                                     ),
 
-                                    // Profile picture
                                     CircleAvatar(
                                       radius: 42,
                                       backgroundColor: AppColors.white,
                                       child: CircleAvatar(
                                         radius: 40,
-                                        backgroundImage: NetworkImage(
-                                          profileData?.profilePicture ?? "",
+                                        backgroundColor: AppColors.primaryColor
+                                            .withOpacity(0.3), // fallback
+                                        child: ClipOval(
+                                          child:
+                                              (profileData?.profilePicture !=
+                                                          null &&
+                                                      profileData!
+                                                          .profilePicture!
+                                                          .isNotEmpty)
+                                                  ? Image.network(
+                                                    profileData
+                                                            .profilePicture ??
+                                                        "",
+                                                    width: 80,
+                                                    height: 80,
+                                                    fit: BoxFit.cover,
+                                                    loadingBuilder: (
+                                                      context,
+                                                      child,
+                                                      loadingProgress,
+                                                    ) {
+                                                      if (loadingProgress ==
+                                                          null) {
+                                                        return child;
+                                                      }
+                                                      return Center(
+                                                        child: CircularProgressIndicator(
+                                                          valueColor:
+                                                              AlwaysStoppedAnimation(
+                                                                AppColors.white,
+                                                              ),
+                                                          strokeWidth: 2,
+                                                        ),
+                                                      );
+                                                    },
+                                                    errorBuilder: (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      return Icon(
+                                                        Icons.person,
+                                                        size: 60,
+                                                        color:
+                                                            AppColors
+                                                                .primaryColor,
+                                                      );
+                                                    },
+                                                  )
+                                                  : Icon(
+                                                    Icons.person,
+                                                    size: 40,
+                                                    color: AppColors.white,
+                                                  ),
                                         ),
                                       ),
                                     ),
@@ -327,87 +382,96 @@ class ProfileView extends StatelessWidget {
                   //         colorText: AppColors.white,
                   //       ),
                   // ),
-                  _buildSettingsTile(
-                    Icons.notifications_none,
-                    "Notifications",
-                    textColor: textColor,
-                    trailing: Switch(
-                      value: true,
-                      onChanged: (bool value) {
-                        Get.snackbar(
-                          "Notifications",
-                          "Notifications Toggled: $value",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.sucessPrimary,
-                          colorText: AppColors.white,
-                        );
-                      },
-                      activeColor: AppColors.primaryColor,
-                      inactiveThumbColor: secondaryTextColor,
-                      inactiveTrackColor: dividerColor,
-                    ),
-                  ),
-
+                  // _buildSettingsTile(
+                  //   Icons.notifications_none,
+                  //   "Notifications",
+                  //   textColor: textColor,
+                  //   trailing: Switch(
+                  //     value: true,
+                  //     onChanged: (bool value) {
+                  //       Get.snackbar(
+                  //         "Notifications",
+                  //         "Notifications Toggled: $value",
+                  //         snackPosition: SnackPosition.BOTTOM,
+                  //         backgroundColor: AppColors.sucessPrimary,
+                  //         colorText: AppColors.white,
+                  //       );
+                  //     },
+                  //     activeColor: AppColors.primaryColor,
+                  //     inactiveThumbColor: secondaryTextColor,
+                  //     inactiveTrackColor: dividerColor,
+                  //   ),
+                  // ),
                   _buildSettingsTile(
                     Icons.security,
                     "Privacy Policy",
                     textColor: textColor,
-                    onTap:
-                        () => Get.snackbar(
-                          "Action",
-                          "Privacy Policy Tapped",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.primaryColor,
-                          colorText: AppColors.white,
+                    onTap: () {
+                      Get.to(
+                        WebviewView(
+                          url: "https://theastrodarshan.com/Privacy.aspx",
                         ),
+                      );
+                    },
+                  ),
+                  _buildSettingsTile(
+                    Icons.security,
+                    "Terms & Conditions",
+                    textColor: textColor,
+                    onTap: () {
+                      Get.to(
+                        WebviewView(
+                          url: "https://theastrodarshan.com/Terms.aspx",
+                        ),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 25),
 
                   // App Section
-                  _buildSectionTitle("Astrology Services", textColor),
-                  _buildSettingsTile(
-                    Icons.article_outlined,
-                    "Birth Chart Analysis",
-                    textColor: textColor,
-                    onTap:
-                        () => Get.snackbar(
-                          "Service",
-                          "Birth Chart Analysis Available",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.primaryColor,
-                          colorText: AppColors.white,
-                        ),
-                  ),
+                  // _buildSectionTitle("Astrology Services", textColor),
+                  // _buildSettingsTile(
+                  //   Icons.article_outlined,
+                  //   "Birth Chart Analysis",
+                  //   textColor: textColor,
+                  //   onTap:
+                  //       () => Get.snackbar(
+                  //         "Service",
+                  //         "Birth Chart Analysis Available",
+                  //         snackPosition: SnackPosition.BOTTOM,
+                  //         backgroundColor: AppColors.primaryColor,
+                  //         colorText: AppColors.white,
+                  //       ),
+                  // ),
 
-                  _buildSettingsTile(
-                    Icons.favorite_outline,
-                    "Compatibility Report",
-                    textColor: textColor,
-                    onTap:
-                        () => Get.snackbar(
-                          "Service",
-                          "Compatibility Report Available",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.primaryColor,
-                          colorText: AppColors.white,
-                        ),
-                  ),
+                  // _buildSettingsTile(
+                  //   Icons.favorite_outline,
+                  //   "Compatibility Report",
+                  //   textColor: textColor,
+                  //   onTap:
+                  //       () => Get.snackbar(
+                  //         "Service",
+                  //         "Compatibility Report Available",
+                  //         snackPosition: SnackPosition.BOTTOM,
+                  //         backgroundColor: AppColors.primaryColor,
+                  //         colorText: AppColors.white,
+                  //       ),
+                  // ),
 
-                  _buildSettingsTile(
-                    Icons.star_rate_rounded,
-                    "Rate Our Services",
-                    textColor: textColor,
-                    onTap:
-                        () => Get.snackbar(
-                          "Action",
-                          "Rate Us Tapped",
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.primaryColor,
-                          colorText: AppColors.white,
-                        ),
-                  ),
-
+                  // _buildSettingsTile(
+                  //   Icons.star_rate_rounded,
+                  //   "Rate Our Services",
+                  //   textColor: textColor,
+                  //   onTap:
+                  //       () => Get.snackbar(
+                  //         "Action",
+                  //         "Rate Us Tapped",
+                  //         snackPosition: SnackPosition.BOTTOM,
+                  //         backgroundColor: AppColors.primaryColor,
+                  //         colorText: AppColors.white,
+                  //       ),
+                  // ),
                   const SizedBox(height: 35),
 
                   // Enhanced Logout Button
@@ -431,7 +495,9 @@ class ProfileView extends StatelessWidget {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primaryColor.withOpacity(0.3),
+                                  color: AppColors.primaryColor.withOpacity(
+                                    0.3,
+                                  ),
                                   spreadRadius: 2,
                                   blurRadius: 10,
                                   offset: const Offset(0, 5),

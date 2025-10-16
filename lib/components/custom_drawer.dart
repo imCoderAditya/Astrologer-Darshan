@@ -4,6 +4,7 @@ import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/core/config/theme/theme_controller.dart';
 import 'package:astrology/app/modules/profile/controllers/profile_controller.dart';
+import 'package:astrology/app/modules/webview/views/webview_view.dart';
 import 'package:astrology/app/routes/app_pages.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:flutter/material.dart';
@@ -23,19 +24,19 @@ class DrawerController extends GetxController {
     DrawerItem(icon: Icons.person, title: "Profile", route: Routes.PROFILE),
     // DrawerItem(
     //   icon: Icons.calendar_today_outlined,
-    //   title: "My Readings",
+    //   title: "About",
     //   route: "/readings",
     // ),
-    // DrawerItem(
-    //   icon: Icons.article_outlined,
-    //   title: "Saved Articles",
-    //   route: "/articles",
-    // ),
-    // DrawerItem(
-    //   icon: Icons.groups_outlined,
-    //   title: "Consult Experts",
-    //   route: "/experts",
-    // ),
+    DrawerItem(
+      icon: Icons.article_outlined,
+      title: "Privacy Policy",
+      route: "/articles",
+    ),
+    DrawerItem(
+      icon: Icons.groups_outlined,
+      title: "Terms & Condition",
+      route: Routes.TERMS_CONDITION,
+    ),
     // DrawerItem(
     //   icon: Icons.settings_input_component_outlined,
     //   title: "Settings",
@@ -71,7 +72,6 @@ class AppDrawer extends StatelessWidget {
     final themeController = Get.find<ThemeController>();
 
     final drawerController = Get.put(DrawerController());
-
     return Obx(() {
       final isDark = themeController.isDarkMode.value;
       final bgColor =
@@ -110,7 +110,7 @@ class AppDrawer extends StatelessWidget {
             children: [
               // Enhanced Gradient Header
               _buildGradientHeader(isDark, highlightTextColor),
-
+ 
               // Branded App Name with Animation
               _buildBrandSection(highlightTextColor),
 
@@ -149,7 +149,15 @@ class AppDrawer extends StatelessWidget {
               ),
 
               // Theme Toggle (moved out of _buildAnimatedNavItem as it's a special case)
-              SizedBox(height: 150.h),
+               _buildOnlineOffline(
+                themeController,
+                textColor,
+                highlightColor,
+                highlightTextColor,
+                secondaryColor,
+                isDark,
+              ),
+      
               _buildThemeToggle(
                 themeController,
                 textColor,
@@ -158,6 +166,7 @@ class AppDrawer extends StatelessWidget {
                 secondaryColor,
                 isDark,
               ),
+            
 
               _buildFooterSection(context, textColor, secondaryColor, isDark),
             ],
@@ -198,6 +207,16 @@ class AppDrawer extends StatelessWidget {
             duration: const Duration(milliseconds: 1200),
             curve: Curves.elasticOut,
             builder: (context, value, child) {
+              final isActive =
+                  (profileController.profileModel.value?.data?.profilePicture !=
+                      null) &&
+                  (profileController
+                          .profileModel
+                          .value
+                          ?.data
+                          ?.profilePicture
+                          ?.isNotEmpty ??
+                      false);
               // Clamp scale value explicitly to prevent overshoot issues
               final clampedScale = (0.8 + (value * 0.2)).clamp(0.0, 1.0);
               return Transform.scale(
@@ -224,17 +243,56 @@ class AppDrawer extends StatelessWidget {
                       ),
                     ),
                     child: CircleAvatar(
-                      radius: 38,
-                      backgroundColor: Colors.transparent,
+                      radius: 42,
+                      backgroundColor: AppColors.white,
                       child: CircleAvatar(
-                        radius: 35,
-                        backgroundImage: NetworkImage(
-                          profileController
-                                  .profileModel
-                                  .value
-                                  ?.data
-                                  ?.profilePicture ??
-                              "",
+                        radius: 40,
+                        backgroundColor: AppColors.primaryColor.withOpacity(
+                          0.3,
+                        ), // fallback
+                        child: ClipOval(
+                          child:
+                              isActive
+                                  ? Image.network(
+                                    profileController
+                                            .profileModel
+                                            .value
+                                            ?.data
+                                            ?.profilePicture ??
+                                        "",
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (
+                                      context,
+                                      child,
+                                      loadingProgress,
+                                    ) {
+                                      if (loadingProgress == null) {
+                                        return child;
+                                      }
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor: AlwaysStoppedAnimation(
+                                            AppColors.white,
+                                          ),
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(
+                                        Icons.person,
+                                        size: 60,
+                                        color: AppColors.primaryColor,
+                                      );
+                                    },
+                                  )
+                                  : Icon(
+                                    Icons.person,
+                                    size: 40,
+                                    color: AppColors.primaryColor,
+                                  ),
                         ),
                       ),
                     ),
@@ -618,6 +676,115 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
+  Widget _buildOnlineOffline(
+    ThemeController themeController,
+    Color textColor,
+    Color highlightColor,
+    Color highlightTextColor,
+    Color secondaryColor,
+    bool isDark,
+  ) {
+    bool isOnline =
+        profileController.profileModel.value?.data?.isOnline ?? false;
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => {
+            isOnline = !isOnline,
+            debugPrint(isOnline.toString()),
+            profileController.onlineOffline(isOnline: isOnline)
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    isOnline
+                        ? Icons.online_prediction
+                        : Icons.offline_bolt,
+                    color: AppColors.accentColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    isOnline ? "Online" : "Offline",
+                    style: AppTextStyles.body().copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 52,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    color:
+                        isOnline
+                            ? AppColors.accentColor
+                            : secondaryColor.withOpacity(
+                              0.3,
+                            ), // No clamp needed here
+                    border: Border.all(
+                      color:
+                          isOnline
+                              ? AppColors.accentColor
+                              : secondaryColor.withOpacity(
+                                0.5,
+                              ), // No clamp needed here
+                      width: 1,
+                    ),
+                  ),
+                  child: AnimatedAlign(
+                    duration: const Duration(milliseconds: 300),
+                    alignment:
+                        isOnline ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      margin: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(
+                              0.2,
+                            ), // No clamp needed here
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        isOnline ? Icons.online_prediction : Icons.offline_bolt,
+                        size: 14,
+                        color: isOnline ? AppColors.accentColor : Colors.orange,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFooterSection(
     BuildContext context,
     Color textColor,
@@ -702,8 +869,12 @@ class AppDrawer extends StatelessWidget {
 
     Get.back(); // Close drawer
     if (index == 0) {
-    } else if (index == 1){
+    } else if (index == 1) {
       Get.toNamed(Routes.PROFILE);
+    } else if (index == 2) {
+      Get.to(WebviewView(url: "https://theastrodarshan.com/Privacy.aspx"));
+    } else if (index == 3) {
+      Get.to(WebviewView(url: "https://theastrodarshan.com/Terms.aspx"));
     }
 
     // final item = drawerController.drawerItems[index];

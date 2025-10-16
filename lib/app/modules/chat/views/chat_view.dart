@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart' as foundation;
 
 // Main Chat Screen
 class ChatView extends StatefulWidget {
+ 
   final Session? sessionData;
   const ChatView({super.key, this.sessionData});
 
@@ -30,9 +31,12 @@ class _ChatViewState extends State<ChatView> {
   final timerService = TimerService();
 
   String? timerValue;
+ 
   @override
   void initState() {
+   
     if (controller.isDisable.value == false) {
+
       _timerStart();
     }
     super.initState();
@@ -67,7 +71,7 @@ class _ChatViewState extends State<ChatView> {
     controller.showEmojiPicker.value = false;
 
     timerService.stopTimer();
-    callcontroller.statusUpdate("Completed", controller.sessionID).then((
+    callcontroller.statusUpdate("Completed", controller.sessionID,"Chat").then((
       value,
     ) async {
       debugPrint("complete API call :${controller.sessionID}");
@@ -78,9 +82,10 @@ class _ChatViewState extends State<ChatView> {
 
   @override
   Widget build(BuildContext context) {
+ 
     final controller = Get.put(ChatController());
+   
     final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return WillPopScope(
       onWillPop: () async {
         if (controller.isDisable.value == false) {
@@ -277,7 +282,11 @@ class _ChatViewState extends State<ChatView> {
               ? SizedBox()
               : Padding(
                 padding: const EdgeInsets.only(right: 20),
-                child: Text("$timerValue", style: AppTextStyles.body()),
+                child: Text("Timer  $timerValue", style: AppTextStyles.body().copyWith(
+                  color: AppColors.white,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                )),
               );
         }),
         // IconButton(

@@ -1,8 +1,8 @@
-// ignore_for_file: deprecated_member_use, library_private_types_in_public_api
-
+// ignore_for_file: deprecated_member_use, library_private_types_in_public_api, unused_field
 
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
+import 'package:astrology/app/modules/home/controllers/home_controller.dart';
 import 'package:astrology/app/modules/notification/controllers/notification_controller.dart';
 import 'package:astrology/app/modules/userRequest/controllers/user_request_controller.dart';
 import 'package:astrology/app/modules/userRequest/views/user_request_view.dart';
@@ -27,297 +27,407 @@ class HomeView extends StatelessWidget {
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final userRequestController = Get.put(UserRequestController());
 
-    return Scaffold(
-      backgroundColor: background,
-      drawer: AppDrawer(),
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryColor,
-        elevation: 0,
-        centerTitle: false,
-      
-        title: Text(
-          "Astro Darshan Astrologer",
-          style: AppTextStyles.headlineMedium().copyWith(
-            color: AppColors.white,
-            fontWeight: FontWeight.w500,
-            fontSize: 18.sp,
-          ),
-        ),
-        actions: [
-          GetBuilder<NotificationController>(
-            init: NotificationController(),
-            builder: (controller) {
-              return Stack(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      if (controller.notificationModel.value?.unreadCount !=
-                          0) {
-                        controller.readNotification();
-                      }
-                      Get.toNamed(Routes.NOTIFICATION);
-                    },
-                    icon: Icon(
-                      Icons.notifications_none,
-                      color: AppColors.white,
-                    ),
-                  ),
-                  controller.notificationModel.value?.unreadCount == null ||
-                          controller.notificationModel.value?.unreadCount == 0
-                      ? SizedBox()
-                      : Positioned(
-                        right: 8,
-                        top: 5,
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: AppColors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            controller.notificationModel.value?.unreadCount
-                                    .toString() ??
-                                "",
-                            style: TextStyle(
-                              color: AppColors.white,
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+    return GetBuilder<HomeController>(
+      init: HomeController(),
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: background,
+          drawer: AppDrawer(),
+          appBar: AppBar(
+            backgroundColor: AppColors.primaryColor,
+            elevation: 0,
+            centerTitle: false,
+
+            title: Text(
+              "Astro Darshan Astrologer",
+              style: AppTextStyles.headlineMedium().copyWith(
+                color: AppColors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 18.sp,
+              ),
+            ),
+            actions: [
+              GetBuilder<NotificationController>(
+                init: NotificationController(),
+                builder: (controller) {
+                  return Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          if (controller.notificationModel.value?.unreadCount !=
+                              0) {
+                            controller.readNotification();
+                          }
+                          Get.toNamed(Routes.NOTIFICATION);
+                        },
+                        icon: Icon(
+                          Icons.notifications_none,
+                          color: AppColors.white,
                         ),
                       ),
-                ],
-              );
-            },
+                      controller.notificationModel.value?.unreadCount == null ||
+                              controller.notificationModel.value?.unreadCount ==
+                                  0
+                          ? SizedBox()
+                          : Positioned(
+                            right: 8,
+                            top: 5,
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: AppColors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                controller.notificationModel.value?.unreadCount
+                                        .toString() ??
+                                    "",
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 12.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AnimatedOnlineStatus(
-              cardColor: isDark ? AppColors.darkBackground : AppColors.white,
-              isDark: isDark,
-            ),
-            SizedBox(height: 20),
-
-            // Grid of Services
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.9,
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AnimatedServiceCard(
-                  onTap: () {
-                    userRequestController.fetchUserRequest(sessionType: "Chat");
-                    Get.to(UserRequestView(sessionType: "Chat"));
-                  },
-                  icon: Icons.chat_bubble_outline,
-                  title: "Chat Request",
-                  color: AppColors.sucessPrimary,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
+                SizedBox(height: 20),
+
+                // Grid of Services
+                GridView.count(
+                  crossAxisCount: 4,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 10,
+                  crossAxisSpacing: 10,
+                  childAspectRatio: 0.7,
+                  children: [
+                    AnimatedServiceCard(
+                      onTap: () {
+                        userRequestController.fetchUserRequest(
+                          sessionType: "Chat",
+                        );
+                        Get.to(UserRequestView(sessionType: "Chat"));
+                      },
+                      icon: Icons.chat_bubble_outline,
+                      title: "Chat Request",
+                      color: AppColors.sucessPrimary,
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+
+                    AnimatedServiceCard(
+                      onTap: () {
+                        userRequestController.fetchUserRequest(
+                          sessionType: "Call",
+                        );
+                        Get.to(UserRequestView(sessionType: "Call"));
+                      },
+                      icon: Icons.phone,
+                      title: "Call Request",
+                      color: AppColors.secondaryPrimary,
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    AnimatedServiceCard(
+                      onTap: () {
+                        // userRequestController.fetchUserRequest(sessionType: "Call");
+                        Get.toNamed(Routes.HOST_ASTRO);
+                      },
+                      icon: Icons.live_tv,
+                      title: "Go Live",
+                      color: AppColors.red,
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+
+                    AnimatedServiceCard(
+                      onTap: () {
+                        // userRRequestController.fetchUserRequest(sessionType: "Call");
+                        Get.toNamed(Routes.WALLET);
+                      },
+                      icon: Icons.account_balance_wallet_outlined,
+                      title: "Wallet Transactions",
+                      color: AppColors.primaryColor,
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    AnimatedServiceCard(
+                      onTap: () {
+                        // userRequestController.fetchUserRequest(sessionType: "Call");
+                        Get.toNamed(Routes.CUSTOMER);
+                      },
+                      icon: Icons.people,
+                      title: "Customer",
+                      color: AppColors.yellow.withRed(67),
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    AnimatedServiceCard(
+                      onTap: () {
+                        // userRequestController.fetchUserRequest(sessionType: "Call");
+
+                        Get.toNamed(Routes.GIFT);
+                      },
+                      icon: Icons.card_giftcard,
+                      title: "Gift",
+                      color: AppColors.primaryColor.withRed(60),
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    AnimatedServiceCard(
+                      onTap: () {
+                        // userRequestController.fetchUserRequest(sessionType: "Call");
+                        Get.toNamed(Routes.REVIEW);
+                      },
+                      icon: Icons.reviews,
+                      title: "Review",
+                      color: AppColors.darkTextPrimary.withRed(60),
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                    AnimatedServiceCard(
+                      onTap: () {
+                        Get.toNamed(Routes.PROFILE);
+                      },
+                      icon: Icons.person,
+                      title: "Profile",
+                      color: AppColors.primaryColor.withBlue(30),
+                      cardColor: cardColor,
+                      textColor: textColor,
+                      isDark: isDark,
+                    ),
+                  ],
                 ),
 
-                AnimatedServiceCard(
-                  onTap: () {
-                    userRequestController.fetchUserRequest(sessionType: "Call");
-                    Get.to(UserRequestView(sessionType: "Call"));
-                  },
-                  icon: Icons.phone,
-                  title: "Call Request",
-                  color: AppColors.secondaryPrimary,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
-                AnimatedServiceCard(
-                  onTap: () {
-                    // userRequestController.fetchUserRequest(sessionType: "Call");
-                    Get.toNamed(Routes.HOST_ASTRO);
-                  },
-                  icon: Icons.live_tv,
-                  title: "Go Live",
-                  color: AppColors.red,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
-                // _buildServiceCard(
-                //   icon: Icons.assignment,
-                //   title: "Report Request",
-                //   color: AppColors.accentColor,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.wb_sunny_outlined,
-                //   title: "Daily Horoscope",
-                //   color: AppColors.primaryColor,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.auto_graph,
-                //   title: "Free kundli",
-                //   color: AppColors.red,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.favorite_border,
-                //   title: "Kundli Matching",
-                //   color: AppColors.sucessPrimary,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.temple_hindu,
-                //   title: "My Puja",
-                //   color: AppColors.secondaryPrimary,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.play_circle_outline,
-                //   title: "Get Course",
-                //   color: AppColors.red,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.school_outlined,
-                //   title: "My Courses",
-                //   color: AppColors.primaryColor,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.people_outline,
-                //   title: "My Followers",
-                //   color: AppColors.red,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.inventory_2_outlined,
-                //   title: "Products",
-                //   color: AppColors.sucessPrimary,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                AnimatedServiceCard(
-                  onTap: () {
-                    // userRequestController.fetchUserRequest(sessionType: "Call");
-                    Get.toNamed(Routes.WALLET);
-                  },
-                  icon: Icons.account_balance_wallet_outlined,
-                  title: "Wallet Transactions",
-                  color: AppColors.primaryColor,
-                  cardColor: cardColor,
-                  textColor: textColor,
-                  isDark: isDark,
-                ),
+                // SizedBox(height: 20),
+                // Obx(() {
+                //   final profile =
+                //       controller.profileController.profileModel.value;
 
-                // _buildServiceCard(
-                //   icon: Icons.history,
-                //   title: "History",
-                //   color: AppColors.primaryColor,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
-                // _buildServiceCard(
-                //   icon: Icons.rate_review_outlined,
-                //   title: "Customer Review",
-                //   color: AppColors.accentColor,
-                //   cardColor: cardColor,
-                //   textColor: textColor,
-                //   isDark: isDark,
-                // ),
+                //   if (profile == null) {
+                //     return Center(
+                //       child: CircularProgressIndicator(
+                //         color: AppColors.primaryColor,
+                //       ),
+                //     );
+                //   }
+
+                //   final isOnline = profile.data?.isOnline ?? false;
+                //   return AnimatedOnlineStatus(
+                //     cardColor: AppColors.primaryColor,
+                //     isDark: true,
+                //     initialStatus: isOnline,
+                //     onStatusChanged: (status) {},
+                //   );
+                // }),
+              
+                SizedBox(height: 10),
+                notificationView(),
+                SizedBox(height: 80),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
 
-            SizedBox(height: 80),
-          ],
+  Card notificationView() {
+    return Card(
+      margin: EdgeInsets.only(bottom: 10.h, top: 6.h),
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primaryColor,
+              AppColors.primaryColor.withOpacity(0.8),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with icon
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text('🔔', style: TextStyle(fontSize: 24)),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Important Notification',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 20),
+
+              // Divider
+              Container(
+                height: 1,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withOpacity(0),
+                      Colors.white.withOpacity(0.5),
+                      Colors.white.withOpacity(0),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // Greeting
+              Text(
+                'Dear Astrologer,',
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              SizedBox(height: 12),
+
+              // Main content
+              Text(
+                'We kindly remind you to strictly follow our Privacy Policy and Terms & Conditions.',
+                style: TextStyle(
+                  color: AppColors.white.withOpacity(0.95),
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+              ),
+
+              SizedBox(height: 12),
+
+              // Warning box
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('⚠️', style: TextStyle(fontSize: 20)),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Please do not contact users directly or share any personal details outside the app.',
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 12),
+
+              // Additional info
+              Text(
+                'All communications must take place only through the official app to ensure a safe and trusted experience for both you and the users.',
+                style: TextStyle(
+                  color: AppColors.white.withOpacity(0.95),
+                  fontSize: 15,
+                  height: 1.5,
+                ),
+              ),
+
+              SizedBox(height: 20),
+
+              // Footer
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Text('✨', style: TextStyle(fontSize: 20)),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Thank you for your understanding and cooperation.',
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 14,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '— Team Astro Darshan',
+                            style: TextStyle(
+                              color: AppColors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
-  // Widget _buildServiceCard({
-  //   required IconData icon,
-  //   required String title,
-  //   required Color color,
-  //   required Color cardColor,
-  //   required Color textColor,
-  //   required bool isDark,
-  //   void Function()? onTap,
-  // }) {
-  //   return GestureDetector(
-  //     onTap: onTap,
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //         color: cardColor,
-  //         borderRadius: BorderRadius.circular(16),
-  //         border: Border.all(color: color.withOpacity(0.3), width: 1.5),
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color:
-  //                 isDark
-  //                     ? AppColors.black.withOpacity(0.2)
-  //                     : AppColors.lightDivider.withOpacity(0.1),
-  //             spreadRadius: 1,
-  //             blurRadius: 4,
-  //             offset: Offset(0, 2),
-  //           ),
-  //         ],
-  //       ),
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Container(
-  //             padding: EdgeInsets.all(12),
-  //             decoration: BoxDecoration(
-  //               color: color.withOpacity(0.1),
-  //               shape: BoxShape.circle,
-  //             ),
-  //             child: Icon(icon, color: color, size: 28),
-  //           ),
-  //           SizedBox(height: 8),
-  //           Padding(
-  //             padding: EdgeInsets.symmetric(horizontal: 8),
-  //             child: Text(
-  //               title,
-  //               style: AppTextStyles.small().copyWith(
-  //                 color: textColor,
-  //                 fontWeight: FontWeight.w600,
-  //               ),
-  //               textAlign: TextAlign.center,
-  //               maxLines: 2,
-  //               overflow: TextOverflow.ellipsis,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }
 
 class AnimatedServiceCard extends StatefulWidget {
@@ -397,14 +507,14 @@ class _AnimatedServiceCardState extends State<AnimatedServiceCard>
           return Transform.scale(
             scale: _scaleAnimation.value,
             child: Container(
-              padding: EdgeInsets.all(18),
+              padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [widget.cardColor, widget.cardColor.withOpacity(0.9)],
                 ),
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(14.sp),
                 border: Border.all(
                   color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
                   width: _isPressed ? 2 : 1,
@@ -429,13 +539,13 @@ class _AnimatedServiceCardState extends State<AnimatedServiceCard>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TweenAnimationBuilder<double>(
-                    tween: Tween(begin: 0.0, end: _isPressed ? 1.2 : 1.0),
+                    tween: Tween(begin: 0.0, end: _isPressed ? 1 : 1.0),
                     duration: Duration(milliseconds: 200),
                     builder: (context, scale, child) {
                       return Transform.scale(
                         scale: scale,
                         child: Container(
-                          padding: EdgeInsets.all(16),
+                          padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             gradient: RadialGradient(
                               colors: [
@@ -458,7 +568,7 @@ class _AnimatedServiceCardState extends State<AnimatedServiceCard>
                           child: Icon(
                             widget.icon,
                             color: widget.color,
-                            size: 34,
+                            size: 24,
                           ),
                         ),
                       );
@@ -471,7 +581,7 @@ class _AnimatedServiceCardState extends State<AnimatedServiceCard>
                     widget.title,
                     style: TextStyle(
                       color: widget.textColor,
-                      fontSize: 14.5,
+                      fontSize: 10.sp,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.4,
                       height: 1.3,
@@ -490,15 +600,18 @@ class _AnimatedServiceCardState extends State<AnimatedServiceCard>
   }
 }
 
-// Animated version with pulsing indicator
 class AnimatedOnlineStatus extends StatefulWidget {
   final Color cardColor;
   final bool isDark;
+  final bool initialStatus;
+  final Function(bool)? onStatusChanged;
 
   const AnimatedOnlineStatus({
     super.key,
     required this.cardColor,
     required this.isDark,
+    this.initialStatus = false,
+    this.onStatusChanged,
   });
 
   @override
@@ -507,162 +620,302 @@ class AnimatedOnlineStatus extends StatefulWidget {
 
 class _AnimatedOnlineStatusState extends State<AnimatedOnlineStatus>
     with TickerProviderStateMixin {
+  late bool isOnline;
+  late AnimationController _controller;
   late AnimationController _pulseController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
   late Animation<double> _pulseAnimation;
 
   @override
   void initState() {
     super.initState();
+    isOnline = widget.initialStatus;
+
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 600),
+      vsync: this,
+    );
+
     _pulseController = AnimationController(
       duration: Duration(milliseconds: 1500),
       vsync: this,
-    )..repeat();
+    );
 
-    _pulseAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [widget.cardColor, widget.cardColor.withOpacity(0.95)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: AppColors.primaryColor.withOpacity(0.25),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color:
-                widget.isDark
-                    ? AppColors.black.withOpacity(0.6)
-                    : AppColors.primaryColor.withOpacity(0.12),
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: Offset(0, 6),
-          ),
-          BoxShadow(
-            color: Colors.white.withOpacity(widget.isDark ? 0.05 : 0.8),
-            spreadRadius: 0,
-            blurRadius: 1,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Enhanced icon with glow effect
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryColor.withOpacity(0.15),
-                  AppColors.primaryColor.withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: AppColors.primaryColor.withOpacity(0.3),
-                width: 1,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.primaryColor.withOpacity(0.2),
-                  spreadRadius: 0,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Icon(
-              Icons.wifi_rounded,
-              color: AppColors.primaryColor,
-              size: 22,
-            ),
-          ),
+    if (isOnline) {
+      _pulseController.repeat(reverse: true);
+    }
 
-          SizedBox(width: 16),
-
-          Expanded(
-            child: Text(
-              "You are Currently Online",
-              style: AppTextStyles.body().copyWith(
-                color: AppColors.primaryColor,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.4,
-                height: 1.2,
-              ),
-            ),
-          ),
-
-          // Animated status indicator
-          AnimatedBuilder(
-            animation: _pulseAnimation,
-            builder: (context, child) {
-              return Row(
-                children: [
-                  Text(
-                    "Online",
-                    style: AppTextStyles.body().copyWith(
-                      color: AppColors.primaryColor,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 20 * _pulseAnimation.value,
-                        height: 20 * _pulseAnimation.value,
-                        decoration: BoxDecoration(
-                          color: AppColors.sucessPrimary.withOpacity(
-                            0.3 * (1 - _pulseAnimation.value),
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      Container(
-                        width: 12,
-                        height: 12,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.primaryColor.withOpacity(0.7),
-                              spreadRadius: 0,
-                              blurRadius: 8,
-                              offset: Offset(0, 0),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
+    _controller.forward();
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _pulseController.dispose();
     super.dispose();
+  }
+
+  void _toggleStatus() {
+    setState(() {
+      isOnline = !isOnline;
+    });
+
+    _controller.reset();
+    _controller.forward();
+
+    if (isOnline) {
+      _pulseController.repeat(reverse: true);
+    } else {
+      _pulseController.stop();
+      _pulseController.reset();
+    }
+
+    if (widget.onStatusChanged != null) {
+      widget.onStatusChanged!(isOnline);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: Duration(milliseconds: isOnline ? 2000 : 0),
+      height: (isOnline) ? 410.h : 300.h,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 500),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.r),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+
+            colors:
+                isOnline
+                    ? [
+                      Color.fromARGB(255, 47, 121, 1),
+                      Color.fromARGB(255, 7, 70, 9),
+                      Color.fromARGB(255, 47, 121, 1),
+                    ]
+                    : [
+                      AppColors.primaryColor,
+                      AppColors.accentColor,
+                      AppColors.primaryColor,
+                    ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 20.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Status',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            isOnline ? 'Active' : 'Inactive',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Main Content
+              AnimatedContainer(
+                duration: Duration(milliseconds: isOnline ? 2000 : 0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Animated Status Icon
+                    AnimatedBuilder(
+                      animation: Listenable.merge([
+                        _controller,
+                        _pulseController,
+                      ]),
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: 0.8 * (isOnline ? _pulseAnimation.value : 0.8),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Outer glow rings
+                              if (isOnline) ...[
+                                Container(
+                                  width: 280,
+                                  height: 280,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.withOpacity(0.1),
+                                  ),
+                                ),
+                                Container(
+                                  width: 220,
+                                  height: 220,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white.withOpacity(0.15),
+                                  ),
+                                ),
+                              ],
+                              // Main circle
+                              Container(
+                                width: 160,
+                                height: 160,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 30,
+                                      spreadRadius: 5,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  isOnline ? Icons.power : Icons.power_off,
+                                  size: 80,
+                                  color:
+                                      isOnline
+                                          ? Color(0xFF4CAF50)
+                                          : Color(0xFF757575),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+
+                    // Status Text
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: isOnline ? 2000 : 0),
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: Column(
+                          children: [
+                            Text(
+                              isOnline ? 'ONLINE' : 'OFFLINE',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 4,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(
+                              isOnline
+                                  ? 'You are available for consultations'
+                                  : 'Tap below to go online',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
+                                fontSize: 16,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10.h),
+
+              // Toggle Button
+              GestureDetector(
+                onTap: _toggleStatus,
+                child: AnimatedContainer(
+                  width: 130.w,
+                  duration: Duration(milliseconds: isOnline ? 2000 : 0),
+
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(35),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isOnline ? Icons.toggle_on : Icons.toggle_off,
+                        color: isOnline ? Color(0xFF4CAF50) : Color(0xFF757575),
+                        size: 32,
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        isOnline ? 'Go Offline' : 'Go Online',
+                        style: TextStyle(
+                          color:
+                              isOnline ? Color(0xFF4CAF50) : Color(0xFF757575),
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

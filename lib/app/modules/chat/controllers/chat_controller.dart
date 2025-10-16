@@ -38,15 +38,23 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
   int? currentUserID;
   int? sessionID;
   RxBool isDisable = false.obs;
+  final msg = """Welcome to Astro Darshan! ✨
+We’re glad to have you here. Our expert astrologers are ready to guide you with insights and remedies tailored just for you. 🙏
+Please confirm your name, date of birth, time, and place of birth to begin your consultation.""";
 
-  Future<void> setData({int? sessionId}) async {
+  Future<void> setData({int? sessionId, String? status}) async {
     final userId_ = LocalStorageService.getUserId();
     final userId = userId_;
     currentUserID = int.parse(userId.toString());
     sessionID = sessionId;
     update();
     debugPrint("currentUserID=$currentUserID sessionID $sessionID");
-    initializeWebSocket();
+    await initializeWebSocket();
+
+    if (status?.toLowerCase() == "pending") {
+      await Future.delayed(Duration(seconds: 1));
+      sendMessage(message: msg);
+    }
   }
 
   // Storage key for messages
@@ -80,7 +88,7 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
     showEmojiPicker.value = false;
   }
 
-  void initializeWebSocket() {
+  Future<void> initializeWebSocket() async {
     messages.clear();
     scrollToBottom();
     // Check if WebSocketService is already initialized
@@ -184,6 +192,19 @@ class ChatController extends GetxController with GetTickerProviderStateMixin {
 
     final messageText = message ?? messageController.text.trim();
     final localId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // Remove all spaces before checking
+    String cleanedInput = messageText.replaceAll(' ', '');
+    debugPrint(cleanedInput);
+    // ✅ Allow dd-MM-yyyy or dd/MM/yyyy format
+    final dateFormatRegExp = RegExp(r'^\d{1,2}[-/]\d{1,2}[-/]\d{2,4}$');
+
+    // If it's not a valid date format and contains numbers → block it
+    if (!dateFormatRegExp.hasMatch(cleanedInput) &&
+        RegExp(r'[0-9]').hasMatch(cleanedInput)) {
+      messageController.clear();
+      return;
+    }
 
     // ✅ Create local message for immediate UI update (NO messageID)
     final localMessage = Message(

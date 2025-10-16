@@ -127,6 +127,7 @@ class SignController extends GetxController {
         LoggerUtils.error("Failed Register :- ${res.data}");
       }
     } catch (e) {
+      SnackBarUiView.showError(message: "Something went wrong");
       LoggerUtils.error("Error: $e");
     } finally {
       isLoading.value = false;

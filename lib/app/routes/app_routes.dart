@@ -21,6 +21,11 @@ abstract class Routes {
   static const SIGN = _Paths.SIGN;
   static const OTP_VERIFY = _Paths.OTP_VERIFY;
   static const GAMES = _Paths.GAMES;
+  static const CUSTOMER = _Paths.CUSTOMER;
+  static const GIFT = _Paths.GIFT;
+  static const WEBVIEW = _Paths.WEBVIEW;
+  static const TERMS_CONDITION = _Paths.TERMS_CONDITION;
+  static const REVIEW = _Paths.REVIEW;
 }
 
 abstract class _Paths {
@@ -43,4 +48,9 @@ abstract class _Paths {
   static const SIGN = '/sign';
   static const OTP_VERIFY = '/otp-verify';
   static const GAMES = '/games';
+  static const CUSTOMER = '/customer';
+  static const GIFT = '/gift';
+  static const WEBVIEW = '/webview';
+  static const TERMS_CONDITION = '/terms-condition';
+  static const REVIEW = '/review';
 }

@@ -8,8 +8,12 @@ import '../modules/auth/sign/bindings/sign_binding.dart';
 import '../modules/auth/sign/views/sign_view.dart';
 import '../modules/chat/bindings/chat_binding.dart';
 import '../modules/chat/views/chat_view.dart';
+import '../modules/customer/bindings/customer_binding.dart';
+import '../modules/customer/views/customer_view.dart';
 import '../modules/games/bindings/games_binding.dart';
 import '../modules/games/views/games_view.dart';
+import '../modules/gift/bindings/gift_binding.dart';
+import '../modules/gift/views/gift_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/hostAstro/bindings/host_astro_binding.dart';
@@ -20,14 +24,20 @@ import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
+import '../modules/review/bindings/review_binding.dart';
+import '../modules/review/views/review_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
+import '../modules/termsCondition/bindings/terms_condition_binding.dart';
+import '../modules/termsCondition/views/terms_condition_view.dart';
 import '../modules/userRequest/bindings/user_request_binding.dart';
 import '../modules/userRequest/views/user_request_view.dart';
 import '../modules/voiceCall/bindings/voice_call_binding.dart';
 import '../modules/voiceCall/views/voice_call_view.dart';
 import '../modules/wallet/bindings/wallet_binding.dart';
 import '../modules/wallet/views/wallet_view.dart';
+import '../modules/webview/bindings/webview_binding.dart';
+import '../modules/webview/views/webview_view.dart';
 
 part 'app_routes.dart';
 
@@ -103,6 +113,31 @@ class AppPages {
       name: _Paths.GAMES,
       page: () => const GamesView(),
       binding: GamesBinding(),
+    ),
+    GetPage(
+      name: _Paths.CUSTOMER,
+      page: () => const CustomerView(),
+      binding: CustomerBinding(),
+    ),
+    GetPage(
+      name: _Paths.GIFT,
+      page: () => const GiftView(),
+      binding: GiftBinding(),
+    ),
+    GetPage(
+      name: _Paths.WEBVIEW,
+      page: () => const WebviewView(),
+      binding: WebviewBinding(),
+    ),
+    GetPage(
+      name: _Paths.TERMS_CONDITION,
+      page: () => const TermsConditionView(),
+      binding: TermsConditionBinding(),
+    ),
+    GetPage(
+      name: _Paths.REVIEW,
+      page: () => const ReviewView(),
+      binding: ReviewBinding(),
     ),
   ];
 }

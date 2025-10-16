@@ -36,7 +36,7 @@ class UserRequestController extends GetxController {
     }
   }
 
-  Future<void> statusUpdate(String? status, int? sessionId) async {
+  Future<void> statusUpdate(String? status, int? sessionId, String? sessionType) async {
     try {
       debugPrint(" sessionId ::::$sessionId");
       final res = await BaseClient.post(
@@ -45,7 +45,7 @@ class UserRequestController extends GetxController {
       );
 
       if (res != null && res.statusCode == 200) {
-        await fetchUserRequest();
+        await fetchUserRequest(sessionType: sessionType??"");
       } else {
         LoggerUtils.error("Failed ${res.data}");
       }

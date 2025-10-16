@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/data/endpoint/end_pont.dart';
@@ -19,6 +20,31 @@ class ProfileController extends GetxController {
 
       if (res != null && res.statusCode == 200) {
         profileModel.value = profileModelFromJson(json.encode(res.data));
+        log("Profile :${json.encode(profileModel.value)}");
+      } else {
+        debugPrint("Failed Response ${res?.data}");
+      }
+    } catch (e) {
+      debugPrint("Error: $e");
+    } finally {
+      update();
+    }
+  }
+
+  Future<void> onlineOffline({bool? isOnline}) async {
+    final astrologerId = LocalStorageService.getAstrologerId();
+    try {
+      final res = await BaseClient.post(
+        api: EndPoint.onlineUpdateStatus,
+        data: {
+          "AstrologerId": int.tryParse(astrologerId.toString()),
+          "IsOnline": isOnline,
+        },
+      );
+
+      if (res != null && res.statusCode == 201) {
+        log("Profile :${json.encode(profileModel.value)}");
+        getProfile();
       } else {
         debugPrint("Failed Response ${res?.data}");
       }

@@ -3,90 +3,106 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/voice_call_controller.dart';
 
-class VoiceCallView extends StatelessWidget {
+class VoiceCallView extends StatefulWidget {
   final String? channelName;
 
   VoiceCallView({super.key, this.channelName});
+
+  @override
+  State<VoiceCallView> createState() => _VoiceCallViewState();
+}
+
+class _VoiceCallViewState extends State<VoiceCallView> {
   final VoiceCallController controller = Get.put(VoiceCallController());
+
+  @override
+  void dispose() {
+    controller.leaveChannel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    controller.channelName.value = channelName??"";
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Voice Call'),
-        automaticallyImplyLeading: true,
-        centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        actions: [
-          Obx(
-            () => Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Center(
-                child: Text(
-                  controller.connectionStatus,
-                  style: const TextStyle(fontSize: 14),
+    controller.channelName.value = widget.channelName??"";
+    return WillPopScope(
+      onWillPop: () async=>false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Voice Call'),
+          automaticallyImplyLeading: false,
+          centerTitle: false,
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          actions: [
+            Obx(
+              () => Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Center(
+                  child: Text(
+                    controller.connectionStatus,
+                    style: const TextStyle(fontSize: 14),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.blue, Colors.indigo],
-          ),
+          ],
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Channel Info
-              _buildChannelInfo(),
-
-              // Participants List
-              Expanded(child: _buildParticipantsList()),
-
-              // Control Buttons
-              _buildControlButtons(),
-            ],
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.blue, Colors.indigo],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Channel Info
+                // _buildChannelInfo(),
+      
+                // Participants List
+                Expanded(child: _buildParticipantsList()),
+      
+                // Control Buttons
+                _buildControlButtons(),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildChannelInfo() {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(
-            'Channel: $channelName',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Obx(
-            () => Text(
-              '${controller.participantsCount} Participant(s)',
-              style: const TextStyle(color: Colors.white70, fontSize: 14),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildChannelInfo() {
+  //   return Container(
+  //     margin: const EdgeInsets.all(16),
+  //     padding: const EdgeInsets.all(20),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white.withOpacity(0.1),
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: Column(
+  //       children: [
+  //         Text(
+  //           'Channel: ${widget.channelName}',
+  //           style: const TextStyle(
+  //             color: Colors.white,
+  //             fontSize: 18,
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //         const SizedBox(height: 8),
+  //         Obx(
+  //           () => Text(
+  //             '${controller.participantsCount} Participant(s)',
+  //             style: const TextStyle(color: Colors.white70, fontSize: 14),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildParticipantsList() {
     return Obx(() {
@@ -103,7 +119,7 @@ class VoiceCallView extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
-                onPressed: () => controller.joinChannel(channelName ?? ""),
+                onPressed: () => controller.joinChannel(widget.channelName ?? ""),
                 icon: const Icon(Icons.call),
                 label: const Text('Join Call'),
                 style: ElevatedButton.styleFrom(
@@ -239,7 +255,7 @@ class VoiceCallView extends StatelessWidget {
               icon: Icons.call_end,
               color: Colors.red,
               onPressed: () async {
-                await controller.leaveChannel();
+                
                 Get.back();
               },
             ),

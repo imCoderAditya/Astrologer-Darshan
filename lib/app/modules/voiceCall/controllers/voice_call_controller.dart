@@ -1,6 +1,9 @@
 // 1. Agora Controller - GetX Controller for managing voice call state
+import 'dart:io';
+
 import 'package:agora_token_generator/agora_token_generator.dart';
 import 'package:astrology/app/core/utils/logger_utils.dart';
+import 'package:astrology/app/modules/userRequest/controllers/user_request_controller.dart';
 import 'package:astrology/components/global_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +13,10 @@ import 'package:permission_handler/permission_handler.dart';
 class VoiceCallController extends GetxController {
   static const String APPID = "8afca3f27f524c65a4ead12c1f5f92fa";
   static const String APPCERTIFICATE = "d1dc9896ab264eb18df26c49dfe96e01";
-
+  final userRequestController =
+      Get.isRegistered()
+          ? Get.find<UserRequestController>()
+          : Get.put(UserRequestController());
   // Agora Engine instance
   RtcEngine? engine;
 
@@ -18,6 +24,7 @@ class VoiceCallController extends GetxController {
   RxBool isJoined = false.obs;
   RxBool isMuted = false.obs;
   RxBool isLoading = false.obs;
+  RxBool isCalling = false.obs;
   RxBool isSpeakerOn = false.obs;
   RxList<int> remoteUsers = <int>[].obs;
   RxString channelName = ''.obs;
@@ -42,8 +49,9 @@ class VoiceCallController extends GetxController {
   Future<void> initializeAgora() async {
     try {
       // Request microphone permission
-      await requestMicrophonePermission();
-
+      if (Platform.isAndroid) {
+        await requestMicrophonePermission();
+      }
       // Create Agora engine
       engine = createAgoraRtcEngine();
 
@@ -86,45 +94,54 @@ class VoiceCallController extends GetxController {
   void _setEventHandlers() {
     engine!.registerEventHandler(
       RtcEngineEventHandler(
-        onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
+        onJoinChannelSuccess: (RtcConnection connection, int elapsed) async {
           LoggerUtils.debug(
             "Local user joined channel: ${connection.channelId}",
           );
           isJoined.value = true;
           localUid.value = connection.localUid!;
           isLoading.value = false;
-          Get.snackbar(
-            "Success",
-            "Joined channel successfully",
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
+          isSpeakerOn.value = true;
+          await engine!.setEnableSpeakerphone(isSpeakerOn.value);
+          // Get.snackbar(
+          //   "Success",
+          //   "Joined channel successfully",
+          //   backgroundColor: Colors.green,
+          //   colorText: Colors.white,
+          // );
         },
-
-        onUserJoined: (RtcConnection connection, int remoteUid, int elapsed) {
+        onUserJoined: (
+          RtcConnection connection,
+          int remoteUid,
+          int elapsed,
+        ) async {
           LoggerUtils.debug("Remote user joined: $remoteUid");
           remoteUsers.add(remoteUid);
-          Get.snackbar(
-            "User Joined",
-            "User $remoteUid joined the call",
-            backgroundColor: Colors.blue,
-            colorText: Colors.white,
-          );
+
+          // Get.snackbar(
+          //   "User Joined",
+          //   "User $remoteUid joined the call",
+          //   backgroundColor: Colors.blue,
+          //   colorText: Colors.white,
+          // );
         },
 
         onUserOffline: (
           RtcConnection connection,
           int remoteUid,
           UserOfflineReasonType reason,
-        ) {
+        ) async {
           LoggerUtils.debug("Remote user left: $remoteUid");
           remoteUsers.remove(remoteUid);
-          Get.snackbar(
-            "User Left",
-            "User $remoteUid left the call",
-            backgroundColor: Colors.orange,
-            colorText: Colors.white,
-          );
+          Get.back();
+          userRequestController.fetchUserRequest(sessionType: "Call");
+
+          // Get.snackbar(
+          //   "User Left",
+          //   "User $remoteUid left the call",
+          //   backgroundColor: Colors.orange,
+          //   colorText: Colors.white,
+          // );
         },
 
         onLeaveChannel: (RtcConnection connection, RtcStats stats) {
@@ -133,6 +150,7 @@ class VoiceCallController extends GetxController {
           remoteUsers.clear();
           localUid.value = 0;
           channelName.value = '';
+          userRequestController.fetchUserRequest();
         },
 
         onAudioVolumeIndication: (
@@ -207,7 +225,9 @@ class VoiceCallController extends GetxController {
         uid: uid,
         options: const ChannelMediaOptions(
           clientRoleType: ClientRoleType.clientRoleBroadcaster,
+          isAudioFilterable: true,
           channelProfile: ChannelProfileType.channelProfileCommunication,
+          autoSubscribeAudio: true,
         ),
       );
     } catch (e) {

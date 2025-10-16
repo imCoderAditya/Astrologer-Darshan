@@ -168,7 +168,11 @@ class UserRequestView extends GetView<UserRequestController> {
               color: AppColors.primaryColor,
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(Icons.remove_from_queue_rounded, color: Colors.white, size: 24.w),
+            child: Icon(
+              Icons.remove_from_queue_rounded,
+              color: Colors.white,
+              size: 24.w,
+            ),
           ),
           SizedBox(width: 16.w),
           Expanded(
@@ -219,11 +223,22 @@ class UserRequestView extends GetView<UserRequestController> {
             //   });
             //   return;
             // }
-            if (session?.status?.toLowerCase() == "pending") {
-              controller.statusUpdate("Active", session?.sessionId);
+            // if (session?.status?.toLowerCase() == "pending") {
+            //   controller.statusUpdate("Active", session?.sessionId);
+            // }
+            if ((session?.status?.toLowerCase() == "completed" ||
+                session?.status?.toLowerCase() == "cancelled") &&
+                session?.sessionType?.toLowerCase() == "call") {
+              return;
             }
             if (session?.sessionType == "Chat") {
-              await chatController.setData(sessionId: session?.sessionId);
+              if (session?.status?.toLowerCase() == "pending") {
+                controller.statusUpdate("Active", session?.sessionId,"Chat");
+              }
+              await chatController.setData(
+                sessionId: session?.sessionId,
+                status: session?.status,
+              );
               Get.to(ChatView(sessionData: session));
             } else {
               Get.to(VoiceCallView(channelName: session?.sessionId.toString()));
@@ -372,17 +387,17 @@ class UserRequestView extends GetView<UserRequestController> {
           session?.sessionType ?? 'Unknown',
         ),
         SizedBox(height: 8.h),
-        _buildDetailRow(
-          Icons.schedule,
-          'Duration',
-          '${session?.duration ?? 0} minutes',
-        ),
-        SizedBox(height: 8.h),
-        _buildDetailRow(
-          Icons.currency_rupee,
-          'Amount',
-          '₹${session?.totalAmount?.toStringAsFixed(2) ?? '0.00'}',
-        ),
+        // _buildDetailRow(
+        //   Icons.schedule,
+        //   'Duration',
+        //   '${session?.duration ?? 0} minutes',
+        // ),
+        // SizedBox(height: 8.h),
+        // _buildDetailRow(
+        //   Icons.currency_rupee,
+        //   'Amount',
+        //   '₹${session?.totalAmount?.toStringAsFixed(2) ?? '0.00'}',
+        // ),
       ],
     );
   }
@@ -443,5 +458,4 @@ class UserRequestView extends GetView<UserRequestController> {
       ),
     );
   }
-
 }
