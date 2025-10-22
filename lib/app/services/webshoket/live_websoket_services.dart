@@ -9,7 +9,7 @@ import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_disposable.dart';
 import 'package:web_socket_channel/io.dart';
 
-class LiveWebsoketServices extends GetxService {
+class LiveWebshoketServices extends GetxService {
   IOWebSocketChannel? _channel;
   final RxBool isConnected = false.obs;
   final RxString connectionStatus = 'Disconnected'.obs;
@@ -28,7 +28,7 @@ class LiveWebsoketServices extends GetxService {
       HttpOverrides.global = MyHttpOverrides();
 
       final wsUrl = Uri.parse(
-        'wss://adwss.veteransoftwares.com/live-ws?liveSessionId=16',
+        'wss://astrologylivechat.veteransoftwares.com/ws/chat/$sessionId',
       );
       debugPrint("Session: $sessionId");
 

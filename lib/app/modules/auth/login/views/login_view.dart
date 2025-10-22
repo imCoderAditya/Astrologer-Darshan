@@ -5,7 +5,6 @@ import 'package:astrology/app/core/config/theme/app_text_styles.dart'
     show AppTextStyles;
 import 'package:astrology/app/core/config/theme/theme_controller.dart';
 
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

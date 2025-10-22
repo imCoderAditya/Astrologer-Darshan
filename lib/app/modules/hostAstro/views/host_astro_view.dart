@@ -1,12 +1,10 @@
 // host_view.dart - UI for Astrologer (Broadcasting Live)
 // ignore_for_file: deprecated_member_use
 
-import 'dart:convert';
-
-
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
+import 'package:astrology/components/custom_cached_network_image.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/host_astro_controller.dart';
@@ -19,17 +17,17 @@ class HostView extends GetView<HostController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HostController());
-    controller.liveWebSocketService?.sendMessage({
-      "liveSessionID": 16,
-      "userID": 800,
-      "Username": "Honey",
-      "message": "Hello, this is a test message!",
-      "messageType": "Text",
-      "profile_Url": "c://upload/abc.png",
-      "amount": 0,
-      "isVisible": true,
-    });
-   debugPrint("==>${json.encode(controller.messages)}");
+    // controller.liveWebshoketServices?.sendMessage({
+    //   "liveSessionID": 16,
+    //   "userID": 800,
+    //   "Username": "Honey",
+    //   "message": "Hello, this is a test message!",
+    //   "messageType": "Text",
+    //   "profile_Url": "c://upload/abc.png",
+    //   "amount": 0,
+    //   "isVisible": true,
+    // });
+    // debugPrint("==>${json.encode(controller.liveAstrolorWebSoketList)}");
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E27),
       body: SafeArea(
@@ -72,6 +70,10 @@ class HostView extends GetView<HostController> {
 
               // Live Timer
               _buildLiveTimer(),
+
+              controller.isLive.value
+                  ? _buildBottomMessageControls()
+                  : SizedBox(),
 
               // Viewer Count
               _buildViewerCount(),
@@ -262,7 +264,7 @@ class HostView extends GetView<HostController> {
 
   Widget _buildBottomControls() {
     return Positioned(
-      bottom: 40,
+      bottom: 20,
       left: 16,
       right: 16,
       child: Container(
@@ -346,6 +348,143 @@ class HostView extends GetView<HostController> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBottomMessageControls() {
+    return Positioned(
+      bottom: 120.h,
+      left: 10.w,
+      right: 10.w,
+      top: 320,
+      child: ListView.builder(
+        clipBehavior: Clip.none,
+        padding: EdgeInsets.zero,
+        reverse: true, // New messages appear at bottom
+        itemCount: controller.liveAstrolorWebSoketList.length,
+        itemBuilder: (context, index) {
+          var liveAstro = controller.liveAstrolorWebSoketList.reversed.toList();
+          final liveAstroReversed = liveAstro[index];
+          return _buildMessageBubble(
+            image: liveAstroReversed.profilePicture ?? "",
+            username: liveAstroReversed.senderName ?? '',
+            message: liveAstroReversed.content ?? "",
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildMessageBubble({
+    required String username,
+    required String message,
+    required String? image,
+  }) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Profile Avatar with soft glow
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.pink.withOpacity(0.2),
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 20,
+              backgroundColor: Colors.pinkAccent.withOpacity(0.4),
+              child: ClipOval(
+                child:
+                    (image?.isEmpty ?? true)
+                        ? const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 18,
+                        )
+                        : CustomCachedNetworkImage(
+                          imageUrl: image ?? "",
+                          fit: BoxFit.cover,
+                        ),
+              ),
+            ),
+          ),
+
+          SizedBox(width: 10.w),
+
+          // Message Section
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Username
+                Text(
+                  username,
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.4,
+                    shadows: [
+                      Shadow(
+                        color: AppColors.primaryColor.withOpacity(0.09),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(height: 4.h),
+
+                // Message Bubble
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryColor.withOpacity(0.02),
+                        AppColors.accentColor.withOpacity(0.8),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                      width: 0.8,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    message,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.95),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

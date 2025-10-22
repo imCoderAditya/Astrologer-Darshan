@@ -2,6 +2,7 @@
 // ignore_for_file: deprecated_member_use, constant_identifier_names
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
@@ -9,7 +10,7 @@ import 'package:agora_token_generator/agora_token_generator.dart';
 import 'package:astrology/app/core/utils/logger_utils.dart';
 import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/data/endpoint/end_pont.dart';
-import 'package:astrology/app/data/models/message/message_model.dart';
+import 'package:astrology/app/data/models/liveAstroChat/live_astro_websocket_model.dart';
 import 'package:astrology/app/routes/app_pages.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
 import 'package:astrology/app/services/webshoket/live_websoket_services.dart';
@@ -29,6 +30,7 @@ const String APPID = "25747e4b1b9c43d8a8b7cde83abddf45";
 const String APPCERTIFICATE = "3bac8b59eec041909daf6ef145021e45";
 
 class HostController extends GetxController {
+  TextEditingController messageController = TextEditingController();
   final userId = LocalStorageService.getUserId();
   late RtcEngine engine;
   String? channelName;
@@ -85,96 +87,98 @@ class HostController extends GetxController {
   }
 
   // WebSocket service
-   LiveWebsoketServices? liveWebSocketService;
-  StreamSubscription? _wsSubscription;
-  int? currentUserID;
-  List<Message> messages = [];
+  //  LiveWebsoketServices? liveWebSocketService;
+  // StreamSubscription? _wsSubscription;
+  // int? currentUserID;
+  // List<Message> messages = [];
 
-  Future<void> initializeWebSocket({String? sessionId}) async {
-    // Init service
-    if (Get.isRegistered<LiveWebsoketServices>()) {
-      liveWebSocketService = Get.find<LiveWebsoketServices>();
-    } else {
-      liveWebSocketService = Get.put(LiveWebsoketServices());
-    }
+  // Future<void> initializeWebSocket({String? sessionId}) async {
+  //   // Init service
+  //   if (Get.isRegistered<LiveWebsoketServices>()) {
+  //     liveWebSocketService = Get.find<LiveWebsoketServices>();
+  //   } else {
+  //     liveWebSocketService = Get.put(LiveWebsoketServices());
+  //   }
 
-    // Connect if not already connected
-    if (!(liveWebSocketService?.isConnected.value == true)) {
-      await liveWebSocketService?.connect(sessionId: sessionId);
-    }
+  //   // Connect if not already connected
+  //   if (!(liveWebSocketService?.isConnected.value == true)) {
+  //     await liveWebSocketService?.connect(sessionId: sessionId);
+  //   }
 
-    // Cancel previous subscription before listening again
-    await _wsSubscription?.cancel();
+  //   // Cancel previous subscription before listening again
+  //   await _wsSubscription?.cancel();
 
-    // Listen to incoming messages
-    _wsSubscription = liveWebSocketService?.messageStream.listen((message) {
-      log("📨 Incoming WebSocket: $message");
-      handleIncomingMessage(message);
-    });
-  }
+  //   // Listen to incoming messages
+  //   _wsSubscription = liveWebSocketService?.messageStream.listen((message) {
+  //     log("📨 Incoming WebSocket: $message");
+  //     handleIncomingMessage(message);
+  //   });
+  // }
 
-  void handleIncomingMessage(Map<String, dynamic> messageData) {
-    LoggerUtils.debug("📨 Received message: $messageData");
+  // void handleIncomingMessage(Map<String, dynamic> messageData) {
+  //   LoggerUtils.debug("📨 Received message: $messageData");
 
-    if (messageData['type'] == 'chat_message') {
-      final incomingMessage = Message.fromWebSocket(
-        messageData,
-        currentUserID ?? 0,
-      );
+  //   if (messageData['type'] == 'chat_message') {
+  //     final incomingMessage = Message.fromWebSocket(
+  //       messageData,
+  //       currentUserID ?? 0,
+  //     );
 
-      LoggerUtils.debug(
-        "📋 Processed message - SenderID: ${incomingMessage.senderID}, CurrentUserID: $currentUserID, Text: ${incomingMessage.text}",
-      );
+  //     LoggerUtils.debug(
+  //       "📋 Processed message - SenderID: ${incomingMessage.senderID}, CurrentUserID: $currentUserID, Text: ${incomingMessage.text}",
+  //     );
 
-      // Same sender (self)
-      if (incomingMessage.senderID == currentUserID) {
-        LoggerUtils.debug("🔄 This is our own message coming back from server");
+  //     // Same sender (self)
+  //     if (incomingMessage.senderID == currentUserID) {
+  //       LoggerUtils.debug("🔄 This is our own message coming back from server");
 
-        final localMessageIndex = messages.indexWhere(
-          (message) =>
-              message.isSentByMe &&
-              message.text == incomingMessage.text &&
-              message.senderID == currentUserID &&
-              message.messageID == null,
-        );
+  //       final localMessageIndex = messages.indexWhere(
+  //         (message) =>
+  //             message.isSentByMe &&
+  //             message.text == incomingMessage.text &&
+  //             message.senderID == currentUserID &&
+  //             message.messageID == null,
+  //       );
 
-        if (localMessageIndex != -1) {
-          messages.removeAt(localMessageIndex);
-          messages.insert(localMessageIndex, incomingMessage);
-          LoggerUtils.debug("✅ Replaced local message with server message");
-        } else {
-          final existingIndex = messages.indexWhere(
-            (m) => m.messageID == incomingMessage.messageID,
-          );
+  //       if (localMessageIndex != -1) {
+  //         messages.removeAt(localMessageIndex);
+  //         messages.insert(localMessageIndex, incomingMessage);
+  //         LoggerUtils.debug("✅ Replaced local message with server message");
+  //       } else {
+  //         final existingIndex = messages.indexWhere(
+  //           (m) => m.messageID == incomingMessage.messageID,
+  //         );
 
-          if (existingIndex == -1) {
-            messages.add(incomingMessage);
-            scrollToBottom();
-            LoggerUtils.debug("✅ Added own message as new");
-          }
-        }
-      } else {
-        // Another user
-        LoggerUtils.debug("👤 Message from another user");
+  //         if (existingIndex == -1) {
+  //           messages.add(incomingMessage);
+  //           scrollToBottom();
+  //           LoggerUtils.debug("✅ Added own message as new");
+  //         }
+  //       }
+  //     } else {
+  //       // Another user
+  //       LoggerUtils.debug("👤 Message from another user");
 
-        final existingIndex = messages.indexWhere(
-          (m) => m.messageID == incomingMessage.messageID,
-        );
+  //       final existingIndex = messages.indexWhere(
+  //         (m) => m.messageID == incomingMessage.messageID,
+  //       );
 
-        if (existingIndex == -1) {
-          messages.add(incomingMessage);
-          scrollToBottom();
-          LoggerUtils.debug("✅ Added new message from other user");
-        } else {
-          LoggerUtils.debug("⚠️ Duplicate message skipped");
-        }
-      }
-    }
-  }
+  //       if (existingIndex == -1) {
+  //         messages.add(incomingMessage);
+  //         scrollToBottom();
+  //         LoggerUtils.debug("✅ Added new message from other user");
+  //       } else {
+  //         LoggerUtils.debug("⚠️ Duplicate message skipped");
+  //       }
+  //     }
+  //   }
+  // }
 
-  void scrollToBottom() {
-    // implement your scroll handling
-  }
+  // void scrollToBottom() {
+  //   /
+  //   / implement your scroll handling
+  // }
+
   Future<void> generateToken({String? channelName, String? userName}) async {
     GlobalLoader.show();
     const String appId = APPID;
@@ -541,15 +545,6 @@ class HostController extends GetxController {
     SnackBarUiView.showSuccess(message: 'Voice effect applied');
   }
 
-  @override
-  void onInit() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _initTokenAndEngine();
-    });
-
-    super.onInit();
-  }
-
   final astrologerId = LocalStorageService.getAstrologerId();
 
   int? liveStramId;
@@ -624,7 +619,7 @@ class HostController extends GetxController {
 
   @override
   void dispose() {
-       // Cancel subscription
+    // Cancel subscription
     _wsSubscription?.cancel();
     _wsSubscription = null;
 
@@ -634,4 +629,225 @@ class HostController extends GetxController {
     // animationController.dispose();
     super.dispose();
   }
+
+  @override
+  void onInit() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _initTokenAndEngine();
+    });
+
+    super.onInit();
+  }
+
+  //-------------------------Live Astrologer chat session--------------------------------
+  LiveWebshoketServices? liveWebshoketServices;
+  StreamSubscription? _wsSubscription;
+  final RxList<LiveAstrolorWebSoketModel> liveAstrolorWebSoketList =
+      <LiveAstrolorWebSoketModel>[].obs;
+  Future<void> initializeWebSocket() async {
+    // messages.clear();
+    // scrollToBottom();
+    // Check if WebSocketService is already initialized
+    if (Get.isRegistered<LiveWebshoketServices>()) {
+      liveWebshoketServices = Get.find<LiveWebshoketServices>();
+    } else {
+      liveWebshoketServices = Get.put(LiveWebshoketServices());
+    }
+
+    // Connect if not already connected
+    if (!(liveWebshoketServices?.isConnected.value == true)) {
+      liveWebshoketServices?.connect(sessionId: "86");
+    }
+
+    // Cancel previous subscription before listening again
+    _wsSubscription?.cancel();
+
+    // Listen to incoming messages
+    _wsSubscription = liveWebshoketServices?.messageStream.listen((
+      messageData,
+    ) {
+      handleIncomingMessage(messageData);
+    });
+  }
+
+  int? currentUserID;
+  LiveAstrolorWebSoketModel? liveAstrolorWebSoketModel;
+  void handleIncomingMessage(Map<String, dynamic> messageData) {
+    currentUserID = int.parse(userId.toString());
+    LoggerUtils.debug("📨 Received message: $messageData");
+
+    // Only handle valid chat messages
+    if (messageData['type'] != 'chat_message') return;
+
+    final message = LiveAstrolorWebSoketModel.fromJson(messageData);
+
+    LoggerUtils.debug("👤 Message from another user");
+
+    final alreadyExists = liveAstrolorWebSoketList.any(
+      (m) => m.messageId == message.messageId,
+    );
+
+    if (!alreadyExists) {
+      liveAstrolorWebSoketList.add(message);
+      log(
+        "✅ Added new message from other user ${json.encode(liveAstrolorWebSoketList)}",
+      );
+    } else {
+      LoggerUtils.debug("⚠️ Duplicate message skipped");
+    }
+  }
+
+  void sendMessageLocal() {
+    // if (messageController.text.trim().isEmpty) return;
+
+    final messageText = messageController.text.trim();
+
+    if (messageController.text.length >= 3 &&
+        RegExp(r'^[0-9]+$').hasMatch(messageController.text)) {
+      messageController.clear();
+      return;
+    }
+    final localId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // ✅ Create local message for immediate UI update (NO messageID)
+    // final localMessage = {
+    //   {
+    //     "action": "sendMessage",
+    //     "senderId": 143,
+    //     "messageType": "Text",
+    //     "content": "Hello from WebSocket! 9",
+    //     "fileUrl": null,
+    //   },
+    // };
+
+    // ✅ Add local message immediately to show on screen
+    // messages.add(localMessage);
+
+    messageController.clear();
+    // this.messageText.value = '';
+    // isTyping.value = false;
+    // scrollToBottom();
+
+    LoggerUtils.debug(
+      "✅ Added local message with status: sending - ID: $localId",
+    );
+
+    // Send via WebSocket
+    final messageData = {
+      "action": "sendMessage",
+      "senderId": currentUserID,
+      "messageType": "Text",
+      "content": messageText,
+      "fileUrl": null,
+    };
+
+    liveWebshoketServices?.sendMessage(messageData);
+
+    // Update local message status to sent after sending
+    // Future.delayed(const Duration(milliseconds: 500), () {
+    //   final index = messages.indexWhere((m) => m.id == localId);
+    //   if (index != -1 && messages[index].status == MessageStatus.sending) {
+    //     messages[index] = messages[index].copyWith(status: MessageStatus.sent);
+    //     LoggerUtils.debug("✅ Updated local message status to: sent");
+    //   }
+    // });
+  }
 }
+
+//------------------------- Model -------------------------
+// class LiveAstrolorWebSoketModel {
+//   final int? messageID;
+//   final int? sessionID;
+//   final int? senderID;
+//   final String? messageType;
+//   final String? content;
+//   final String? fileURL;
+//   final bool? isRead;
+//   final DateTime? sentAt;
+//   final String? source;
+//   final String? type;
+
+//   const LiveAstrolorWebSoketModel({
+//     this.messageID,
+//     this.sessionID,
+//     this.senderID,
+//     this.messageType,
+//     this.content,
+//     this.fileURL,
+//     this.isRead,
+//     this.sentAt,
+//     this.source,
+//     this.type,
+//   });
+
+//   factory LiveAstrolorWebSoketModel.fromJson(Map<String, dynamic> json) {
+//     return LiveAstrolorWebSoketModel(
+//       messageID:
+//           json['messageID'] is int
+//               ? json['messageID']
+//               : int.tryParse(json['messageID']?.toString() ?? ''),
+//       sessionID:
+//           json['sessionID'] is int
+//               ? json['sessionID']
+//               : int.tryParse(json['sessionID']?.toString() ?? ''),
+//       senderID:
+//           json['senderID'] is int
+//               ? json['senderID']
+//               : int.tryParse(json['senderID']?.toString() ?? ''),
+//       messageType: json['messageType']?.toString(),
+//       content: json['content']?.toString(),
+//       fileURL: json['fileURL']?.toString(),
+//       isRead:
+//           json['isRead'] is bool
+//               ? json['isRead']
+//               : (json['isRead']?.toString().toLowerCase() == 'true'),
+//       sentAt:
+//           json['sentAt'] != null
+//               ? DateTime.tryParse(json['sentAt'].toString())
+//               : null,
+//       source: json['source']?.toString(),
+//       type: json['type']?.toString(),
+//     );
+//   }
+
+//   Map<String, dynamic> toJson() {
+//     return {
+//       'type': type,
+//       'messageID': messageID,
+//       'sessionID': sessionID,
+//       'senderID': senderID,
+//       'messageType': messageType,
+//       'content': content,
+//       'fileURL': fileURL,
+//       'isRead': isRead,
+//       'sentAt': sentAt?.toIso8601String(),
+//       'source': source,
+//     };
+//   }
+
+//   LiveAstrolorWebSoketModel copyWith({
+//     int? messageID,
+//     int? sessionID,
+//     int? senderID,
+//     String? messageType,
+//     String? content,
+//     String? fileURL,
+//     bool? isRead,
+//     DateTime? sentAt,
+//     String? source,
+//     String? type,
+//   }) {
+//     return LiveAstrolorWebSoketModel(
+//       messageID: messageID ?? this.messageID,
+//       sessionID: sessionID ?? this.sessionID,
+//       senderID: senderID ?? this.senderID,
+//       messageType: messageType ?? this.messageType,
+//       content: content ?? this.content,
+//       fileURL: fileURL ?? this.fileURL,
+//       isRead: isRead ?? this.isRead,
+//       sentAt: sentAt ?? this.sentAt,
+//       source: source ?? this.source,
+//       type: type ?? this.type,
+//     );
+//   }
+// }

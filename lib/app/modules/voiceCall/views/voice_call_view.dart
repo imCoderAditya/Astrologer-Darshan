@@ -6,7 +6,7 @@ import '../controllers/voice_call_controller.dart';
 class VoiceCallView extends StatefulWidget {
   final String? channelName;
 
-  VoiceCallView({super.key, this.channelName});
+  const VoiceCallView({super.key, this.channelName});
 
   @override
   State<VoiceCallView> createState() => _VoiceCallViewState();
