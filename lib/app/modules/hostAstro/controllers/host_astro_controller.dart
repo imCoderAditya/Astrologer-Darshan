@@ -709,24 +709,7 @@ class HostController extends GetxController {
     }
     final localId = DateTime.now().millisecondsSinceEpoch.toString();
 
-    // ✅ Create local message for immediate UI update (NO messageID)
-    // final localMessage = {
-    //   {
-    //     "action": "sendMessage",
-    //     "senderId": 143,
-    //     "messageType": "Text",
-    //     "content": "Hello from WebSocket! 9",
-    //     "fileUrl": null,
-    //   },
-    // };
-
-    // ✅ Add local message immediately to show on screen
-    // messages.add(localMessage);
-
     messageController.clear();
-    // this.messageText.value = '';
-    // isTyping.value = false;
-    // scrollToBottom();
 
     LoggerUtils.debug(
       "✅ Added local message with status: sending - ID: $localId",
@@ -742,112 +725,5 @@ class HostController extends GetxController {
     };
 
     liveWebshoketServices?.sendMessage(messageData);
-
-    // Update local message status to sent after sending
-    // Future.delayed(const Duration(milliseconds: 500), () {
-    //   final index = messages.indexWhere((m) => m.id == localId);
-    //   if (index != -1 && messages[index].status == MessageStatus.sending) {
-    //     messages[index] = messages[index].copyWith(status: MessageStatus.sent);
-    //     LoggerUtils.debug("✅ Updated local message status to: sent");
-    //   }
-    // });
   }
 }
-
-//------------------------- Model -------------------------
-// class LiveAstrolorWebSoketModel {
-//   final int? messageID;
-//   final int? sessionID;
-//   final int? senderID;
-//   final String? messageType;
-//   final String? content;
-//   final String? fileURL;
-//   final bool? isRead;
-//   final DateTime? sentAt;
-//   final String? source;
-//   final String? type;
-
-//   const LiveAstrolorWebSoketModel({
-//     this.messageID,
-//     this.sessionID,
-//     this.senderID,
-//     this.messageType,
-//     this.content,
-//     this.fileURL,
-//     this.isRead,
-//     this.sentAt,
-//     this.source,
-//     this.type,
-//   });
-
-//   factory LiveAstrolorWebSoketModel.fromJson(Map<String, dynamic> json) {
-//     return LiveAstrolorWebSoketModel(
-//       messageID:
-//           json['messageID'] is int
-//               ? json['messageID']
-//               : int.tryParse(json['messageID']?.toString() ?? ''),
-//       sessionID:
-//           json['sessionID'] is int
-//               ? json['sessionID']
-//               : int.tryParse(json['sessionID']?.toString() ?? ''),
-//       senderID:
-//           json['senderID'] is int
-//               ? json['senderID']
-//               : int.tryParse(json['senderID']?.toString() ?? ''),
-//       messageType: json['messageType']?.toString(),
-//       content: json['content']?.toString(),
-//       fileURL: json['fileURL']?.toString(),
-//       isRead:
-//           json['isRead'] is bool
-//               ? json['isRead']
-//               : (json['isRead']?.toString().toLowerCase() == 'true'),
-//       sentAt:
-//           json['sentAt'] != null
-//               ? DateTime.tryParse(json['sentAt'].toString())
-//               : null,
-//       source: json['source']?.toString(),
-//       type: json['type']?.toString(),
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'type': type,
-//       'messageID': messageID,
-//       'sessionID': sessionID,
-//       'senderID': senderID,
-//       'messageType': messageType,
-//       'content': content,
-//       'fileURL': fileURL,
-//       'isRead': isRead,
-//       'sentAt': sentAt?.toIso8601String(),
-//       'source': source,
-//     };
-//   }
-
-//   LiveAstrolorWebSoketModel copyWith({
-//     int? messageID,
-//     int? sessionID,
-//     int? senderID,
-//     String? messageType,
-//     String? content,
-//     String? fileURL,
-//     bool? isRead,
-//     DateTime? sentAt,
-//     String? source,
-//     String? type,
-//   }) {
-//     return LiveAstrolorWebSoketModel(
-//       messageID: messageID ?? this.messageID,
-//       sessionID: sessionID ?? this.sessionID,
-//       senderID: senderID ?? this.senderID,
-//       messageType: messageType ?? this.messageType,
-//       content: content ?? this.content,
-//       fileURL: fileURL ?? this.fileURL,
-//       isRead: isRead ?? this.isRead,
-//       sentAt: sentAt ?? this.sentAt,
-//       source: source ?? this.source,
-//       type: type ?? this.type,
-//     );
-//   }
-// }

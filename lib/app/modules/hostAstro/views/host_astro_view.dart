@@ -17,17 +17,6 @@ class HostView extends GetView<HostController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HostController());
-    // controller.liveWebshoketServices?.sendMessage({
-    //   "liveSessionID": 16,
-    //   "userID": 800,
-    //   "Username": "Honey",
-    //   "message": "Hello, this is a test message!",
-    //   "messageType": "Text",
-    //   "profile_Url": "c://upload/abc.png",
-    //   "amount": 0,
-    //   "isVisible": true,
-    // });
-    // debugPrint("==>${json.encode(controller.liveAstrolorWebSoketList)}");
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E27),
       body: SafeArea(
