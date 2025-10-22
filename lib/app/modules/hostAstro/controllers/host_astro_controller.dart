@@ -86,99 +86,6 @@ class HostController extends GetxController {
     return true;
   }
 
-  // WebSocket service
-  //  LiveWebsoketServices? liveWebSocketService;
-  // StreamSubscription? _wsSubscription;
-  // int? currentUserID;
-  // List<Message> messages = [];
-
-  // Future<void> initializeWebSocket({String? sessionId}) async {
-  //   // Init service
-  //   if (Get.isRegistered<LiveWebsoketServices>()) {
-  //     liveWebSocketService = Get.find<LiveWebsoketServices>();
-  //   } else {
-  //     liveWebSocketService = Get.put(LiveWebsoketServices());
-  //   }
-
-  //   // Connect if not already connected
-  //   if (!(liveWebSocketService?.isConnected.value == true)) {
-  //     await liveWebSocketService?.connect(sessionId: sessionId);
-  //   }
-
-  //   // Cancel previous subscription before listening again
-  //   await _wsSubscription?.cancel();
-
-  //   // Listen to incoming messages
-  //   _wsSubscription = liveWebSocketService?.messageStream.listen((message) {
-  //     log("📨 Incoming WebSocket: $message");
-  //     handleIncomingMessage(message);
-  //   });
-  // }
-
-  // void handleIncomingMessage(Map<String, dynamic> messageData) {
-  //   LoggerUtils.debug("📨 Received message: $messageData");
-
-  //   if (messageData['type'] == 'chat_message') {
-  //     final incomingMessage = Message.fromWebSocket(
-  //       messageData,
-  //       currentUserID ?? 0,
-  //     );
-
-  //     LoggerUtils.debug(
-  //       "📋 Processed message - SenderID: ${incomingMessage.senderID}, CurrentUserID: $currentUserID, Text: ${incomingMessage.text}",
-  //     );
-
-  //     // Same sender (self)
-  //     if (incomingMessage.senderID == currentUserID) {
-  //       LoggerUtils.debug("🔄 This is our own message coming back from server");
-
-  //       final localMessageIndex = messages.indexWhere(
-  //         (message) =>
-  //             message.isSentByMe &&
-  //             message.text == incomingMessage.text &&
-  //             message.senderID == currentUserID &&
-  //             message.messageID == null,
-  //       );
-
-  //       if (localMessageIndex != -1) {
-  //         messages.removeAt(localMessageIndex);
-  //         messages.insert(localMessageIndex, incomingMessage);
-  //         LoggerUtils.debug("✅ Replaced local message with server message");
-  //       } else {
-  //         final existingIndex = messages.indexWhere(
-  //           (m) => m.messageID == incomingMessage.messageID,
-  //         );
-
-  //         if (existingIndex == -1) {
-  //           messages.add(incomingMessage);
-  //           scrollToBottom();
-  //           LoggerUtils.debug("✅ Added own message as new");
-  //         }
-  //       }
-  //     } else {
-  //       // Another user
-  //       LoggerUtils.debug("👤 Message from another user");
-
-  //       final existingIndex = messages.indexWhere(
-  //         (m) => m.messageID == incomingMessage.messageID,
-  //       );
-
-  //       if (existingIndex == -1) {
-  //         messages.add(incomingMessage);
-  //         scrollToBottom();
-  //         LoggerUtils.debug("✅ Added new message from other user");
-  //       } else {
-  //         LoggerUtils.debug("⚠️ Duplicate message skipped");
-  //       }
-  //     }
-  //   }
-  // }
-
-  // void scrollToBottom() {
-  //   /
-  //   / implement your scroll handling
-  // }
-
   Future<void> generateToken({String? channelName, String? userName}) async {
     GlobalLoader.show();
     const String appId = APPID;
@@ -206,14 +113,6 @@ class HostController extends GetxController {
     await initAgora();
     GlobalLoader.hide();
     Get.toNamed(Routes.HOST_ASTRO);
-  }
-
-  @override
-  void onClose() {
-    _liveTimer?.cancel();
-    // stopLive();
-    endLiveStram();
-    super.onClose();
   }
 
   Future<void> initAgora() async {
@@ -426,12 +325,6 @@ class HostController extends GetxController {
       } else {
         await engine.stopScreenCapture();
       }
-      // SnackBarUiView.showSuccess(
-      //   message:
-      //       isScreenSharing.value
-      //           ? 'Screen sharing started'
-      //           : 'Screen sharing stopped',
-      // );
     } catch (e) {
       debugPrint('Screen share error: $e');
       isScreenSharing.value = false;
@@ -561,9 +454,9 @@ class HostController extends GetxController {
         api: EndPoint.goLive,
         formData: FormData.fromMap({
           "AstrologerID": astrologerId,
-          "Title": "Live Astrology Q&A",
-          "Description": "Ask me anything live!",
-          "Category": "Horoscope",
+          "Title": "",
+          "Description": "",
+          "Category": "",
 
           // 'ThumbnailFile': await MultipartFile.fromFile(
           //   'D:/aditya_new/Astrologer-Darshan/assets/images/astro.png',
@@ -583,7 +476,7 @@ class HostController extends GetxController {
           channelName: streamkey['StreamKey'] ?? '',
           userName: streamkey['Title'] ?? '',
         );
-        await initializeWebSocket();
+        await initializeWebSocket(liveStramId.toString());
       } else {
         LoggerUtils.error("Error:${res.data}");
       }
@@ -618,16 +511,15 @@ class HostController extends GetxController {
   }
 
   @override
-  void dispose() {
+  void onClose() {
+    _liveTimer?.cancel();
+    // stopLive();
+    log("Close=======>");
+    disconnectWebSocket();
+    endLiveStram();
     // Cancel subscription
-    _wsSubscription?.cancel();
-    _wsSubscription = null;
 
-    // Dispose controllers
-    // messageController.dispose();
-    // scrollController.dispose();
-    // animationController.dispose();
-    super.dispose();
+    super.onClose();
   }
 
   @override
@@ -644,7 +536,7 @@ class HostController extends GetxController {
   StreamSubscription? _wsSubscription;
   final RxList<LiveAstrolorWebSoketModel> liveAstrolorWebSoketList =
       <LiveAstrolorWebSoketModel>[].obs;
-  Future<void> initializeWebSocket() async {
+  Future<void> initializeWebSocket(String? sessionID) async {
     // messages.clear();
     // scrollToBottom();
     // Check if WebSocketService is already initialized
@@ -656,7 +548,7 @@ class HostController extends GetxController {
 
     // Connect if not already connected
     if (!(liveWebshoketServices?.isConnected.value == true)) {
-      liveWebshoketServices?.connect(sessionId: "86");
+      liveWebshoketServices?.connect(sessionId: sessionID.toString());
     }
 
     // Cancel previous subscription before listening again
@@ -725,5 +617,25 @@ class HostController extends GetxController {
     };
 
     liveWebshoketServices?.sendMessage(messageData);
+  }
+
+  void disconnectWebSocket() {
+    try {
+      LoggerUtils.debug("🔌 Disconnecting WebSocket...");
+
+      // Cancel subscription to avoid memory leaks
+      _wsSubscription?.cancel();
+      _wsSubscription = null;
+
+      // Close connection if active
+      liveWebshoketServices?.disconnect();
+
+      // Optionally clear the message list (if desired)
+      // liveAstrolorWebSoketList.clear();
+
+      LoggerUtils.debug("✅ WebSocket disconnected successfully");
+    } catch (e) {
+      LoggerUtils.debug("❌ Error while disconnecting WebSocket: $e");
+    }
   }
 }
