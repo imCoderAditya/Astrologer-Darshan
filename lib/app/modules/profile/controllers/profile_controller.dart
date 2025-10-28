@@ -5,6 +5,7 @@ import 'package:astrology/app/data/baseclient/base_client.dart';
 import 'package:astrology/app/data/endpoint/end_pont.dart';
 import 'package:astrology/app/data/models/profile/profile_model.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
+import 'package:astrology/components/global_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -32,6 +33,7 @@ class ProfileController extends GetxController {
   }
 
   Future<void> onlineOffline({bool? isOnline}) async {
+    GlobalLoader.show();
     final astrologerId = LocalStorageService.getAstrologerId();
     try {
       final res = await BaseClient.post(
@@ -51,6 +53,7 @@ class ProfileController extends GetxController {
     } catch (e) {
       debugPrint("Error: $e");
     } finally {
+      GlobalLoader.hide();
       update();
     }
   }

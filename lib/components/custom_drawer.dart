@@ -110,7 +110,7 @@ class AppDrawer extends StatelessWidget {
             children: [
               // Enhanced Gradient Header
               _buildGradientHeader(isDark, highlightTextColor),
- 
+
               // Branded App Name with Animation
               _buildBrandSection(highlightTextColor),
 
@@ -149,15 +149,14 @@ class AppDrawer extends StatelessWidget {
               ),
 
               // Theme Toggle (moved out of _buildAnimatedNavItem as it's a special case)
-               _buildOnlineOffline(
-                themeController,
+              _buildOnlineOffline(
                 textColor,
                 highlightColor,
                 highlightTextColor,
                 secondaryColor,
                 isDark,
               ),
-      
+
               _buildThemeToggle(
                 themeController,
                 textColor,
@@ -166,7 +165,6 @@ class AppDrawer extends StatelessWidget {
                 secondaryColor,
                 isDark,
               ),
-            
 
               _buildFooterSection(context, textColor, secondaryColor, isDark),
             ],
@@ -677,7 +675,6 @@ class AppDrawer extends StatelessWidget {
   }
 
   Widget _buildOnlineOffline(
-    ThemeController themeController,
     Color textColor,
     Color highlightColor,
     Color highlightTextColor,
@@ -692,11 +689,12 @@ class AppDrawer extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => {
-            isOnline = !isOnline,
-            debugPrint(isOnline.toString()),
-            profileController.onlineOffline(isOnline: isOnline)
-          },
+          onTap:
+              () => {
+                isOnline = !isOnline,
+                debugPrint(isOnline.toString()),
+                profileController.onlineOffline(isOnline: isOnline),
+              },
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -708,9 +706,7 @@ class AppDrawer extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
-                    isOnline
-                        ? Icons.online_prediction
-                        : Icons.offline_bolt,
+                    isOnline ? Icons.online_prediction : Icons.offline_bolt,
                     color: AppColors.accentColor,
                     size: 24,
                   ),

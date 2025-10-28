@@ -18,7 +18,7 @@ void main() async {
   );
  await FirebaseServices.firebaseToken();
   FirebaseServices().setupFirebaseForegroundListener();
-  FirebaseLocalHandle().initLocalNotifications();
+  // FirebaseLocalHandle().initLocalNotifications();
   
   await GetStorage.init();
   SystemChrome.setSystemUIOverlayStyle(

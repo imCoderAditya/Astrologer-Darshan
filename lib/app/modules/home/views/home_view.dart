@@ -4,6 +4,7 @@ import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/modules/home/controllers/home_controller.dart';
 import 'package:astrology/app/modules/notification/controllers/notification_controller.dart';
+import 'package:astrology/app/modules/profile/controllers/profile_controller.dart';
 import 'package:astrology/app/modules/userRequest/controllers/user_request_controller.dart';
 import 'package:astrology/app/modules/userRequest/views/user_request_view.dart';
 import 'package:astrology/app/routes/app_pages.dart';
@@ -26,7 +27,7 @@ class HomeView extends StatelessWidget {
     final Color textColor =
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final userRequestController = Get.put(UserRequestController());
-
+   
     return GetBuilder<HomeController>(
       init: HomeController(),
       builder: (controller) {
@@ -101,8 +102,16 @@ class HomeView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 20),
-
+                Card(
+                  child: _buildOnlineOffline(
+                    textColor,
+                    AppColors.primaryColor,
+                    AppColors.primaryColor,
+                    AppColors.primaryColor,
+                    isDark,
+                  ),
+                ),
+                SizedBox(height: 10.h),
                 // Grid of Services
                 GridView.count(
                   crossAxisCount: 4,
@@ -238,11 +247,131 @@ class HomeView extends StatelessWidget {
                 //     onStatusChanged: (status) {},
                 //   );
                 // }),
-              
                 SizedBox(height: 10),
                 notificationView(),
                 SizedBox(height: 80),
               ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildOnlineOffline(
+    Color textColor,
+    Color highlightColor,
+    Color highlightTextColor,
+    Color secondaryColor,
+    bool isDark,
+  ) {
+    bool isOnline =
+        profileController.profileModel.value?.data?.isOnline ?? false;
+    return GetBuilder<ProfileController>(
+      init: ProfileController(),
+      builder: (controller) {
+        return Container(
+          margin: EdgeInsets.symmetric(vertical: 2.h),
+          padding: EdgeInsets.symmetric(vertical: 10.h),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+          child: Material(
+            color: Colors.transparent,
+            child: GestureDetector(
+              onTap:
+                  () async => {
+                    isOnline = !isOnline,
+                    debugPrint(isOnline.toString()),
+                    await profileController.onlineOffline(isOnline: isOnline),
+                    profileController.update(),
+                  },
+              // borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        isOnline ? Icons.online_prediction : Icons.offline_bolt,
+                        color: AppColors.accentColor,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Text(
+                        isOnline ? "Online" : "Offline",
+                        style: AppTextStyles.body().copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 52,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color:
+                            isOnline
+                                ? AppColors.accentColor
+                                : secondaryColor.withOpacity(
+                                  0.3,
+                                ), // No clamp needed here
+                        border: Border.all(
+                          color:
+                              isOnline
+                                  ? AppColors.accentColor
+                                  : secondaryColor.withOpacity(
+                                    0.5,
+                                  ), // No clamp needed here
+                          width: 1,
+                        ),
+                      ),
+                      child: AnimatedAlign(
+                        duration: const Duration(milliseconds: 300),
+                        alignment:
+                            isOnline
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          margin: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(
+                                  0.2,
+                                ), // No clamp needed here
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isOnline
+                                ? Icons.online_prediction
+                                : Icons.offline_bolt,
+                            size: 14,
+                            color:
+                                isOnline
+                                    ? AppColors.accentColor
+                                    : Colors.orange,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         );

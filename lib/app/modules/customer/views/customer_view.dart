@@ -4,6 +4,7 @@ import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/utils/date_utils.dart';
 import 'package:astrology/app/data/models/followers/followers_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/customer_controller.dart';
 
@@ -248,34 +249,34 @@ class CustomerView extends GetView<CustomerController> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      if (user.email != null && user.email!.isNotEmpty)
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_city,
-                              size: 14,
-                              color:
-                                  isDark
-                                      ? AppColors.darkTextSecondary
-                                      : AppColors.lightTextSecondary,
-                            ),
-                            const SizedBox(width: 5),
-                            Expanded(
-                              child: Text(
-                                user.placeOfBirth ?? "",
-                                style: TextStyle(
-                                  color:
-                                      isDark
-                                          ? AppColors.darkTextSecondary
-                                          : AppColors.lightTextSecondary,
-                                  fontSize: 13,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                       SizedBox(height: 10.h),
+                      // if (user.email != null && user.email!.isNotEmpty)
+                      //   Row(
+                      //     children: [
+                      //       Icon(
+                      //         Icons.location_city,
+                      //         size: 14,
+                      //         color:
+                      //             isDark
+                      //                 ? AppColors.darkTextSecondary
+                      //                 : AppColors.lightTextSecondary,
+                      //       ),
+                      //       const SizedBox(width: 5),
+                      //       Expanded(
+                      //         child: Text(
+                      //           user.placeOfBirth ?? "",
+                      //           style: TextStyle(
+                      //             color:
+                      //                 isDark
+                      //                     ? AppColors.darkTextSecondary
+                      //                     : AppColors.lightTextSecondary,
+                      //             fontSize: 13,
+                      //           ),
+                      //           overflow: TextOverflow.ellipsis,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
                       if (user.phoneNumber != null &&
                           user.phoneNumber!.isNotEmpty)
                         Row(

@@ -577,9 +577,10 @@ class _ChatViewState extends State<ChatView> {
                         ],
                       ),
                       child: Icon(
+                        // Icons.send,
                         controller.messageText.isNotEmpty
                             ? Icons.send
-                            : Icons.mic,
+                            : Icons.send,
                         color: Colors.white,
                         size: 20.r,
                       ),

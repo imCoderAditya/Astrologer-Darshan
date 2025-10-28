@@ -5,6 +5,8 @@ import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/components/custom_cached_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart'
+    show CachedNetworkImage;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../controllers/host_astro_controller.dart';
@@ -60,10 +62,12 @@ class HostView extends GetView<HostController> {
               // Live Timer
               _buildLiveTimer(),
 
-              controller.isLive.value
-                  ? _buildBottomMessageControls()
-                  : SizedBox(),
-
+              Obx(
+                () =>
+                    controller.isLive.value
+                        ? _buildBottomMessageControls()
+                        : SizedBox(),
+              ),
               // Viewer Count
               _buildViewerCount(),
             ],
@@ -356,6 +360,7 @@ class HostView extends GetView<HostController> {
           var liveAstro = controller.liveAstrolorWebSoketList.reversed.toList();
           final liveAstroReversed = liveAstro[index];
           return _buildMessageBubble(
+            fileUrl: liveAstroReversed.fileUrl ?? "",
             image: liveAstroReversed.profilePicture ?? "",
             username: liveAstroReversed.senderName ?? '',
             message: liveAstroReversed.content ?? "",
@@ -367,9 +372,11 @@ class HostView extends GetView<HostController> {
 
   Widget _buildMessageBubble({
     required String username,
+    String? fileUrl,
     required String message,
     required String? image,
   }) {
+    debugPrint(fileUrl ?? "");
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6.h, horizontal: 10.w),
       child: Row(
@@ -417,7 +424,7 @@ class HostView extends GetView<HostController> {
                 Text(
                   username,
                   style: TextStyle(
-                    color: AppColors.primaryColor,
+                    color: AppColors.white,
                     fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.4,
@@ -429,45 +436,36 @@ class HostView extends GetView<HostController> {
                     ],
                   ),
                 ),
-
                 SizedBox(height: 4.h),
 
-                // Message Bubble
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primaryColor.withOpacity(0.02),
-                        AppColors.accentColor.withOpacity(0.8),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
-                      width: 0.8,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
+                fileUrl?.isEmpty ?? true
+                    ? SizedBox()
+                    : ClipRRect(
+                      borderRadius: BorderRadius.circular(
+                        10,
+                      ), // Adjust radius as needed
+                      child: CachedNetworkImage(
+                        height: 60.h,
+                        width: 80.w,
+                        fit: BoxFit.cover,
+                        imageUrl: fileUrl ?? "",
+                        placeholder:
+                            (context, url) => const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                        errorWidget:
+                            (context, url, error) => const Icon(Icons.error),
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    message,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.95),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      height: 1.4,
                     ),
+
+                // Message Bubble
+                Text(
+                  message,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.95),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w400,
+                    height: 1.4,
                   ),
                 ),
               ],
