@@ -265,11 +265,12 @@ class HomeView extends StatelessWidget {
     Color secondaryColor,
     bool isDark,
   ) {
-    bool isOnline =
-        profileController.profileModel.value?.data?.isOnline ?? false;
+
     return GetBuilder<ProfileController>(
       init: ProfileController(),
       builder: (controller) {
+            bool isOnline =
+        profileController.profileModel.value?.data?.isOnline ?? false;
         return Container(
           margin: EdgeInsets.symmetric(vertical: 2.h),
           padding: EdgeInsets.symmetric(vertical: 10.h),

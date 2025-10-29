@@ -122,25 +122,21 @@ class HostController extends GetxController {
       engine = createAgoraRtcEngine();
       await engine.initialize(RtcEngineContext(appId: APPID));
 
-      localVideoViewController = VideoViewController(
-        rtcEngine: engine,
-        canvas: const VideoCanvas(
-          uid: 0,
-          renderMode: RenderModeType.renderModeHidden,
-        ),
-      );
-
       engine.registerEventHandler(
         RtcEngineEventHandler(
           onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-            debugPrint('Host joined channel: ${connection.channelId}');
+            log('Host joined channel: ${connection.channelId}');
             isLive.value = true;
             connectionState.value = 'live';
             _startLiveTimer();
           },
           onUserJoined: (RtcConnection connection, int uid, int elapsed) {
-            debugPrint('Viewer joined: $uid');
+            log('Viewer joined: $uid');
             viewerCount.value++;
+          },
+          onRtcStats: (RtcConnection connection, RtcStats stats) {
+            viewerCount.value = stats.userCount ?? 0;
+            debugPrint("👥 Total users in channel: ${stats.userCount}");
           },
           onUserOffline: (
             RtcConnection connection,
@@ -201,6 +197,11 @@ class HostController extends GetxController {
         ),
       );
 
+      localVideoViewController = VideoViewController(
+        rtcEngine: engine,
+        canvas: VideoCanvas(uid: uId, renderMode: RenderModeType.renderModeFit),
+      );
+
       // Configure for broadcasting
       await _configureForBroadcasting();
 
@@ -216,13 +217,13 @@ class HostController extends GetxController {
     await engine.enableVideo();
     await engine.enableAudio();
 
-    // Set client role as broadcaster (host)
-    await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
+    // // Set channel profile for live broadcasting
 
-    // Set channel profile for live broadcasting
     await engine.setChannelProfile(
       ChannelProfileType.channelProfileLiveBroadcasting,
     );
+    // Set client role as broadcaster (host)
+    await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
     // Configure video for broadcasting
     await engine.setVideoEncoderConfiguration(
