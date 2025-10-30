@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:agora_rtm/agora_rtm.dart';
 import 'package:agora_token_generator/agora_token_generator.dart';
 import 'package:astrology/app/core/utils/logger_utils.dart';
 import 'package:astrology/app/data/baseclient/base_client.dart';
@@ -37,6 +38,7 @@ class HostController extends GetxController {
   String? userName;
   String? token;
   int? uId;
+  late RtmClient rtmClient;
 
   // Basic states
   final isEngineReady = false.obs;
@@ -122,21 +124,25 @@ class HostController extends GetxController {
       engine = createAgoraRtcEngine();
       await engine.initialize(RtcEngineContext(appId: APPID));
 
+      localVideoViewController = VideoViewController(
+        rtcEngine: engine,
+        canvas: VideoCanvas(
+          uid: 0,
+          renderMode: RenderModeType.renderModeHidden,
+        ),
+      );
+
       engine.registerEventHandler(
         RtcEngineEventHandler(
           onJoinChannelSuccess: (RtcConnection connection, int elapsed) {
-            log('Host joined channel: ${connection.channelId}');
+            debugPrint('Host joined channel: ${connection.channelId}');
             isLive.value = true;
             connectionState.value = 'live';
             _startLiveTimer();
           },
           onUserJoined: (RtcConnection connection, int uid, int elapsed) {
-            log('Viewer joined: $uid');
+            debugPrint('Viewer joined: $uid');
             viewerCount.value++;
-          },
-          onRtcStats: (RtcConnection connection, RtcStats stats) {
-            viewerCount.value = stats.userCount ?? 0;
-            debugPrint("👥 Total users in channel: ${stats.userCount}");
           },
           onUserOffline: (
             RtcConnection connection,
@@ -147,6 +153,11 @@ class HostController extends GetxController {
             if (viewerCount.value > 0) {
               viewerCount.value--;
             }
+          },
+
+          onRtcStats: (RtcConnection connection, RtcStats stats) {
+            viewerCount.value = stats.userCount ?? 0;
+            debugPrint("👥 Total users in channel: ${stats.userCount}");
           },
           onConnectionStateChanged: (
             RtcConnection connection,
@@ -197,11 +208,6 @@ class HostController extends GetxController {
         ),
       );
 
-      localVideoViewController = VideoViewController(
-        rtcEngine: engine,
-        canvas: VideoCanvas(uid: uId, renderMode: RenderModeType.renderModeFit),
-      );
-
       // Configure for broadcasting
       await _configureForBroadcasting();
 
@@ -217,13 +223,13 @@ class HostController extends GetxController {
     await engine.enableVideo();
     await engine.enableAudio();
 
-    // // Set channel profile for live broadcasting
+    // Set client role as broadcaster (host)
+    await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
+    // Set channel profile for live broadcasting
     await engine.setChannelProfile(
       ChannelProfileType.channelProfileLiveBroadcasting,
     );
-    // Set client role as broadcaster (host)
-    await engine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
 
     // Configure video for broadcasting
     await engine.setVideoEncoderConfiguration(

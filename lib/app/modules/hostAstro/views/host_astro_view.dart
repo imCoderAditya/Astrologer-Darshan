@@ -492,33 +492,33 @@ class HostView extends GetView<HostController> {
           const SizedBox(height: 12),
 
           // Screen share button
-          _buildSideButton(
-            icon:
-                controller.isScreenSharing.value
-                    ? Icons.stop_screen_share
-                    : Icons.screen_share,
-            onPressed: controller.toggleScreenShare,
-            tooltip:
-                controller.isScreenSharing.value
-                    ? 'Stop sharing'
-                    : 'Share screen',
-            isActive: controller.isScreenSharing.value,
-          ),
+          // _buildSideButton(
+          //   icon:
+          //       controller.isScreenSharing.value
+          //           ? Icons.stop_screen_share
+          //           : Icons.screen_share,
+          //   onPressed: controller.toggleScreenShare,
+          //   tooltip:
+          //       controller.isScreenSharing.value
+          //           ? 'Stop sharing'
+          //           : 'Share screen',
+          //   isActive: controller.isScreenSharing.value,
+          // ),
           const SizedBox(height: 12),
 
           // Recording button
-          _buildSideButton(
-            icon:
-                controller.isRecording.value
-                    ? Icons.stop
-                    : Icons.radio_button_checked,
-            onPressed: controller.toggleRecording,
-            tooltip:
-                controller.isRecording.value
-                    ? 'Stop recording'
-                    : 'Start recording',
-            isActive: controller.isRecording.value,
-          ),
+          // _buildSideButton(
+          //   icon:
+          //       controller.isRecording.value
+          //           ? Icons.stop
+          //           : Icons.radio_button_checked,
+          //   onPressed: controller.toggleRecording,
+          //   tooltip:
+          //       controller.isRecording.value
+          //           ? 'Stop recording'
+          //           : 'Start recording',
+          //   isActive: controller.isRecording.value,
+          // ),
           const SizedBox(height: 12),
 
           // // Virtual background button
