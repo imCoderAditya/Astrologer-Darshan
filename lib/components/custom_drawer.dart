@@ -149,13 +149,13 @@ class AppDrawer extends StatelessWidget {
               ),
 
               // Theme Toggle (moved out of _buildAnimatedNavItem as it's a special case)
-              _buildOnlineOffline(
-                textColor,
-                highlightColor,
-                highlightTextColor,
-                secondaryColor,
-                isDark,
-              ),
+              // _buildOnlineOffline(
+              //   textColor,
+              //   highlightColor,
+              //   highlightTextColor,
+              //   secondaryColor,
+              //   isDark,
+              // ),
 
               _buildThemeToggle(
                 themeController,
@@ -674,112 +674,112 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildOnlineOffline(
-    Color textColor,
-    Color highlightColor,
-    Color highlightTextColor,
-    Color secondaryColor,
-    bool isDark,
-  ) {
-    bool isOnline =
-        profileController.profileModel.value?.data?.isOnline ?? false;
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap:
-              () => {
-                isOnline = !isOnline,
-                debugPrint(isOnline.toString()),
-                profileController.onlineOffline(isOnline: isOnline),
-              },
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    isOnline ? Icons.online_prediction : Icons.offline_bolt,
-                    color: AppColors.accentColor,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Text(
-                    isOnline ? "Online" : "Offline",
-                    style: AppTextStyles.body().copyWith(
-                      color: textColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  width: 52,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    color:
-                        isOnline
-                            ? AppColors.accentColor
-                            : secondaryColor.withOpacity(
-                              0.3,
-                            ), // No clamp needed here
-                    border: Border.all(
-                      color:
-                          isOnline
-                              ? AppColors.accentColor
-                              : secondaryColor.withOpacity(
-                                0.5,
-                              ), // No clamp needed here
-                      width: 1,
-                    ),
-                  ),
-                  child: AnimatedAlign(
-                    duration: const Duration(milliseconds: 300),
-                    alignment:
-                        isOnline ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      margin: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(
-                              0.2,
-                            ), // No clamp needed here
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        isOnline ? Icons.online_prediction : Icons.offline_bolt,
-                        size: 14,
-                        color: isOnline ? AppColors.accentColor : Colors.orange,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildOnlineOffline(
+  //   Color textColor,
+  //   Color highlightColor,
+  //   Color highlightTextColor,
+  //   Color secondaryColor,
+  //   bool isDark,
+  // ) {
+  //   bool isOnline =
+  //       profileController.profileModel.value?.data?.isOnline ?? false;
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+  //     decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+  //     child: Material(
+  //       color: Colors.transparent,
+  //       child: InkWell(
+  //         onTap:
+  //             () => {
+  //               // isOnline = !isOnline,
+  //               // debugPrint(isOnline.toString()),
+  //               // profileController.onlineOffline(isOnline: isOnline),
+  //             },
+  //         borderRadius: BorderRadius.circular(16),
+  //         child: Padding(
+  //           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+  //           child: Row(
+  //             children: [
+  //               Container(
+  //                 padding: const EdgeInsets.all(2),
+  //                 decoration: BoxDecoration(
+  //                   borderRadius: BorderRadius.circular(8),
+  //                 ),
+  //                 child: Icon(
+  //                   isOnline ? Icons.online_prediction : Icons.offline_bolt,
+  //                   color: AppColors.accentColor,
+  //                   size: 24,
+  //                 ),
+  //               ),
+  //               const SizedBox(width: 20),
+  //               Expanded(
+  //                 child: Text(
+  //                   isOnline ? "Online" : "Offline",
+  //                   style: AppTextStyles.body().copyWith(
+  //                     color: textColor,
+  //                     fontWeight: FontWeight.w500,
+  //                     fontSize: 16,
+  //                   ),
+  //                 ),
+  //               ),
+  //               AnimatedContainer(
+  //                 duration: const Duration(milliseconds: 300),
+  //                 width: 52,
+  //                 height: 28,
+  //                 decoration: BoxDecoration(
+  //                   borderRadius: BorderRadius.circular(14),
+  //                   color:
+  //                       isOnline
+  //                           ? AppColors.accentColor
+  //                           : secondaryColor.withOpacity(
+  //                             0.3,
+  //                           ), // No clamp needed here
+  //                   border: Border.all(
+  //                     color:
+  //                         isOnline
+  //                             ? AppColors.accentColor
+  //                             : secondaryColor.withOpacity(
+  //                               0.5,
+  //                             ), // No clamp needed here
+  //                     width: 1,
+  //                   ),
+  //                 ),
+  //                 child: AnimatedAlign(
+  //                   duration: const Duration(milliseconds: 300),
+  //                   alignment:
+  //                       isOnline ? Alignment.centerRight : Alignment.centerLeft,
+  //                   child: Container(
+  //                     width: 24,
+  //                     height: 24,
+  //                     margin: const EdgeInsets.all(2),
+  //                     decoration: BoxDecoration(
+  //                       shape: BoxShape.circle,
+  //                       color: Colors.white,
+  //                       boxShadow: [
+  //                         BoxShadow(
+  //                           color: Colors.black.withOpacity(
+  //                             0.2,
+  //                           ), // No clamp needed here
+  //                           blurRadius: 4,
+  //                           offset: const Offset(0, 2),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     child: Icon(
+  //                       isOnline ? Icons.online_prediction : Icons.offline_bolt,
+  //                       size: 14,
+  //                       color: isOnline ? AppColors.accentColor : Colors.orange,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildFooterSection(
     BuildContext context,

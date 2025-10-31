@@ -27,7 +27,7 @@ class HomeView extends StatelessWidget {
     final Color textColor =
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
     final userRequestController = Get.put(UserRequestController());
-   
+
     return GetBuilder<HomeController>(
       init: HomeController(),
       builder: (controller) {
@@ -102,23 +102,14 @@ class HomeView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Card(
-                  child: _buildOnlineOffline(
-                    textColor,
-                    AppColors.primaryColor,
-                    AppColors.primaryColor,
-                    AppColors.primaryColor,
-                    isDark,
-                  ),
-                ),
-                SizedBox(height: 10.h),
                 // Grid of Services
                 GridView.count(
+                  padding: EdgeInsets.only(top: 8.h, bottom: 14.h),
                   crossAxisCount: 4,
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10.h,
+                  crossAxisSpacing: 10.w,
                   childAspectRatio: 0.7,
                   children: [
                     AnimatedServiceCard(
@@ -225,7 +216,13 @@ class HomeView extends StatelessWidget {
                     ),
                   ],
                 ),
-
+                _buildOnlineOffline(
+                  textColor,
+                  AppColors.primaryColor,
+                  AppColors.primaryColor,
+                  AppColors.primaryColor,
+                  isDark,
+                ),
                 // SizedBox(height: 20),
                 // Obx(() {
                 //   final profile =
@@ -265,118 +262,249 @@ class HomeView extends StatelessWidget {
     Color secondaryColor,
     bool isDark,
   ) {
-
+    final bool isDark = Theme.of(Get.context!).brightness == Brightness.dark;
     return GetBuilder<ProfileController>(
       init: ProfileController(),
       builder: (controller) {
-            bool isOnline =
-        profileController.profileModel.value?.data?.isOnline ?? false;
-        return Container(
-          margin: EdgeInsets.symmetric(vertical: 2.h),
-          padding: EdgeInsets.symmetric(vertical: 10.h),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-          child: Material(
-            color: Colors.transparent,
-            child: GestureDetector(
-              onTap:
-                  () async => {
-                    isOnline = !isOnline,
-                    debugPrint(isOnline.toString()),
-                    await profileController.onlineOffline(isOnline: isOnline),
-                    profileController.update(),
-                  },
-              // borderRadius: BorderRadius.circular(16),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        isOnline ? Icons.online_prediction : Icons.offline_bolt,
-                        color: AppColors.accentColor,
-                        size: 24,
-                      ),
+        return Column(
+          children: [
+            Obx(
+              () => customToggleButton(
+                isOnline: controller.isAvailableForChat.value,
+                onToggle: () async {
+                  controller.isAvailableForChat.value =
+                      !controller.isAvailableForChat.value;
+                  await profileController.onlineOffline(
+                    isAvailableForCall: controller.isAvailableForCall.value,
+                    isAvailableForChat: controller.isAvailableForChat.value,
+                  );
+                  profileController.update();
+                },
+                label: "Chat",
+                activeIcon: Icons.chat,
+                inactiveIcon: Icons.chat,
+                activeColor: AppColors.accentColor,
+                inactiveColor: Colors.grey,
+                textColor: isDark ? AppColors.white : AppColors.primaryColor,
+              ),
+            ),
+            SizedBox(height: 5.h),
+            Obx(
+              () => customToggleButton(
+                isOnline: controller.isAvailableForCall.value,
+                onToggle: () async {
+                  controller.isAvailableForCall.value =
+                      !controller.isAvailableForCall.value;
+                  await profileController.onlineOffline(
+                    isAvailableForCall: controller.isAvailableForCall.value,
+                    isAvailableForChat: controller.isAvailableForChat.value,
+                  );
+                  profileController.update();
+                },
+                label: "Call",
+                activeIcon: Icons.call,
+                inactiveIcon: Icons.call,
+                activeColor: AppColors.accentColor,
+                inactiveColor: Colors.grey,
+                textColor: isDark ? AppColors.white : AppColors.primaryColor,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Container customToggleButton({
+    required bool isOnline,
+    required VoidCallback onToggle,
+    String label = "Call",
+    IconData? activeIcon,
+    IconData? inactiveIcon,
+    Color? activeColor,
+    Color? inactiveColor,
+    Color? textColor,
+    Color? backgroundColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color:
+            backgroundColor ?? AppColors.primaryColor.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: AppColors.primaryColor.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onToggle,
+          borderRadius: BorderRadius.circular(10),
+          splashColor: (activeColor ?? AppColors.accentColor).withValues(
+            alpha: 0.1,
+          ),
+          highlightColor: (activeColor ?? AppColors.accentColor).withValues(
+            alpha: 0.05,
+          ),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            child: Row(
+              children: [
+                // Icon Container with gradient
+                Container(
+                  height: 35.h,
+                  width: 35.w,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors:
+                          isOnline
+                              ? [
+                                (activeColor ?? AppColors.accentColor)
+                                    .withValues(alpha: 0.8),
+                                (activeColor ?? AppColors.accentColor)
+                                    .withValues(alpha: 0.5),
+                              ]
+                              : [
+                                (inactiveColor ?? Colors.grey).withValues(
+                                  alpha: 0.2,
+                                ),
+                                (inactiveColor ?? Colors.grey).withValues(
+                                  alpha: 0.1,
+                                ),
+                              ],
                     ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Text(
-                        isOnline ? "Online" : "Offline",
+                    boxShadow:
+                        isOnline
+                            ? [
+                              BoxShadow(
+                                color: (activeColor ?? AppColors.accentColor)
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                            : [],
+                  ),
+                  child: Icon(
+                    isOnline
+                        ? (activeIcon ?? Icons.call_rounded)
+                        : (inactiveIcon ?? Icons.call_end_rounded),
+                    color: AppColors.white,
+                    size: 20.h,
+                  ),
+                ),
+                SizedBox(width: 16.w),
+
+                // Label
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
                         style: AppTextStyles.body().copyWith(
-                          color: textColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      width: 52,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color:
-                            isOnline
-                                ? AppColors.accentColor
-                                : secondaryColor.withOpacity(
-                                  0.3,
-                                ), // No clamp needed here
-                        border: Border.all(
                           color:
                               isOnline
-                                  ? AppColors.accentColor
-                                  : secondaryColor.withOpacity(
-                                    0.5,
-                                  ), // No clamp needed here
-                          width: 1,
+                                  ? (textColor ?? Colors.white)
+                                  : (textColor ?? Colors.white).withValues(
+                                    alpha: 0.5,
+                                  ),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14.sp,
                         ),
                       ),
-                      child: AnimatedAlign(
-                        duration: const Duration(milliseconds: 300),
-                        alignment:
+                      SizedBox(height: 2.h),
+                      Text(
+                        isOnline ? "Enabled" : "Disabled",
+                        style: AppTextStyles.body().copyWith(
+                          color:
+                              isOnline
+                                  ? (textColor ?? AppColors.accentColor)
+                                      .withValues(alpha: 0.9)
+                                  : (textColor ?? Colors.grey).withValues(
+                                    alpha: 0.7,
+                                  ),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Animated Toggle Switch
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  width: 56,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color:
+                        isOnline
+                            ? (activeColor ?? AppColors.accentColor)
+                            : (inactiveColor ?? Colors.grey).withValues(
+                              alpha: 0.3,
+                            ),
+                    boxShadow: [
+                      BoxShadow(
+                        color:
                             isOnline
-                                ? Alignment.centerRight
-                                : Alignment.centerLeft,
+                                ? (activeColor ?? AppColors.accentColor)
+                                    .withValues(alpha: 0.4)
+                                : Colors.black.withValues(alpha: 0.1),
+                        blurRadius: isOnline ? 8 : 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      // Background indicator
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        left: isOnline ? null : 4,
+                        right: isOnline ? 4 : null,
+                        top: 4,
+                        bottom: 4,
                         child: Container(
                           width: 24,
                           height: 24,
-                          margin: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(
-                                  0.2,
-                                ), // No clamp needed here
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            isOnline
-                                ? Icons.online_prediction
-                                : Icons.offline_bolt,
-                            size: 14,
-                            color:
-                                isOnline
-                                    ? AppColors.accentColor
-                                    : Colors.orange,
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                      // Icon overlay
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        left: isOnline ? null : 8,
+                        right: isOnline ? 8 : null,
+                        top: 8,
+                        child: Icon(
+                          isOnline ? Icons.check_rounded : Icons.close_rounded,
+                          size: 16,
+                          color:
+                              isOnline
+                                  ? (activeColor ?? AppColors.accentColor)
+                                  : (inactiveColor ?? Colors.grey),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 

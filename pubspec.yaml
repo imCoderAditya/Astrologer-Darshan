@@ -58,7 +58,6 @@ dependencies:
   shimmer_animation: ^2.2.2
   carousel_slider: ^5.1.1
   agora_rtc_engine: ^6.5.2
-  agora_rtm: ^2.2.5
   flutter_rating: ^2.0.2
   flutter_media_downloader: ^2.0.0
   device_info_plus: ^10.0.1

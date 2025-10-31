@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
+  var isAvailableForChat = false.obs;
+  var isAvailableForCall = false.obs;
   Rxn<ProfileModel> profileModel = Rxn<ProfileModel>();
 
   Future<void> getProfile() async {
@@ -21,6 +23,10 @@ class ProfileController extends GetxController {
 
       if (res != null && res.statusCode == 200) {
         profileModel.value = profileModelFromJson(json.encode(res.data));
+        isAvailableForChat.value =
+            profileModel.value?.data?.isAvailableForChat ?? false;
+        isAvailableForCall.value =
+            profileModel.value?.data?.isAvailableForCall ?? false;
         log("Profile :${json.encode(profileModel.value)}");
       } else {
         debugPrint("Failed Response ${res?.data}");
@@ -32,7 +38,10 @@ class ProfileController extends GetxController {
     }
   }
 
-  Future<void> onlineOffline({bool? isOnline}) async {
+  Future<void> onlineOffline({
+    bool? isAvailableForCall,
+    bool? isAvailableForChat,
+  }) async {
     GlobalLoader.show();
     final astrologerId = LocalStorageService.getAstrologerId();
     try {
@@ -40,21 +49,22 @@ class ProfileController extends GetxController {
         api: EndPoint.onlineUpdateStatus,
         data: {
           "AstrologerId": int.tryParse(astrologerId.toString()),
-          "IsOnline": isOnline,
+          "IsAvailableForCall": isAvailableForCall,
+          "IsAvailableForChat": isAvailableForChat,
         },
       );
 
       if (res != null && res.statusCode == 201) {
         log("Profile :${json.encode(profileModel.value)}");
-        getProfile();
+        await getProfile();
       } else {
         debugPrint("Failed Response ${res?.data}");
       }
     } catch (e) {
       debugPrint("Error: $e");
     } finally {
-      GlobalLoader.hide();
       update();
+      GlobalLoader.hide();
     }
   }
 

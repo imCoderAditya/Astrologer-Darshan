@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
-import 'package:agora_rtm/agora_rtm.dart';
 import 'package:agora_token_generator/agora_token_generator.dart';
 import 'package:astrology/app/core/utils/logger_utils.dart';
 import 'package:astrology/app/data/baseclient/base_client.dart';
@@ -38,7 +37,7 @@ class HostController extends GetxController {
   String? userName;
   String? token;
   int? uId;
-  late RtmClient rtmClient;
+
 
   // Basic states
   final isEngineReady = false.obs;
