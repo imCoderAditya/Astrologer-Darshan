@@ -221,22 +221,75 @@ class ProfileView extends StatelessWidget {
                           const SizedBox(height: 16),
 
                           // Name with mystical styling
-                          Text(
-                            "${profileData?.firstName ?? ""} ${profileData?.lastName ?? ""}",
-                            style: AppTextStyles.headlineMedium().copyWith(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 1.2,
-                              shadows: [
-                                Shadow(
-                                  blurRadius: 10.0,
-                                  color: AppColors.primaryColor.withOpacity(
-                                    0.5,
-                                  ),
-                                  offset: const Offset(0, 2),
+                          Row(
+                            children: [
+                              Text(
+                                "${profileData?.firstName ?? ""} ${profileData?.lastName ?? ""}",
+                                style: AppTextStyles.headlineMedium().copyWith(
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.w600,
+
+                                  letterSpacing: 1.2,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 10.0,
+                                      color: AppColors.primaryColor.withOpacity(
+                                        0.5,
+                                      ),
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(width: 10.w),
+                              TextButton(
+                                style: ButtonStyle(
+                                  padding: WidgetStatePropertyAll(
+                                    EdgeInsets.symmetric(
+                                      horizontal: 10.w,
+                                      vertical: 2.w,
+                                    ),
+                                  ),
+                                  shape: WidgetStatePropertyAll(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.r),
+                                      side: BorderSide(
+                                        color: AppColors.white,
+                                        width: 2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Get.toNamed(
+                                    Routes.EDIT_PROFILE,
+                                    arguments: controller.profileModel,
+                                  )?.then((value) {
+                                    controller.getProfile();
+                                  });
+                                },
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Icon(
+                                      Icons.edit,
+                                      size: 16.h,
+                                      color: AppColors.white,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      "Edit",
+                                      style: AppTextStyles.button.copyWith(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
 
                           // const SizedBox(height: 8),
@@ -255,6 +308,8 @@ class ProfileView extends StatelessWidget {
                             profileData?.email ?? "",
                             style: AppTextStyles.caption().copyWith(
                               color: AppColors.white.withOpacity(0.8),
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 6),
@@ -272,8 +327,9 @@ class ProfileView extends StatelessWidget {
                                 TextSpan(
                                   text: profileData?.bio ?? "",
                                   style: AppTextStyles.caption().copyWith(
-                                    color: AppColors.white.withOpacity(0.8),
-                                    fontSize: 10.sp,
+                                    color: AppColors.white.withOpacity(0.6),
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],

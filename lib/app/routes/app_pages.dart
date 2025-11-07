@@ -10,6 +10,8 @@ import '../modules/chat/bindings/chat_binding.dart';
 import '../modules/chat/views/chat_view.dart';
 import '../modules/customer/bindings/customer_binding.dart';
 import '../modules/customer/views/customer_view.dart';
+import '../modules/editProfile/bindings/edit_profile_binding.dart';
+import '../modules/editProfile/views/edit_profile_view.dart';
 import '../modules/games/bindings/games_binding.dart';
 import '../modules/games/views/games_view.dart';
 import '../modules/gift/bindings/gift_binding.dart';
@@ -138,6 +140,11 @@ class AppPages {
       name: _Paths.REVIEW,
       page: () => const ReviewView(),
       binding: ReviewBinding(),
+    ),
+    GetPage(
+      name: _Paths.EDIT_PROFILE,
+      page: () => const EditProfileView(),
+      binding: EditProfileBinding(),
     ),
   ];
 }

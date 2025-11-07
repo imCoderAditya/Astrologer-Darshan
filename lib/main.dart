@@ -12,15 +12,13 @@ import 'app/core/config/theme/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 
 void main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
-   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
- await FirebaseServices.firebaseToken();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseServices.firebaseToken();
   FirebaseServices().setupFirebaseForegroundListener();
+
   // FirebaseLocalHandle().initLocalNotifications();
-  
+
   await GetStorage.init();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(

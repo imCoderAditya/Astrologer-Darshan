@@ -11,8 +11,6 @@ class FirebaseServices {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   // Initialize the plugin (only once, e.g., in main.dart)
-  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  //     FlutterLocalNotificationsPlugin();
 
   // Call this function in main() after initializing Firebase
   Future<void> setupFirebaseForegroundListener() async {
@@ -56,6 +54,7 @@ class FirebaseServices {
               playSound: true,
               color: AppColors.primaryColor,
               icon: '@mipmap/launcher_icon',
+              timeoutAfter: 60000,
               // sound:  const UriAndroidNotificationSound("assets/icons/sound.mp3"),
               importance: Importance.max,
               priority: Priority.high,

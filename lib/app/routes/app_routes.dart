@@ -26,6 +26,7 @@ abstract class Routes {
   static const WEBVIEW = _Paths.WEBVIEW;
   static const TERMS_CONDITION = _Paths.TERMS_CONDITION;
   static const REVIEW = _Paths.REVIEW;
+  static const EDIT_PROFILE = _Paths.EDIT_PROFILE;
 }
 
 abstract class _Paths {
@@ -53,4 +54,5 @@ abstract class _Paths {
   static const WEBVIEW = '/webview';
   static const TERMS_CONDITION = '/terms-condition';
   static const REVIEW = '/review';
+  static const EDIT_PROFILE = '/edit-profile';
 }
