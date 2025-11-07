@@ -5,9 +5,13 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:astrology/app/core/utils/logger_utils.dart';
+import 'package:astrology/app/data/baseclient/base_client.dart';
+import 'package:astrology/app/data/endpoint/end_pont.dart';
 import 'package:astrology/app/data/models/profile/profile_model.dart';
+import 'package:astrology/app/data/models/specialization/specialization_model.dart';
 import 'package:astrology/app/modules/profile/controllers/profile_controller.dart';
 import 'package:astrology/app/services/storage/local_storage_service.dart';
+import 'package:astrology/components/global_loader.dart';
 import 'package:astrology/components/snack_bar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +21,7 @@ import 'package:intl/intl.dart';
 
 class EditProfileController extends GetxController {
   Rxn<ProfileModel> profileModel = Rxn<ProfileModel>();
+  Rxn<SpecializationModel> specializationModel = Rxn<SpecializationModel>();
   // Text Controllers
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -39,6 +44,7 @@ class EditProfileController extends GetxController {
   RxString? profilePicture = "".obs;
 
   // Observable variables
+  Rxn<Specialization> selectSpecialization = Rxn<Specialization>();
   final selectedGender = ''.obs;
   final profileImage = Rx<File?>(null);
   final isLoading = false.obs;
@@ -84,6 +90,7 @@ class EditProfileController extends GetxController {
   }
 
   void loadProfileData() async {
+    await fetchSpecialization();
     final data = profileModel.value?.data;
     if (data != null) {
       firstNameController.text = data.firstName ?? '';
@@ -95,12 +102,20 @@ class EditProfileController extends GetxController {
       selectedGender.value = data.gender ?? "";
       bioController.text = data.bio ?? '';
       experienceController.text = data.experience?.toString() ?? '';
-      specializationsController.text = data.specializations ?? '';
       languagesController.text = data.languages ?? '';
       educationController.text = data.education ?? '';
       certificationsController.text = data.certifications ?? '';
       profilePicture?.value = data.profilePicture ?? "";
 
+      selectSpecialization.value = specializationModel.value?.specialization
+          ?.firstWhere(
+            (e) =>
+                e.categoryName?.toLowerCase() ==
+                data.specializations?.toLowerCase(),
+          );
+
+      log("uu==>${json.encode(selectSpecialization.value)}");
+      
       /// bank accountDetails & taxDetails are in a combined string
       /// you probably need to decode or parse it if API provides structured JSON
       final bankJson = jsonDecode(data.bankAccountDetails!);
@@ -111,7 +126,6 @@ class EditProfileController extends GetxController {
       panController.text = bankJson['Pan'] ?? '';
       gstController.text = bankJson['GST'] ?? '';
 
-     
       update();
     }
   }
@@ -259,7 +273,8 @@ class EditProfileController extends GetxController {
           experienceController.text.trim().isEmpty
               ? '0'
               : experienceController.text.trim();
-      request.fields['Specializations'] = specializationsController.text.trim();
+      request.fields['Specializations'] =
+          selectSpecialization.value?.categoryName ?? "";
       request.fields['Languages'] = languagesController.text.trim();
       request.fields['Education'] = educationController.text.trim();
       request.fields['Certifications'] = certificationsController.text.trim();
@@ -299,6 +314,7 @@ class EditProfileController extends GetxController {
       if (response.statusCode == 200) {
         var jsonResponse = jsonDecode(response.body);
         log("Edit Profile res: $jsonResponse");
+        SnackBarUiView.showInfo(message: jsonResponse["message"]);
         // Navigate back or refresh profile
         await Future.delayed(Duration(seconds: 1));
         Get.back(result: true); // Return true to indicate success
@@ -312,34 +328,32 @@ class EditProfileController extends GetxController {
     }
   }
 
-  // Show image source selection dialog
-  Future<void> showImageSourceDialog() async {
-    Get.dialog(
-      AlertDialog(
-        title: Text('Select Image Source'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.photo_library, color: Color(0xFFc40294)),
-              title: Text('Gallery'),
-              onTap: () {
-                Get.back();
-                pickImageFromSource(ImageSource.gallery);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.camera_alt, color: Color(0xFFc40294)),
-              title: Text('Camera'),
-              onTap: () {
-                Get.back();
-                pickImageFromSource(ImageSource.camera);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> fetchSpecialization() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      GlobalLoader.show();
+    });
+    try {
+      final res = await BaseClient.get(
+        api: EndPoint.getConsultationCategoriess,
+      );
+      if (res != null && res.statusCode == 200) {
+        specializationModel.value = specializationModelFromJson(
+          json.encode(res.data),
+        );
+        LoggerUtils.debug(
+          "Response==>${json.encode(specializationModel.value)}",
+        );
+      } else {
+        LoggerUtils.debug("Response==>${res?.data}");
+      }
+    } catch (e) {
+      LoggerUtils.error("Error:$e");
+    } finally {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        GlobalLoader.hide();
+      });
+      update();
+    }
   }
 
   // Pick image from specific source
@@ -356,13 +370,7 @@ class EditProfileController extends GetxController {
         profileImage.value = File(pickedFile.path);
       }
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to pick image: $e',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      LoggerUtils.error("Failed to pick image: $e");
     }
   }
 }

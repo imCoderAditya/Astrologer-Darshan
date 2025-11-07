@@ -2,6 +2,7 @@
 
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
+import 'package:astrology/app/data/models/specialization/specialization_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -203,14 +204,24 @@ class EditProfileView extends GetView<EditProfileController> {
                 secondaryTextColor: secondaryTextColor,
               ),
               SizedBox(height: 15.h),
-              _buildTextField(
-                controller: controller.specializationsController,
+              // _buildTextField(
+              //   controller: controller.specializationsController,
+              //   label: "Specializations (comma separated)",
+              //   icon: Icons.star_outline,
+              //   maxLines: 2,
+              //   textColor: textColor,
+              //   secondaryTextColor: secondaryTextColor,
+              //   hint: "e.g., Vedic, Kundli, Love, Finance",
+              // ),
+              _buildSpecializationDropdownField(
+                value: controller.selectSpecialization.value,
                 label: "Specializations (comma separated)",
-                icon: Icons.star_outline,
-                maxLines: 2,
+                icon: Icons.wc_outlined,
+                items: ['Male', 'Female', 'Other'],
                 textColor: textColor,
                 secondaryTextColor: secondaryTextColor,
-                hint: "e.g., Vedic, Kundli, Love, Finance",
+                onChanged:
+                    (value) => controller.selectSpecialization.value = value!,
               ),
               SizedBox(height: 15.h),
               _buildTextField(
@@ -442,6 +453,84 @@ class EditProfileView extends GetView<EditProfileController> {
     );
   }
 
+  Widget _buildSpecializationDropdownField({
+    Specialization? value,
+    required String label,
+    required IconData icon,
+    required List<String> items,
+    required Color textColor,
+    required Color secondaryTextColor,
+    required Function(Specialization?) onChanged,
+  }) {
+    final bool isDark = Theme.of(Get.context!).brightness == Brightness.dark;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 4.w, bottom: 8.h),
+          child: Text(
+            "Specialization",
+            style: AppTextStyles.caption().copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(
+              color: AppColors.primaryColor.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 2.h),
+          child: Obx(
+            () => DropdownButtonFormField<Specialization>(
+              padding: EdgeInsets.symmetric(vertical: 4.h),
+              value: controller.selectSpecialization.value,
+              decoration: InputDecoration(
+                hintText: "Select Specialization",
+                labelStyle: AppTextStyles.caption().copyWith(
+                  color: secondaryTextColor.withValues(alpha: 0.6),
+                ),
+                helperStyle: AppTextStyles.caption().copyWith(
+                  color: secondaryTextColor.withValues(alpha: 0.6),
+                ),
+                prefixIcon: Icon(
+                  icon,
+                  color: AppColors.primaryColor,
+                  size: 22.sp,
+                ),
+                border: InputBorder.none,
+              ),
+              dropdownColor:
+                  isDark ? AppColors.darkBackground : AppColors.white,
+              style: AppTextStyles.body().copyWith(
+                color: textColor,
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+
+              items:
+                  controller.specializationModel.value?.specialization?.map((
+                    Specialization? item,
+                  ) {
+                    return DropdownMenuItem<Specialization>(
+                      value: item,
+                      child: Text(item?.categoryName ?? ""),
+                    );
+                  }).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+     
+      ],
+    );
+  }
+
   Widget _buildDropdownField({
     required Rx<String> value,
     required String label,
@@ -474,7 +563,7 @@ class EditProfileView extends GetView<EditProfileController> {
               width: 1,
             ),
           ),
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 2.h),
+          padding: EdgeInsets.symmetric(vertical: 2.h),
           child: Obx(
             () => DropdownButtonFormField<String>(
               padding: EdgeInsets.symmetric(vertical: 4.h),

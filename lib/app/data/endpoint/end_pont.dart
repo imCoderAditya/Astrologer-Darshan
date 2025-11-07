@@ -27,4 +27,5 @@ class EndPoint {
   static const getFollowers = "$baseurl/Followers/GetFollowers";
   static const getConsultationReviews = "$baseurl/Consultation/GetReviews";
   static const getGiftTransactions = "$baseurl/LiveSession/GetGiftTransactions";
+  static const getConsultationCategoriess = "$baseurl/Master/GetConsultationCategoriess";
 }
