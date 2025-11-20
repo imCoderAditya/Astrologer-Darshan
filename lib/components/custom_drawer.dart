@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+
+
 import 'package:astrology/app/core/config/theme/app_colors.dart';
 import 'package:astrology/app/core/config/theme/app_text_styles.dart';
 import 'package:astrology/app/core/config/theme/theme_controller.dart';
@@ -50,10 +52,6 @@ class DrawerController extends GetxController {
   }
 }
 
-final profileController =
-    Get.isRegistered<ProfileController>()
-        ? Get.find<ProfileController>()
-        : Get.put(ProfileController());
 
 class DrawerItem {
   final IconData icon;
@@ -156,7 +154,6 @@ class AppDrawer extends StatelessWidget {
               //   secondaryColor,
               //   isDark,
               // ),
-
               _buildThemeToggle(
                 themeController,
                 textColor,
@@ -177,191 +174,204 @@ class AppDrawer extends StatelessWidget {
   // --- Helper Widgets (Refined) ---
 
   Widget _buildGradientHeader(bool isDark, Color highlightTextColor) {
-    final profile = profileController.profileModel.value?.data;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(25, 80, 20, 35),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: AppColors.headerGradientColors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.4),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+    return GetBuilder<ProfileController>(
+      init: ProfileController(),
+      builder: (controller) {
+        final profile = controller.profileModel.value?.data;
+        return Container(
+          padding: const EdgeInsets.fromLTRB(25, 80, 20, 35),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: AppColors.headerGradientColors,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryColor.withOpacity(0.4),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Enhanced Avatar with Pulse Animation
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(
-              begin: 0.0,
-              end: 1.0,
-            ), // Start from 0 to avoid initial overshooting scale
-            duration: const Duration(milliseconds: 1200),
-            curve: Curves.elasticOut,
-            builder: (context, value, child) {
-              final isActive =
-                  (profileController.profileModel.value?.data?.profilePicture !=
-                      null) &&
-                  (profileController
-                          .profileModel
-                          .value
-                          ?.data
-                          ?.profilePicture
-                          ?.isNotEmpty ??
-                      false);
-              // Clamp scale value explicitly to prevent overshoot issues
-              final clampedScale = (0.8 + (value * 0.2)).clamp(0.0, 1.0);
-              return Transform.scale(
-                scale: clampedScale,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.accentColor.withOpacity(
-                          value.clamp(0.0, 1.0),
-                        ), // Clamping here
-                        blurRadius: 20.0 * value,
-                        spreadRadius: 4.0 * value,
+          child: Row(
+            children: [
+              // Enhanced Avatar with Pulse Animation
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(
+                  begin: 0.0,
+                  end: 1.0,
+                ), // Start from 0 to avoid initial overshooting scale
+                duration: const Duration(milliseconds: 1200),
+                curve: Curves.elasticOut,
+                builder: (context, value, child) {
+                  final isActive =
+                      (profile?.profilePicture != null) &&
+                      (profile?.profilePicture?.isNotEmpty ?? false);
+                  // Clamp scale value explicitly to prevent overshoot issues
+                  final clampedScale = (0.8 + (value * 0.2)).clamp(0.0, 1.0);
+                  return Transform.scale(
+                    scale: clampedScale,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentColor.withOpacity(
+                              value.clamp(0.0, 1.0),
+                            ), // Clamping here
+                            blurRadius: 20.0 * value,
+                            spreadRadius: 4.0 * value,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      gradient: RadialGradient(
-                        colors: [Colors.white, Colors.white.withOpacity(0.8)],
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      radius: 42,
-                      backgroundColor: AppColors.white,
-                      child: CircleAvatar(
-                        radius: 40,
-                        backgroundColor: AppColors.primaryColor.withOpacity(
-                          0.3,
-                        ), // fallback
-                        child: ClipOval(
-                          child:
-                              isActive
-                                  ? Image.network(
-                                    profileController
-                                            .profileModel
-                                            .value
-                                            ?.data
-                                            ?.profilePicture ??
-                                        "",
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder: (
-                                      context,
-                                      child,
-                                      loadingProgress,
-                                    ) {
-                                      if (loadingProgress == null) {
-                                        return child;
-                                      }
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation(
-                                            AppColors.white,
-                                          ),
-                                          strokeWidth: 2,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(
-                                        Icons.person,
-                                        size: 60,
-                                        color: AppColors.primaryColor,
-                                      );
-                                    },
-                                  )
-                                  : Icon(
-                                    Icons.person,
-                                    size: 40,
-                                    color: AppColors.primaryColor,
-                                  ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0), // Start from 0
-                  duration: const Duration(milliseconds: 800),
-                  curve: Curves.easeOutBack,
-                  builder: (context, value, child) {
-                    return Transform.translate(
-                      offset: Offset((1 - value) * 50, 0),
-                      child: Opacity(
-                        opacity: value.clamp(0.0, 1.0), // Clamp opacity here
-                        child: Text(
-                          "${profile?.firstName ?? ""} ${profile?.lastName ?? ""}",
-                          style: AppTextStyles.headlineMedium().copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 4.0,
-                                color: Colors.black.withOpacity(
-                                  0.5,
-                                ), // No clamp needed here
-                                offset: const Offset(1, 2),
-                              ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3),
+                          gradient: RadialGradient(
+                            colors: [
+                              Colors.white,
+                              Colors.white.withOpacity(0.8),
                             ],
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 4),
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: 1.0), // Start from 0
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOutBack,
-                  builder: (context, value, child) {
-                    return Transform.translate(
-                      offset: Offset((1 - value) * 50, 0),
-                      child: Opacity(
-                        opacity: value.clamp(0.0, 1.0), // Clamp opacity here
-                        child: Text(
-                          profile?.email ?? "",
-                          style: AppTextStyles.caption().copyWith(
-                            color: Colors.white.withOpacity(
-                              0.9,
-                            ), // No clamp needed here
-                            fontSize: 14,
+                        child: CircleAvatar(
+                          radius: 42,
+                          backgroundColor: AppColors.white,
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundColor: AppColors.primaryColor.withOpacity(
+                              0.3,
+                            ), // fallback
+                            child: ClipOval(
+                              child:
+                                  isActive
+                                      ? Image.network(
+                                        profile?.profilePicture ?? "",
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (
+                                          context,
+                                          child,
+                                          loadingProgress,
+                                        ) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                    AppColors.white,
+                                                  ),
+                                              strokeWidth: 2,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (
+                                          context,
+                                          error,
+                                          stackTrace,
+                                        ) {
+                                          return Icon(
+                                            Icons.person,
+                                            size: 60,
+                                            color: AppColors.primaryColor,
+                                          );
+                                        },
+                                      )
+                                      : Icon(
+                                        Icons.person,
+                                        size: 40,
+                                        color: AppColors.primaryColor,
+                                      ),
+                            ),
                           ),
                         ),
                       ),
-                    );
-                  },
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(
+                        begin: 0.0,
+                        end: 1.0,
+                      ), // Start from 0
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutBack,
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset((1 - value) * 50, 0),
+                          child: Opacity(
+                            opacity: value.clamp(
+                              0.0,
+                              1.0,
+                            ), // Clamp opacity here
+                            child: Text(
+                              "${profile?.firstName ?? ""} ${profile?.lastName ?? ""}",
+                              style: AppTextStyles.headlineMedium().copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 4.0,
+                                    color: Colors.black.withOpacity(
+                                      0.5,
+                                    ), // No clamp needed here
+                                    offset: const Offset(1, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 4),
+                    TweenAnimationBuilder<double>(
+                      tween: Tween<double>(
+                        begin: 0.0,
+                        end: 1.0,
+                      ), // Start from 0
+                      duration: const Duration(milliseconds: 1000),
+                      curve: Curves.easeOutBack,
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset((1 - value) * 50, 0),
+                          child: Opacity(
+                            opacity: value.clamp(
+                              0.0,
+                              1.0,
+                            ), // Clamp opacity here
+                            child: Text(
+                              profile?.email ?? "",
+                              style: AppTextStyles.caption().copyWith(
+                                color: Colors.white.withOpacity(
+                                  0.9,
+                                ), // No clamp needed here
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

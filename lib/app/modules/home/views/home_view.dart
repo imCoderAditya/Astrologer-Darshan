@@ -274,11 +274,11 @@ class HomeView extends StatelessWidget {
                 onToggle: () async {
                   controller.isAvailableForChat.value =
                       !controller.isAvailableForChat.value;
-                  await profileController.onlineOffline(
+                  await controller.onlineOffline(
                     isAvailableForCall: controller.isAvailableForCall.value,
                     isAvailableForChat: controller.isAvailableForChat.value,
                   );
-                  profileController.update();
+                  controller.update();
                 },
                 label: "Chat",
                 activeIcon: Icons.chat,
@@ -295,11 +295,11 @@ class HomeView extends StatelessWidget {
                 onToggle: () async {
                   controller.isAvailableForCall.value =
                       !controller.isAvailableForCall.value;
-                  await profileController.onlineOffline(
+                  await controller.onlineOffline(
                     isAvailableForCall: controller.isAvailableForCall.value,
                     isAvailableForChat: controller.isAvailableForChat.value,
                   );
-                  profileController.update();
+                  controller.update();
                 },
                 label: "Call",
                 activeIcon: Icons.call,
