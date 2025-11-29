@@ -8,7 +8,7 @@ import '../controllers/voice_call_controller.dart';
 class VoiceCallView extends StatefulWidget {
   final String? channelName;
   final Session? session;
-  const VoiceCallView({super.key, this.channelName,this.session});
+  const VoiceCallView({super.key, this.channelName, this.session});
 
   @override
   State<VoiceCallView> createState() => _VoiceCallViewState();
@@ -134,15 +134,15 @@ class _VoiceCallViewState extends State<VoiceCallView> {
           uid: controller.localUid.value,
           isLocal: true,
           isMuted: controller.isMuted.value,
-           name: "You",
-              photo:
-                  controller
-                      .profileController
-                      .profileModel
-                      .value
-                      ?.data
-                      ?.profilePicture ??
-                  "",
+          name: "You",
+          photo:
+              controller
+                  .profileController
+                  .profileModel
+                  .value
+                  ?.data
+                  ?.profilePicture ??
+              "",
         ),
       );
 
@@ -150,8 +150,10 @@ class _VoiceCallViewState extends State<VoiceCallView> {
       for (int uid in controller.remoteUsers) {
         participants.add(
           _buildParticipantCard(
-            name: widget.session?.astrologerName ?? "",
-            photo: widget.session?.astrologerPhoto ?? "",
+            name:
+                "${widget.session?.customer?.firstName ?? ''} ${widget.session?.customer?.lastName ?? ''}",
+
+            photo: widget.session?.customer?.profilePicture ?? "",
             uid: uid,
             isLocal: false,
             isMuted: false, // You can track remote mute status if needed
@@ -207,7 +209,7 @@ class _VoiceCallViewState extends State<VoiceCallView> {
   //     ),
   //   );
   // }
-Widget _buildParticipantCard({
+  Widget _buildParticipantCard({
     required int uid,
     required bool isLocal,
     required bool isMuted,
@@ -250,16 +252,16 @@ Widget _buildParticipantCard({
           ),
 
           SizedBox(height: 10.h),
-        
+
           Text(
             "$name",
-            style:  TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 18.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
-            SizedBox(height: 5.h),
+          SizedBox(height: 5.h),
           //  Text(
           //   controller.timerText.value.isEmpty?"Calling...":controller.timerText.value,
           //   style:  TextStyle(
@@ -273,6 +275,7 @@ Widget _buildParticipantCard({
       ),
     );
   }
+
   Widget _buildControlButtons() {
     return Container(
       padding: const EdgeInsets.all(24),
