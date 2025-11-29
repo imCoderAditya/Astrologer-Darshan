@@ -227,13 +227,13 @@ class UserRequestView extends GetView<UserRequestController> {
             //   controller.statusUpdate("Active", session?.sessionId);
             // }
             if ((session?.status?.toLowerCase() == "completed" ||
-                session?.status?.toLowerCase() == "cancelled") &&
+                    session?.status?.toLowerCase() == "cancelled") &&
                 session?.sessionType?.toLowerCase() == "call") {
               return;
             }
             if (session?.sessionType == "Chat") {
               if (session?.status?.toLowerCase() == "pending") {
-                controller.statusUpdate("Active", session?.sessionId,"Chat");
+                controller.statusUpdate("Active", session?.sessionId, "Chat");
               }
               await chatController.setData(
                 sessionId: session?.sessionId,
@@ -241,7 +241,12 @@ class UserRequestView extends GetView<UserRequestController> {
               );
               Get.to(ChatView(sessionData: session));
             } else {
-              Get.to(VoiceCallView(channelName: session?.sessionId.toString()));
+              Get.to(
+                VoiceCallView(
+                  channelName: session?.sessionId.toString(),
+                  session: session,
+                ),
+              );
             }
           },
           child: Padding(

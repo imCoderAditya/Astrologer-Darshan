@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:agora_token_generator/agora_token_generator.dart';
 import 'package:astrology/app/core/utils/logger_utils.dart';
+import 'package:astrology/app/modules/profile/controllers/profile_controller.dart';
 import 'package:astrology/app/modules/userRequest/controllers/user_request_controller.dart';
 import 'package:astrology/components/global_loader.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,11 @@ class VoiceCallController extends GetxController {
       Get.isRegistered()
           ? Get.find<UserRequestController>()
           : Get.put(UserRequestController());
+
+  final profileController =
+      Get.isRegistered<ProfileController>()
+          ? Get.find<ProfileController>()
+          : Get.put(ProfileController());
   // Agora Engine instance
   RtcEngine? engine;
 

@@ -1,12 +1,14 @@
 // ignore_for_file: deprecated_member_use
+import 'package:astrology/app/data/models/userRequest/user_request_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/voice_call_controller.dart';
 
 class VoiceCallView extends StatefulWidget {
   final String? channelName;
-
-  const VoiceCallView({super.key, this.channelName});
+  final Session? session;
+  const VoiceCallView({super.key, this.channelName,this.session});
 
   @override
   State<VoiceCallView> createState() => _VoiceCallViewState();
@@ -23,9 +25,9 @@ class _VoiceCallViewState extends State<VoiceCallView> {
 
   @override
   Widget build(BuildContext context) {
-    controller.channelName.value = widget.channelName??"";
+    controller.channelName.value = widget.channelName ?? "";
     return WillPopScope(
-      onWillPop: () async=>false,
+      onWillPop: () async => false,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Voice Call'),
@@ -60,10 +62,10 @@ class _VoiceCallViewState extends State<VoiceCallView> {
               children: [
                 // Channel Info
                 // _buildChannelInfo(),
-      
+
                 // Participants List
                 Expanded(child: _buildParticipantsList()),
-      
+
                 // Control Buttons
                 _buildControlButtons(),
               ],
@@ -73,36 +75,6 @@ class _VoiceCallViewState extends State<VoiceCallView> {
       ),
     );
   }
-
-  // Widget _buildChannelInfo() {
-  //   return Container(
-  //     margin: const EdgeInsets.all(16),
-  //     padding: const EdgeInsets.all(20),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white.withOpacity(0.1),
-  //       borderRadius: BorderRadius.circular(12),
-  //     ),
-  //     child: Column(
-  //       children: [
-  //         Text(
-  //           'Channel: ${widget.channelName}',
-  //           style: const TextStyle(
-  //             color: Colors.white,
-  //             fontSize: 18,
-  //             fontWeight: FontWeight.bold,
-  //           ),
-  //         ),
-  //         const SizedBox(height: 8),
-  //         Obx(
-  //           () => Text(
-  //             '${controller.participantsCount} Participant(s)',
-  //             style: const TextStyle(color: Colors.white70, fontSize: 14),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildParticipantsList() {
     return Obx(() {
@@ -119,7 +91,8 @@ class _VoiceCallViewState extends State<VoiceCallView> {
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
-                onPressed: () => controller.joinChannel(widget.channelName ?? ""),
+                onPressed:
+                    () => controller.joinChannel(widget.channelName ?? ""),
                 icon: const Icon(Icons.call),
                 label: const Text('Join Call'),
                 style: ElevatedButton.styleFrom(
@@ -161,6 +134,15 @@ class _VoiceCallViewState extends State<VoiceCallView> {
           uid: controller.localUid.value,
           isLocal: true,
           isMuted: controller.isMuted.value,
+           name: "You",
+              photo:
+                  controller
+                      .profileController
+                      .profileModel
+                      .value
+                      ?.data
+                      ?.profilePicture ??
+                  "",
         ),
       );
 
@@ -168,6 +150,8 @@ class _VoiceCallViewState extends State<VoiceCallView> {
       for (int uid in controller.remoteUsers) {
         participants.add(
           _buildParticipantCard(
+            name: widget.session?.astrologerName ?? "",
+            photo: widget.session?.astrologerPhoto ?? "",
             uid: uid,
             isLocal: false,
             isMuted: false, // You can track remote mute status if needed
@@ -183,10 +167,52 @@ class _VoiceCallViewState extends State<VoiceCallView> {
     });
   }
 
-  Widget _buildParticipantCard({
+  // Widget _buildParticipantCard({
+  //   required int uid,
+  //   required bool isLocal,
+  //   required bool isMuted,
+  //   String? name,
+  //   String? photo,
+  // }) {
+  //   return Container(
+  //     margin: const EdgeInsets.only(bottom: 12),
+  //     padding: const EdgeInsets.all(16),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white.withOpacity(0.1),
+  //       borderRadius: BorderRadius.circular(12),
+  //       border: isLocal ? Border.all(color: Colors.white, width: 2) : null,
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         CircleAvatar(
+  //           backgroundColor: isLocal ? Colors.green : Colors.blue,
+  //           child: Text(
+  //             isLocal ? 'You' : uid.toString(),
+  //             style: const TextStyle(color: Colors.white, fontSize: 12),
+  //           ),
+  //         ),
+  //         const SizedBox(width: 12),
+  //         Expanded(
+  //           child: Text(
+  //             isLocal ? 'You (Local)' : 'User $uid',
+  //             style: const TextStyle(
+  //               color: Colors.white,
+  //               fontSize: 16,
+  //               fontWeight: FontWeight.w500,
+  //             ),
+  //           ),
+  //         ),
+  //         if (isMuted) const Icon(Icons.mic_off, color: Colors.red, size: 20),
+  //       ],
+  //     ),
+  //   );
+  // }
+Widget _buildParticipantCard({
     required int uid,
     required bool isLocal,
     required bool isMuted,
+    String? name,
+    String? photo,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -196,32 +222,57 @@ class _VoiceCallViewState extends State<VoiceCallView> {
         borderRadius: BorderRadius.circular(12),
         border: isLocal ? Border.all(color: Colors.white, width: 2) : null,
       ),
-      child: Row(
+      child: Column(
         children: [
           CircleAvatar(
-            backgroundColor: isLocal ? Colors.green : Colors.blue,
-            child: Text(
-              isLocal ? 'You' : uid.toString(),
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+            radius: 50.r,
+            backgroundColor: Colors.grey.shade300,
+            child:
+                widget.session?.astrologerPhoto?.isNotEmpty ?? false
+                    ? ClipOval(
+                      child: Image.network(
+                        photo ?? "",
+                        fit: BoxFit.cover,
+                        width: 100.w,
+                        height: 100.h,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.person, color: Colors.white);
+                        },
+                      ),
+                    )
+                    : const Icon(Icons.person, color: Colors.white),
+          ),
+
+          SizedBox(height: 10.h),
+        
+          Text(
+            "$name",
+            style:  TextStyle(
+              color: Colors.white,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              isLocal ? 'You (Local)' : 'User $uid',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+            SizedBox(height: 5.h),
+          //  Text(
+          //   controller.timerText.value.isEmpty?"Calling...":controller.timerText.value,
+          //   style:  TextStyle(
+          //     color: Colors.white,
+          //     fontSize: 19.sp,
+          //     fontWeight: FontWeight.w700,
+          //   ),
+          // ),
           if (isMuted) const Icon(Icons.mic_off, color: Colors.red, size: 20),
         ],
       ),
     );
   }
-
   Widget _buildControlButtons() {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -255,7 +306,6 @@ class _VoiceCallViewState extends State<VoiceCallView> {
               icon: Icons.call_end,
               color: Colors.red,
               onPressed: () async {
-                
                 Get.back();
               },
             ),
