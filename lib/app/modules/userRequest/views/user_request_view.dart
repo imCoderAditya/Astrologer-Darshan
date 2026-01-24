@@ -13,24 +13,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/user_request_controller.dart';
 
-class UserRequestView extends StatefulWidget{
+class UserRequestView extends GetView<UserRequestController>{
   final String? sessionType;
-  const UserRequestView({super.key, this.sessionType});
+  const UserRequestView({super.key,this.sessionType});
 
-  @override
-  State<UserRequestView> createState() => _UserRequestViewState();
-}
 
-class _UserRequestViewState extends State<UserRequestView> {
- final controller = Get.put(UserRequestController());
-  @override
-  void initState() {
-    controller.fetchUserRequest(sessionType: widget.sessionType);
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
-
     return GetBuilder<UserRequestController>(
       init: UserRequestController(),
       builder: (controller) {
@@ -97,7 +86,7 @@ class _UserRequestViewState extends State<UserRequestView> {
       return RefreshIndicator(
         onRefresh: () async {
           // Add refresh functionality
-          controller.fetchUserRequest(sessionType: widget.sessionType);
+          controller.fetchUserRequest(sessionType: sessionType);
         },
         child: CustomScrollView(
           slivers: [

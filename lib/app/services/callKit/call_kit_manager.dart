@@ -322,9 +322,9 @@ class CallKitManager {
       Get.to(UserRequestView(sessionType: sessionType));
     }
 
-    // Get.isRegistered<UserRequestController>()
-    //     ? Get.find<UserRequestController>().fetchUserRequest(sessionType: sessionType)
-    //     : Get.put(UserRequestController()).fetchUserRequest(sessionType: sessionType);
+    Get.isRegistered<UserRequestController>()
+        ? Get.find<UserRequestController>().fetchUserRequest(sessionType: sessionType)
+        : Get.put(UserRequestController()).fetchUserRequest(sessionType: sessionType);
     // ✅ NOW CLOSE / HANGUP UI (CallKit close)
     await Future.delayed(const Duration(microseconds: 300));
     await FlutterCallkitIncoming.endCall(callId!);

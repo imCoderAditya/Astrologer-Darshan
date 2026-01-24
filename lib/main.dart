@@ -1,4 +1,5 @@
 
+
 import 'package:astrology/app/services/firebase/firebase_services.dart';
 import 'package:astrology/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,24 +13,6 @@ import 'app/core/config/theme/app_theme.dart';
 import 'app/core/config/theme/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-//   await FirebaseServices.firebaseToken();
-//   FirebaseServices().setupFirebaseForegroundListener();
-
-//   // FirebaseLocalHandle().initLocalNotifications();
-
-//   await GetStorage.init();
-//   SystemChrome.setSystemUIOverlayStyle(
-//     SystemUiOverlayStyle(
-//       statusBarColor: AppColors.primaryColor,
-//       statusBarIconBrightness: Brightness.dark,
-//     ),
-//   );
-//   runApp(MyApp());
-// }
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -40,16 +23,11 @@ void main() async {
 
   await FirebaseServices.firebaseToken();
   await FirebaseServices.instance.init();
-  
+
   runApp(MyApp());
-
-
 }
 
-
-
 class MyApp extends StatelessWidget {
-
   MyApp({super.key});
   final ThemeController themeController = Get.put(ThemeController());
   @override
@@ -71,7 +49,7 @@ class MyApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-              
+
               initialRoute: AppPages.INITIAL,
               getPages: AppPages.routes,
               // home: NavView(),
