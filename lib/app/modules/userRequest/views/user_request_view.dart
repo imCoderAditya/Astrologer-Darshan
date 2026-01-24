@@ -7,17 +7,30 @@ import 'package:astrology/app/data/models/userRequest/user_request_model.dart';
 import 'package:astrology/app/modules/chat/controllers/chat_controller.dart';
 import 'package:astrology/app/modules/chat/views/chat_view.dart';
 import 'package:astrology/app/modules/voiceCall/views/voice_call_view.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../controllers/user_request_controller.dart';
 
-class UserRequestView extends GetView<UserRequestController> {
+class UserRequestView extends StatefulWidget{
   final String? sessionType;
   const UserRequestView({super.key, this.sessionType});
 
   @override
+  State<UserRequestView> createState() => _UserRequestViewState();
+}
+
+class _UserRequestViewState extends State<UserRequestView> {
+ final controller = Get.put(UserRequestController());
+  @override
+  void initState() {
+    controller.fetchUserRequest(sessionType: widget.sessionType);
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
+
     return GetBuilder<UserRequestController>(
       init: UserRequestController(),
       builder: (controller) {
@@ -84,7 +97,7 @@ class UserRequestView extends GetView<UserRequestController> {
       return RefreshIndicator(
         onRefresh: () async {
           // Add refresh functionality
-          controller.fetchUserRequest(sessionType: sessionType);
+          controller.fetchUserRequest(sessionType: widget.sessionType);
         },
         child: CustomScrollView(
           slivers: [
@@ -246,7 +259,9 @@ class UserRequestView extends GetView<UserRequestController> {
                   channelName: session?.sessionId.toString(),
                   session: session,
                 ),
-              );
+              )?.then((value){
+                // controller.fetchUserRequest();
+              });
             }
           },
           child: Padding(

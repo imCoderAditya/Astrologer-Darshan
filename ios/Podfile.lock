@@ -47,6 +47,7 @@ PODS:
   - AgoraRtcEngine_iOS/VQA (4.5.2)
   - connectivity_plus (0.0.1):
     - Flutter
+  - CryptoSwift (1.8.4)
   - device_info_plus (0.0.1):
     - Flutter
   - emoji_picker_flutter (0.0.1):
@@ -84,6 +85,9 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 8.1)
     - nanopb (~> 3.30910.0)
   - Flutter (1.0.0)
+  - flutter_callkit_incoming (0.0.1):
+    - CryptoSwift
+    - Flutter
   - flutter_inappwebview_ios (0.0.1):
     - Flutter
     - flutter_inappwebview_ios/Core (= 0.0.1)
@@ -171,6 +175,7 @@ DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
+  - flutter_callkit_incoming (from `.symlinks/plugins/flutter_callkit_incoming/ios`)
   - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_media_downloader (from `.symlinks/plugins/flutter_media_downloader/ios`)
@@ -194,6 +199,7 @@ SPEC REPOS:
     - AgoraInfra_iOS
     - AgoraIrisRTC_iOS
     - AgoraRtcEngine_iOS
+    - CryptoSwift
     - Firebase
     - FirebaseCore
     - FirebaseCoreInternal
@@ -220,6 +226,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
+  flutter_callkit_incoming:
+    :path: ".symlinks/plugins/flutter_callkit_incoming/ios"
   flutter_inappwebview_ios:
     :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
   flutter_local_notifications:
@@ -261,6 +269,7 @@ SPEC CHECKSUMS:
   AgoraIrisRTC_iOS: eab58c126439adf5ec99632828a558ea216860da
   AgoraRtcEngine_iOS: 97e2398a2addda9057815a2a583a658e36796ff6
   connectivity_plus: 2a701ffec2c0ae28a48cf7540e279787e77c447d
+  CryptoSwift: e64e11850ede528a02a0f3e768cec8e9d92ecb90
   device_info_plus: 97af1d7e84681a90d0693e63169a5d50e0839a0d
   emoji_picker_flutter: 8e50ec5caac456a23a78637e02c6293ea0ac8771
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
@@ -271,6 +280,7 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 317270fec08a5d418fdbc8429282238cab3ac843
   FirebaseMessaging: 3b26e2cee503815e01c3701236b020aa9b576f09
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_callkit_incoming: 417dd1b46541cdd5d855ad795ccbe97d1c18155e
   flutter_inappwebview_ios: 6f63631e2c62a7c350263b13fa5427aedefe81d4
   flutter_local_notifications: ff50f8405aaa0ccdc7dcfb9022ca192e8ad9688f
   flutter_media_downloader: fa9b4779cc9181aed48a0f1dbad5f54c5a5a4517

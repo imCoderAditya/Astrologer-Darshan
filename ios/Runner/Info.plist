@@ -59,6 +59,8 @@
 	<array>
 		<string>remote-notification</string>
 		<string>push-to-talk</string>
+		 <string>voip</string>
+        <string>processing</string> <!-- you can add this if needed -->
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
@@ -77,5 +79,12 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	
+<key>UIBackgroundModes</key>
+<array>
+   
+</array>
+
 </dict>
 </plist>

@@ -1,7 +1,8 @@
-import 'package:astrology/app/core/config/theme/app_colors.dart';
+
 import 'package:astrology/app/services/firebase/firebase_services.dart';
 import 'package:astrology/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,25 +12,44 @@ import 'app/core/config/theme/app_theme.dart';
 import 'app/core/config/theme/theme_controller.dart';
 import 'app/routes/app_pages.dart';
 
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+//   await FirebaseServices.firebaseToken();
+//   FirebaseServices().setupFirebaseForegroundListener();
+
+//   // FirebaseLocalHandle().initLocalNotifications();
+
+//   await GetStorage.init();
+//   SystemChrome.setSystemUIOverlayStyle(
+//     SystemUiOverlayStyle(
+//       statusBarColor: AppColors.primaryColor,
+//       statusBarIconBrightness: Brightness.dark,
+//     ),
+//   );
+//   runApp(MyApp());
+// }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FirebaseServices.firebaseToken();
-  FirebaseServices().setupFirebaseForegroundListener();
-
-  // FirebaseLocalHandle().initLocalNotifications();
-
+  // ✅ register background handler
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await GetStorage.init();
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarColor: AppColors.primaryColor,
-      statusBarIconBrightness: Brightness.dark,
-    ),
-  );
+
+  await FirebaseServices.firebaseToken();
+  await FirebaseServices.instance.init();
+  
   runApp(MyApp());
+
+
 }
 
+
+
 class MyApp extends StatelessWidget {
+
   MyApp({super.key});
   final ThemeController themeController = Get.put(ThemeController());
   @override
@@ -51,6 +71,7 @@ class MyApp extends StatelessWidget {
               theme: AppTheme.lightTheme,
               darkTheme: AppTheme.darkTheme,
               themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+              
               initialRoute: AppPages.INITIAL,
               getPages: AppPages.routes,
               // home: NavView(),

@@ -20,7 +20,7 @@ class UserRequestReposites extends UserRequestRepository {
           "SessionType":sessionType,
           "Status": status ?? "",
           "Page": 1,
-          "Limit": 1000,
+          "Limit": 100000,
         },
       );
 
