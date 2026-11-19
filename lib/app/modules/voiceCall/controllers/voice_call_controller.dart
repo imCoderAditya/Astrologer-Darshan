@@ -9,13 +9,16 @@ import 'package:astrology/components/global_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:astrology/app/routes/app_pages.dart';
+import 'package:astrology/app/services/callKit/call_kit_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class VoiceCallController extends GetxController {
   static const String APPID = "8afca3f27f524c65a4ead12c1f5f92fa";
   static const String APPCERTIFICATE = "d1dc9896ab264eb18df26c49dfe96e01";
+
   final userRequestController =
-      Get.isRegistered()
+      Get.isRegistered<UserRequestController>()
           ? Get.find<UserRequestController>()
           : Get.put(UserRequestController());
 
@@ -23,6 +26,7 @@ class VoiceCallController extends GetxController {
       Get.isRegistered<ProfileController>()
           ? Get.find<ProfileController>()
           : Get.put(ProfileController());
+
   // Agora Engine instance
   RtcEngine? engine;
 
@@ -37,29 +41,46 @@ class VoiceCallController extends GetxController {
   RxInt localUid = 0.obs;
 
   String? token;
-
-  @override
-  void onReady() {
-    generateToken(channelName: channelName.value, userName: "Sachin");
-    super.onReady();
-  }
+  bool _isStarting = false;
 
   @override
   void onClose() {
     leaveChannel();
-    engine?.release();
+    try {
+      engine?.release();
+      engine = null;
+    } catch (e) {
+      LoggerUtils.error("Error releasing Agora engine: $e");
+    }
     super.onClose();
+  }
+
+  /// Start call with specified channel name safely
+  Future<void> startCall(String channel) async {
+    if (channel.trim().isEmpty) {
+      LoggerUtils.error("Invalid empty channel name for call");
+      return;
+    }
+    if (_isStarting || isJoined.value) return;
+    _isStarting = true;
+    channelName.value = channel;
+    await generateToken(channelName: channel, userName: "User");
+    _isStarting = false;
   }
 
   // Initialize Agora SDK
   Future<void> initializeAgora() async {
+    if (channelName.value.trim().isEmpty) return;
     try {
+      await CallKitManager().stopRingtoneSound();
+
       // Request microphone permission
       if (Platform.isAndroid) {
         await requestMicrophonePermission();
       }
-      // Create Agora engine
-      engine = createAgoraRtcEngine();
+
+      // Create Agora engine if null
+      engine ??= createAgoraRtcEngine();
 
       await engine?.initialize(
         RtcEngineContext(
@@ -68,53 +89,51 @@ class VoiceCallController extends GetxController {
         ),
       );
 
+      // Set event handlers before joining
+      _setEventHandlers();
+
       // Enable audio
       await engine?.enableAudio();
-      joinChannel(channelName.value, uid: localUid.value);
-      // Set event handlers
-      _setEventHandlers();
+
+      await joinChannel(channelName.value, uid: localUid.value);
 
       LoggerUtils.debug("Agora SDK initialized successfully");
     } catch (e) {
+      isLoading.value = false;
       LoggerUtils.error("Error initializing Agora: $e");
       Get.snackbar("Error", "Failed to initialize voice call: $e");
     }
   }
 
-  /// Requests microphone permission and throws an exception if not granted
+  /// Requests microphone & bluetooth permission safely
   Future<void> requestMicrophonePermission() async {
-    var status = await Permission.microphone.status;
+    Map<Permission, PermissionStatus> statuses =
+        await [Permission.microphone, Permission.bluetoothConnect].request();
 
-    if (!status.isGranted) {
-      // Request permission
-      status = await Permission.microphone.request();
-    }
-
-    if (!status.isGranted) {
-      // Permission denied
+    if (statuses[Permission.microphone]?.isGranted != true) {
       throw Exception('Microphone permission not granted');
     }
   }
 
-  // Set up event handlers
+  // Set up event handlers safely
   void _setEventHandlers() {
-    engine!.registerEventHandler(
+    if (engine == null) return;
+
+    engine?.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) async {
           LoggerUtils.debug(
             "Local user joined channel: ${connection.channelId}",
           );
           isJoined.value = true;
-          localUid.value = connection.localUid!;
+          localUid.value = connection.localUid ?? localUid.value;
           isLoading.value = false;
           isSpeakerOn.value = true;
-          await engine!.setEnableSpeakerphone(isSpeakerOn.value);
-          // Get.snackbar(
-          //   "Success",
-          //   "Joined channel successfully",
-          //   backgroundColor: Colors.green,
-          //   colorText: Colors.white,
-          // );
+          try {
+            await engine?.setEnableSpeakerphone(isSpeakerOn.value);
+          } catch (e) {
+            LoggerUtils.error("Error enabling speakerphone: $e");
+          }
         },
         onUserJoined: (
           RtcConnection connection,
@@ -122,14 +141,9 @@ class VoiceCallController extends GetxController {
           int elapsed,
         ) async {
           LoggerUtils.debug("Remote user joined: $remoteUid");
-          remoteUsers.add(remoteUid);
-
-          // Get.snackbar(
-          //   "User Joined",
-          //   "User $remoteUid joined the call",
-          //   backgroundColor: Colors.blue,
-          //   colorText: Colors.white,
-          // );
+          if (!remoteUsers.contains(remoteUid)) {
+            remoteUsers.add(remoteUid);
+          }
         },
 
         onUserOffline: (
@@ -139,15 +153,13 @@ class VoiceCallController extends GetxController {
         ) async {
           LoggerUtils.debug("Remote user left: $remoteUid");
           remoteUsers.remove(remoteUid);
-          Get.back();
+          if (Get.isDialogOpen == true) {
+            Get.back();
+          }
+          if (Get.currentRoute == Routes.VOICE_CALL) {
+            Get.back();
+          }
           userRequestController.fetchUserRequest(sessionType: "Call");
-
-          // Get.snackbar(
-          //   "User Left",
-          //   "User $remoteUid left the call",
-          //   backgroundColor: Colors.orange,
-          //   colorText: Colors.white,
-          // );
         },
 
         onLeaveChannel: (RtcConnection connection, RtcStats stats) {
@@ -166,7 +178,6 @@ class VoiceCallController extends GetxController {
           int totalVolume,
         ) {
           // Handle volume indication if needed
-          // You can use this to show speaking indicators
         },
 
         onError: (ErrorCodeType err, String msg) {
@@ -183,47 +194,52 @@ class VoiceCallController extends GetxController {
   }
 
   Future<void> generateToken({String? channelName, String? userName}) async {
+    final channel = channelName ?? this.channelName.value;
+    if (channel.trim().isEmpty) return;
+
     GlobalLoader.show();
-    // Your Agora project credentials
+    try {
+      isLoading.value = true;
+      const int tokenExpireSeconds = 3600; // 1 hour
+      final uniqueUid = DateTime.now().millisecondsSinceEpoch % 1000000000;
 
-    // const String channelName = 'Test';
-    const int tokenExpireSeconds = 3600; // 1 hour
-    final uniqueUid = DateTime.now().millisecondsSinceEpoch % 1000000000;
+      // Generate RTC token
+      String etcToken = RtcTokenBuilder.buildTokenWithUid(
+        appId: APPID,
+        appCertificate: APPCERTIFICATE,
+        channelName: channel,
+        uid: uniqueUid,
+        tokenExpireSeconds: tokenExpireSeconds,
+      );
+      token = etcToken;
+      localUid.value = uniqueUid;
+      this.channelName.value = channel;
+      update();
 
-    // Generate RTC token
-    String etcToken = RtcTokenBuilder.buildTokenWithUid(
-      appId: APPID,
-      appCertificate: APPCERTIFICATE,
-      channelName: channelName ?? "",
-      uid: uniqueUid,
-      tokenExpireSeconds: tokenExpireSeconds,
-    );
-    token = etcToken;
-    localUid.value = uniqueUid;
-    this.channelName.value = channelName ?? "";
-    // this.userName = userName;
-    update();
-    LoggerUtils.debug('🎯initail RTC Token: $token');
-    LoggerUtils.debug('🎯initail RTC UId: $uniqueUid');
-    LoggerUtils.debug('🎯initail RTC Channel: $channelName');
+      LoggerUtils.debug('🎯initial RTC Token: $token');
+      LoggerUtils.debug('🎯initial RTC UId: $uniqueUid');
+      LoggerUtils.debug('🎯initial RTC Channel: $channel');
 
-    await initializeAgora();
-    GlobalLoader.hide();
+      await initializeAgora();
+    } catch (e) {
+      isLoading.value = false;
+      LoggerUtils.error("Error generating token: $e");
+    } finally {
+      GlobalLoader.hide();
+    }
   }
 
   // Join a voice channel
   Future<void> joinChannel(String channel, {int uid = 0}) async {
+    if (channel.trim().isEmpty) return;
     if (isJoined.value) {
-      Get.snackbar("Warning", "Already in a channel");
+      LoggerUtils.debug("Already in a channel");
       return;
     }
 
     try {
       isLoading.value = true;
       channelName.value = channel;
-
-      // For production, generate token server-side
-      // For testing, you can use null or generate a temporary token
 
       await engine?.joinChannel(
         token: token ?? "",
@@ -243,39 +259,44 @@ class VoiceCallController extends GetxController {
     }
   }
 
-  // Leave the current channel
+  // Leave the current channel safely
   Future<void> leaveChannel() async {
-    if (!isJoined.value) return;
+    if (!isJoined.value && engine == null) return;
 
     try {
-      await engine!.leaveChannel();
-      LoggerUtils.error("Left channel successfully");
+      await engine?.leaveChannel();
+      isJoined.value = false;
+      remoteUsers.clear();
+      LoggerUtils.debug("Left channel successfully");
     } catch (e) {
       LoggerUtils.error("Error leaving channel: $e");
     }
   }
 
-  // Toggle mute/unmute
+  // Toggle mute/unmute safely
   Future<void> toggleMute() async {
-    if (!isJoined.value) return;
+    if (!isJoined.value || engine == null) return;
 
     try {
       isMuted.value = !isMuted.value;
-      await engine!.muteLocalAudioStream(isMuted.value);
-      LoggerUtils.error("Audio ${isMuted.value ? 'muted' : 'unmuted'}");
+      await engine?.muteLocalAudioStream(isMuted.value);
+      LoggerUtils.debug("Audio ${isMuted.value ? 'muted' : 'unmuted'}");
     } catch (e) {
       LoggerUtils.error("Error toggling mute: $e");
     }
   }
 
-  // Toggle speaker on/off
+  // Toggle speaker on/off safely
   Future<void> toggleSpeaker() async {
+    if (engine == null) return;
     try {
       isSpeakerOn.value = !isSpeakerOn.value;
-      await engine!.setEnableSpeakerphone(isSpeakerOn.value);
-      print("Speaker ${isSpeakerOn.value ? 'enabled' : 'disabled'}");
+      await engine?.setEnableSpeakerphone(isSpeakerOn.value);
+      LoggerUtils.debug(
+        "Speaker ${isSpeakerOn.value ? 'enabled' : 'disabled'}",
+      );
     } catch (e) {
-      print("Error toggling speaker: $e");
+      LoggerUtils.error("Error toggling speaker: $e");
     }
   }
 

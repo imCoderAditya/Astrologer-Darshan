@@ -62,6 +62,11 @@ class OtpVerifyController extends GetxController {
     super.onClose();
   }
 
+  // Edit phone number - navigate back to login/sign screen
+  void editPhoneNumber() {
+    Get.back();
+  }
+
   // Start the resend timer
   void startResendTimer() {
     canResend.value = false;

@@ -224,6 +224,8 @@ class LoginView extends GetView<LoginController> {
 
                           // Enhanced Phone Form Field
                           Container(
+                            height: 54.h,
+                            alignment: Alignment.center,
                             decoration: BoxDecoration(
                               color:
                                   isDark
@@ -248,15 +250,84 @@ class LoginView extends GetView<LoginController> {
                             child: PhoneFormField(
                               // controller: controller.phoneController,
                               initialValue: PhoneNumber.parse('+91'),
+                              textAlignVertical: TextAlignVertical.center,
                               inputFormatters: [
-                                LengthLimitingTextInputFormatter(
-                                  11,
-                                ), // limits input length to 10
-                                FilteringTextInputFormatter
-                                    .digitsOnly, // optional: only digits allowed
+                                LengthLimitingTextInputFormatter(11),
+                                FilteringTextInputFormatter.digitsOnly,
                               ],
                               countrySelectorNavigator:
-                                  const CountrySelectorNavigator.page(),
+                                  CountrySelectorNavigator.draggableBottomSheet(
+                                    initialChildSize: 0.7,
+                                    minChildSize: 0.5,
+                                    maxChildSize: 0.95,
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(24.r),
+                                    ),
+                                    showDialCode: true,
+                                    favorites: const [
+                                      IsoCode.IN,
+                                      IsoCode.PK,
+                                      IsoCode.AF,
+                                      IsoCode.BT,
+                                      IsoCode.LK,
+                                      IsoCode.BD,
+                                      IsoCode.NP,
+                                      IsoCode.MV,
+                                      IsoCode.AE,
+                                      IsoCode.US,
+                                      IsoCode.GB,
+                                    ],
+                                    backgroundColor:
+                                        isDark
+                                            ? const Color(0xff1a1a24)
+                                            : Colors.white,
+                                    searchBoxDecoration: InputDecoration(
+                                      hintText:
+                                          'Search country name or code...',
+                                      hintStyle: TextStyle(
+                                        color:
+                                            isDark
+                                                ? Colors.white54
+                                                : Colors.black45,
+                                        fontSize: 14.sp,
+                                      ),
+                                      prefixIcon: Icon(
+                                        Icons.search_rounded,
+                                        color: AppColors.primaryColor,
+                                      ),
+                                      filled: true,
+                                      fillColor:
+                                          isDark
+                                              ? Colors.white.withOpacity(0.06)
+                                              : Colors.grey.shade100,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                        vertical: 12.h,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          14.r,
+                                        ),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                    ),
+                                    titleStyle: AppTextStyles.body().copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15.sp,
+                                      color:
+                                          isDark
+                                              ? Colors.white
+                                              : Colors.black87,
+                                    ),
+                                    subtitleStyle: AppTextStyles.body()
+                                        .copyWith(
+                                          fontSize: 13.sp,
+                                          color:
+                                              isDark
+                                                  ? Colors.white60
+                                                  : Colors.black54,
+                                        ),
+                                  ),
                               onChanged: (phoneNumber) {
                                 controller.phoneController.value = phoneNumber;
                                 debugPrint(
@@ -267,24 +338,40 @@ class LoginView extends GetView<LoginController> {
                               isCountryButtonPersistent: true,
                               countryButtonStyle: CountryButtonStyle(
                                 showDialCode: true,
-                                showIsoCode: true,
+                                showIsoCode: false,
                                 showFlag: true,
                                 flagSize: 18.sp,
+                                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                textStyle: AppTextStyles.body().copyWith(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
+
+                              style: AppTextStyles.body().copyWith(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : Colors.black,
                               ),
                               decoration: InputDecoration(
                                 hintText: 'Enter your phone number',
-                                
                                 hintStyle: TextStyle(
                                   color:
                                       isDark
-                                          ? Colors.white.withOpacity(0.5)
-                                          : Colors.black.withOpacity(0.5),
-                                  fontSize: 13.sp,
+                                          ? Colors.white.withOpacity(0.4)
+                                          : Colors.black.withOpacity(0.4),
+                                  fontSize: 14.sp,
                                 ),
+                                isDense: true,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
                                 contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 16.h,
+                                  horizontal: 12.w,
+                                  vertical: 12.h,
                                 ),
                               ),
                             ),

@@ -55,10 +55,11 @@ class FirebaseServices {
           linux: initializationSettingsLinux,
         );
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'default_channel',
+      'general_notification_channel',
       'General Notifications',
       description: 'General notifications',
       importance: Importance.max,
+      playSound: false,
     );
 
     await _local
@@ -68,9 +69,10 @@ class FirebaseServices {
         ?.createNotificationChannel(channel);
 
     await _local.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
         log("🔔 Local Notification Tapped: ${response.payload}");
+        await _callKitManager.stopRingtoneSound();
 
         if (response.payload != null) {
           final Map<String, dynamic> data = jsonDecode(response.payload!);
@@ -98,10 +100,34 @@ class FirebaseServices {
 
       // final type = (message.data["type"] ?? "").toString().toLowerCase();
       final sessionType = (model.sessionType ?? "").toLowerCase().trim();
-      // final screen = (model.screen ?? "").toLowerCase();
       log("Session Type : $sessionType");
-      // ✅ Call only when call type
-      if (sessionType == "call") {
+
+      final isCancel =
+          sessionType == "cancel" ||
+          sessionType == "cancelled" ||
+          sessionType == "missed" ||
+          sessionType == "end" ||
+          sessionType == "ended" ||
+          sessionType == "reject" ||
+          sessionType == "rejected";
+
+      if (isCancel) {
+        await _callKitManager.stopRingtoneSound();
+        await _callKitManager.endAllCalls();
+        return;
+      }
+
+      // ✅ Call for call/video/audio session types
+      final isCall =
+          sessionType == "call" ||
+          sessionType == "videocall" ||
+          sessionType == "audiocall" ||
+          sessionType == "audio_call" ||
+          sessionType == "video_call" ||
+          sessionType == "audio" ||
+          sessionType == "video";
+
+      if (isCall) {
         await _showIncomingCall(model);
       } else {
         await _showLocalNotification(message);
@@ -123,13 +149,16 @@ class FirebaseServices {
     try {
       final callerName = model.title ?? "Incoming Call";
       final handle = model.customerId ?? model.sessionId ?? "Unknown";
+      final sessionType = (model.sessionType ?? "").toLowerCase().trim();
+      final isVideo = sessionType.contains("video");
 
       await _callKitManager.showIncomingCall(
         callerName: callerName,
         handle: handle,
         avatarUrl: null,
-        isVideoCall: false,
+        isVideoCall: isVideo,
         extraData: model.toJson(),
+        duration: 300000,
       );
 
       LoggerUtils.debug("📞 CallKit Incoming Call Shown");
@@ -147,20 +176,22 @@ class FirebaseServices {
 
     final model = NoticationFirebaseModel.fromJson(message.data);
     log("Firebase model : ${json.encode(model)}");
-    await _local.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      model.title.toString(),
-      model.body.toString(),
 
-      NotificationDetails(
+    // Continuous sound for chat/request notifications
+    await _callKitManager.startRingtoneSound();
+
+    await _local.show(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: model.title.toString(),
+      body: model.body.toString(),
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
-          'default_channel',
+          'general_notification_channel',
           'General Notifications',
-          sound: const RawResourceAndroidNotificationSound("sound"),
-          playSound: true,
+          playSound: false,
           color: AppColors.primaryColor,
           icon: '@mipmap/launcher_icon',
-          timeoutAfter: 60000,
+          timeoutAfter: 300000,
           importance: Importance.max,
           priority: Priority.high,
         ),
@@ -204,6 +235,7 @@ class FirebaseServices {
 
   Future<void> handleUserRequestNavigation({Map<String, dynamic>? data}) async {
     try {
+      await _callKitManager.stopRingtoneSound();
       Map<String, dynamic> finalData = {};
 
       // payload priority
@@ -253,18 +285,43 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.data.isEmpty) return;
 
   final model = NoticationFirebaseModel.fromJson(message.data);
-  final sessionType = (model.sessionType ?? "").toLowerCase();
+  final sessionType = (model.sessionType ?? "").toLowerCase().trim();
 
-  if (sessionType == "call") {
-    final callKit = CallKitManager(); // ✅ use your class
+  final isCancel =
+      sessionType == "cancel" ||
+      sessionType == "cancelled" ||
+      sessionType == "missed" ||
+      sessionType == "end" ||
+      sessionType == "ended" ||
+      sessionType == "reject" ||
+      sessionType == "rejected";
+
+  if (isCancel) {
+    final callKit = CallKitManager();
+    await callKit.stopRingtoneSound();
+    await callKit.endAllCalls();
+    return;
+  }
+
+  final isCall =
+      sessionType == "call" ||
+      sessionType == "videocall" ||
+      sessionType == "audiocall" ||
+      sessionType == "audio_call" ||
+      sessionType == "video_call" ||
+      sessionType == "audio" ||
+      sessionType == "video";
+
+  if (isCall) {
+    final callKit = CallKitManager();
 
     await callKit.showIncomingCall(
       callerName: model.title ?? "Incoming Call",
       handle: model.customerId ?? model.sessionId ?? "Unknown",
       avatarUrl: null,
-      isVideoCall: false,
-      extraData: message.data, // full payload
-      duration: 30000,
+      isVideoCall: sessionType.contains("video"),
+      extraData: message.data,
+      duration: 300000,
     );
   }
 }

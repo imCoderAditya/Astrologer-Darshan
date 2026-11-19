@@ -89,7 +89,10 @@ class LocationService {
   /// Get address from latitude and longitude
   static Future<String?> getAddress(double latitude, double longitude) async {
     try {
-      final placemarks = await placemarkFromCoordinates(latitude, longitude);
+      final placemarks = await Geocoding().placemarkFromCoordinates(
+        latitude,
+        longitude,
+      );
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
         return "${place.name} ${place.locality}, ${place.administrativeArea}, ${place.country}";
@@ -107,7 +110,7 @@ class LocationService {
     final ipLocationData =
         publicIP != null ? await getLocationFromIP(publicIP) : null;
     final position = await getCurrentPosition();
-    
+
     String? address;
     double? latitude;
     double? longitude;

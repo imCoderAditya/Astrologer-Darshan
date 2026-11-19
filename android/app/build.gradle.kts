@@ -20,17 +20,19 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.astrodarshan.partner"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
-   // ndkVersion = flutt  er.ndkVersion
+    ndkVersion = "28.2.13676358"
+    androidResources {
+        noCompress.addAll(listOf("svg", "png", "jpg", "jpeg", "ttf", "json"))
+    }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true   // ✅ Enable desugaring
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     defaultConfig {
@@ -42,12 +44,16 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
      signingConfigs {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String
             keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
+            storeFile = keystoreProperties["storeFile"]?.let { path ->
+                val keystoreFile = file(path)
+                if (keystoreFile.exists()) keystoreFile else rootProject.file(path)
+            }
             storePassword = keystoreProperties["storePassword"] as String
         }
     }

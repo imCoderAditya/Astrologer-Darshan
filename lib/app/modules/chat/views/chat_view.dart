@@ -11,13 +11,12 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:google_fonts/google_fonts.dart' hide Config;
 
 import 'package:flutter/foundation.dart' as foundation;
 
 // Main Chat Screen
 class ChatView extends StatefulWidget {
- 
   final Session? sessionData;
   const ChatView({super.key, this.sessionData});
 
@@ -31,12 +30,10 @@ class _ChatViewState extends State<ChatView> {
   final timerService = TimerService();
 
   String? timerValue;
- 
+
   @override
   void initState() {
-   
     if (controller.isDisable.value == false) {
-
       _timerStart();
     }
     super.initState();
@@ -71,20 +68,19 @@ class _ChatViewState extends State<ChatView> {
     controller.showEmojiPicker.value = false;
 
     timerService.stopTimer();
-    callcontroller.statusUpdate("Completed", controller.sessionID,"Chat").then((
-      value,
-    ) async {
-      debugPrint("complete API call :${controller.sessionID}");
-    });
+    callcontroller.statusUpdate("Completed", controller.sessionID, "Chat").then(
+      (value) async {
+        debugPrint("complete API call :${controller.sessionID}");
+      },
+    );
     controller.isDisable.value = false;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
- 
     final controller = Get.put(ChatController());
-   
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return WillPopScope(
       onWillPop: () async {
@@ -282,11 +278,14 @@ class _ChatViewState extends State<ChatView> {
               ? SizedBox()
               : Padding(
                 padding: const EdgeInsets.only(right: 20),
-                child: Text("Timer  $timerValue", style: AppTextStyles.body().copyWith(
-                  color: AppColors.white,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                )),
+                child: Text(
+                  "Timer  $timerValue",
+                  style: AppTextStyles.body().copyWith(
+                    color: AppColors.white,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               );
         }),
         // IconButton(

@@ -5,6 +5,7 @@ import 'package:astrology/app/modules/userRequest/views/user_request_view.dart';
 
 import 'package:astrology/app/routes/app_pages.dart';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_callkit_incoming/entities/android_params.dart';
 import 'package:flutter_callkit_incoming/entities/call_event.dart';
@@ -22,7 +23,47 @@ class CallKitManager {
   CallKitManager._internal();
 
   final Uuid _uuid = const Uuid();
+  final AudioPlayer _ringtonePlayer = AudioPlayer(
+    playerId: 'astro_call_ringtone_player',
+  );
   String? _currentCallId;
+
+  Future<void> _startRingtone() async {
+    try {
+      await _ringtonePlayer.stop();
+      await _ringtonePlayer.setReleaseMode(ReleaseMode.loop);
+      await _ringtonePlayer.setAudioContext(
+        AudioContext(
+          android: AudioContextAndroid(
+            contentType: AndroidContentType.sonification,
+            usageType: AndroidUsageType.notificationRingtone,
+            audioFocus: AndroidAudioFocus.gainTransient,
+          ),
+        ),
+      );
+      await _ringtonePlayer.play(AssetSource('sound.mp3'));
+    } catch (e) {
+      debugPrint("Error starting ringtone: $e");
+    }
+  }
+
+  Future<void> _stopRingtone() async {
+    try {
+      await _ringtonePlayer.pause();
+      await _ringtonePlayer.stop();
+      await _ringtonePlayer.release();
+    } catch (e) {
+      debugPrint("Error stopping ringtone: $e");
+    }
+  }
+
+  Future<void> startRingtoneSound() async {
+    await _startRingtone();
+  }
+
+  Future<void> stopRingtoneSound() async {
+    await _stopRingtone();
+  }
 
   /// Initialize CallKit and listen to events
   void initialize() {
@@ -55,19 +96,17 @@ class CallKitManager {
     String? avatarUrl,
     bool isVideoCall = false,
     Map<String, dynamic>? extraData,
-    int duration = 30000,
+    int duration = 300000,
   }) async {
     _currentCallId = _uuid.v4();
 
     final callKitParams = CallKitParams(
       id: _currentCallId!,
       nameCaller: callerName,
-      appName: "",
+      appName: "Astro Darshan",
       avatar: avatarUrl,
       handle: handle,
       type: isVideoCall ? 1 : 0,
-      textAccept: 'Accept',
-      textDecline: 'Decline',
       duration: duration,
       extra: extraData ?? {},
       headers: {'apiKey': 'your-api-key', 'platform': 'flutter'},
@@ -87,20 +126,24 @@ class CallKitManager {
         subtitle: 'Calling...',
         callbackText: 'Hang Up',
       ),
-
       // Android-specific configuration
       android: AndroidParams(
         isCustomNotification: true,
         isShowLogo: false,
         logoUrl: avatarUrl,
-        ringtonePath: 'sound',
+        ringtonePath: '',
         backgroundColor: '#0955fa',
         backgroundUrl: avatarUrl,
         actionColor: '#4CAF50',
         textColor: '#ffffff',
-        incomingCallNotificationChannelName: "Incoming Call",
-        missedCallNotificationChannelName: "Missed Call",
+        incomingCallNotificationChannelName:
+            "Incoming Call System Ringing Channel",
+        missedCallNotificationChannelName: "Missed Call Channel",
         isShowCallID: false,
+        isShowFullLockedScreen: true,
+        isFullScreen: true,
+        textAccept: 'Accept',
+        textDecline: 'Decline',
       ),
 
       // iOS-specific configuration
@@ -118,10 +161,11 @@ class CallKitManager {
         supportsHolding: true,
         supportsGrouping: false,
         supportsUngrouping: false,
-        ringtonePath: 'assets/icons/sound.mp3',
+        ringtonePath: 'sound.mp3',
       ),
     );
 
+    await _startRingtone();
     await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
     return _currentCallId!;
   }
@@ -194,6 +238,7 @@ class CallKitManager {
 
   /// Hide call notification (Android only)
   Future<void> hideCallNotification([String? callId]) async {
+    await _stopRingtone();
     final id = callId ?? _currentCallId;
     if (id != null) {
       await FlutterCallkitIncoming.hideCallkitIncoming(CallKitParams(id: id));
@@ -202,6 +247,7 @@ class CallKitManager {
 
   /// End a specific call
   Future<void> endCall([String? callId]) async {
+    await _stopRingtone();
     final id = callId ?? _currentCallId;
     if (id != null) {
       await FlutterCallkitIncoming.endCall(id);
@@ -213,6 +259,7 @@ class CallKitManager {
 
   /// End all active calls
   Future<void> endAllCalls() async {
+    await _stopRingtone();
     await FlutterCallkitIncoming.endAllCalls();
     _currentCallId = null;
   }
@@ -227,7 +274,7 @@ class CallKitManager {
 
   /// Get all active calls
   Future<List<dynamic>> getActiveCalls() async {
-    return await FlutterCallkitIncoming.activeCalls() ?? [];
+    return await FlutterCallkitIncoming.activeCalls();
   }
 
   /// Get device push token for VoIP (iOS)
@@ -243,48 +290,48 @@ class CallKitManager {
     FlutterCallkitIncoming.onEvent.listen((CallEvent? event) {
       if (event == null) return;
 
-      switch (event.event) {
-        case Event.actionCallIncoming:
-          _handleIncomingCall(event);
+      switch (event) {
+        case CallEventActionCallIncoming e:
+          _handleIncomingCall(e);
           break;
-        case Event.actionCallStart:
-          _handleCallStart(event);
+        case CallEventActionCallStart e:
+          _handleCallStart(e);
           break;
-        case Event.actionCallAccept:
-          _handleCallAccept(event);
+        case CallEventActionCallAccept e:
+          _handleCallAccept(e);
           break;
-        case Event.actionCallDecline:
-          _handleCallDecline(event);
+        case CallEventActionCallDecline e:
+          _handleCallDecline(e);
           break;
-        case Event.actionCallEnded:
-          _handleCallEnded(event);
+        case CallEventActionCallEnded e:
+          _handleCallEnded(e);
           break;
-        case Event.actionCallTimeout:
-          _handleCallTimeout(event);
+        case CallEventActionCallTimeout e:
+          _handleCallTimeout(e);
           break;
-        case Event.actionCallCallback:
-          _handleCallCallback(event);
+        case CallEventActionCallCallback e:
+          _handleCallCallback(e);
           break;
-        case Event.actionCallToggleHold:
-          _handleToggleHold(event);
+        case CallEventActionCallToggleHold e:
+          _handleToggleHold(e);
           break;
-        case Event.actionCallToggleMute:
-          _handleToggleMute(event);
+        case CallEventActionCallToggleMute e:
+          _handleToggleMute(e);
           break;
-        case Event.actionCallToggleDmtf:
-          _handleToggleDmtf(event);
+        case CallEventActionCallToggleDmtf e:
+          _handleToggleDmtf(e);
           break;
-        case Event.actionCallToggleGroup:
-          _handleToggleGroup(event);
+        case CallEventActionCallToggleGroup e:
+          _handleToggleGroup(e);
           break;
-        case Event.actionCallToggleAudioSession:
-          _handleToggleAudioSession(event);
+        case CallEventActionCallToggleAudioSession e:
+          _handleToggleAudioSession(e);
           break;
-        case Event.actionDidUpdateDevicePushTokenVoip:
-          _handleDevicePushTokenUpdate(event);
+        case CallEventActionDidUpdateDevicePushTokenVoip e:
+          _handleDevicePushTokenUpdate(e);
           break;
-        case Event.actionCallCustom:
-          _handleCustomAction(event);
+        case CallEventActionCallCustom e:
+          _handleCustomAction(e);
           break;
         default:
           break;
@@ -292,112 +339,144 @@ class CallKitManager {
     });
   }
 
-  // Event handlers - Override these in your implementation
-  void _handleIncomingCall(CallEvent event) {
-    debugPrint('Incoming call: ${event.body}');
-    // TODO: Handle incoming call
-    final callId = event.body?["id"]?.toString();
-    log("sessionId $callId");
-  }
-
-  void _handleCallStart(CallEvent event) {
-    debugPrint('Call started: ${event.body}');
-  }
-
-  void _handleCallAccept(CallEvent event) async {
-    debugPrint("✅ Call Accepted => ${event.body}");
-
-    final callId = event.body?["id"]?.toString();
-
-    // ✅ popup ko rehne do (hide/end mat karo)
-
-    // ✅ call connected set karo (CallKit screen active rahega)
-    if (callId != null && callId.isNotEmpty) {
-      await FlutterCallkitIncoming.setCallConnected(callId);
+  // Event handlers
+  void _handleIncomingCall(CallEventActionCallIncoming event) {
+    try {
+      debugPrint('Incoming call: ${event.callKitParams}');
+      final callId = event.callKitParams?.id;
+      log("sessionId $callId");
+    } catch (e) {
+      debugPrint("Error handling incoming call: $e");
     }
-    final sessionType = event.body?["extra"]?["sessionType"]?.toString() ?? "";
-    log(("sessionType $sessionType"));
-    await Future.delayed(Duration(microseconds: 200));
-    if (Get.currentRoute != Routes.USER_REQUEST) {
-      Get.to(UserRequestView(sessionType: sessionType));
-    }
-
-    Get.isRegistered<UserRequestController>()
-        ? Get.find<UserRequestController>().fetchUserRequest(sessionType: sessionType)
-        : Get.put(UserRequestController()).fetchUserRequest(sessionType: sessionType);
-    // ✅ NOW CLOSE / HANGUP UI (CallKit close)
-    await Future.delayed(const Duration(microseconds: 300));
-    await FlutterCallkitIncoming.endCall(callId!);
   }
 
-  void _handleCallDecline(CallEvent event) {
-    debugPrint('Call declined: ${event.body}');
-    _currentCallId = null;
+  void _handleCallStart(CallEventActionCallStart event) {
+    try {
+      debugPrint('Call started: ${event.callKitParams}');
+    } catch (e) {
+      debugPrint("Error handling call start: $e");
+    }
+  }
 
-    // hideCallNotification(event.body["id"]);
-    final data = event.body?["extra"]?["sessionId"]?.toString() ?? "";
-    int sessionId = int.tryParse(data) ?? 0;
-    Get.isRegistered<UserRequestController>()
-        ? Get.find<UserRequestController>().statusUpdate(
+  void _handleCallAccept(CallEventActionCallAccept event) async {
+    try {
+      debugPrint("✅ Call Accepted => ${event.callKitParams}");
+      await _stopRingtone();
+
+      final callId = event.callKitParams?.id ?? "";
+
+      if (callId.isNotEmpty) {
+        await FlutterCallkitIncoming.setCallConnected(callId);
+      }
+      final sessionType =
+          event.callKitParams?.extra?["sessionType"]?.toString() ?? "";
+      log(("sessionType $sessionType"));
+      await Future.delayed(const Duration(milliseconds: 200));
+      if (Get.currentRoute != Routes.USER_REQUEST) {
+        Get.to(UserRequestView(sessionType: sessionType));
+      }
+
+      if (Get.isRegistered<UserRequestController>()) {
+        Get.find<UserRequestController>().fetchUserRequest(
+          sessionType: sessionType,
+        );
+      } else {
+        Get.put(
+          UserRequestController(),
+        ).fetchUserRequest(sessionType: sessionType);
+      }
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (callId.isNotEmpty) {
+        await FlutterCallkitIncoming.endCall(callId);
+      }
+    } catch (e) {
+      debugPrint("Error handling call accept: $e");
+    }
+  }
+
+  void _handleCallDecline(CallEventActionCallDecline event) async {
+    try {
+      debugPrint('Call declined: ${event.callKitParams}');
+      await _stopRingtone();
+      _currentCallId = null;
+
+      final extra = event.callKitParams?.extra;
+      final data =
+          extra?["sessionId"]?.toString() ??
+          extra?["SessionId"]?.toString() ??
+          "";
+      int sessionId = int.tryParse(data) ?? 0;
+
+      if (Get.isRegistered<UserRequestController>()) {
+        await Get.find<UserRequestController>().statusUpdate(
           "Cancelled",
           sessionId,
           "Call",
-        )
-        : Get.put(
+        );
+      } else {
+        await Get.put(
           UserRequestController(),
         ).statusUpdate("Cancelled", sessionId, "Call");
+      }
+    } catch (e) {
+      debugPrint("Error handling call decline: $e");
+    }
   }
 
-  void _handleCallEnded(CallEvent event) {
-    debugPrint('Call ended: ${event.body}');
-    _currentCallId = null;
-    // TODO: Cleanup call resources
+  void _handleCallEnded(CallEventActionCallEnded event) async {
+    try {
+      debugPrint('Call ended: ${event.callKitParams}');
+      await _stopRingtone();
+      _currentCallId = null;
+    } catch (e) {
+      debugPrint("Error handling call ended: $e");
+    }
   }
 
-  void _handleCallTimeout(CallEvent event) {
-    debugPrint('Call timeout: ${event.body}');
-    _currentCallId = null;
-    hideCallNotification(event.body["id"]);
-    // TODO: Show missed call notification
+  void _handleCallTimeout(CallEventActionCallTimeout event) async {
+    try {
+      debugPrint('Call timeout: ${event.id}');
+      await _stopRingtone();
+      _currentCallId = null;
+      if (event.id != null) {
+        hideCallNotification(event.id);
+      }
+    } catch (e) {
+      debugPrint("Error handling call timeout: $e");
+    }
   }
 
-  void _handleCallCallback(CallEvent event) {
-    debugPrint('Call callback: ${event.body}');
-    // TODO: Handle call back action
+  void _handleCallCallback(CallEventActionCallCallback event) {
+    debugPrint('Call callback: ${event.id}');
   }
 
-  void _handleToggleHold(CallEvent event) {
-    debugPrint('Toggle hold (iOS): ${event.body}');
-    // TODO: Handle hold
+  void _handleToggleHold(CallEventActionCallToggleHold event) {
+    debugPrint('Toggle hold (iOS): ${event.id}, onHold: ${event.isOnHold}');
   }
 
-  void _handleToggleMute(CallEvent event) {
-    debugPrint('Toggle mute (iOS): ${event.body}');
-    // TODO: Handle mute
+  void _handleToggleMute(CallEventActionCallToggleMute event) {
+    debugPrint('Toggle mute (iOS): ${event.id}, isMuted: ${event.isMuted}');
   }
 
-  void _handleToggleDmtf(CallEvent event) {
-    debugPrint('Toggle DMTF (iOS): ${event.body}');
-    // TODO: Handle DMTF
+  void _handleToggleDmtf(CallEventActionCallToggleDmtf event) {
+    debugPrint('Toggle DMTF (iOS): ${event.id}, digits: ${event.digits}');
   }
 
-  void _handleToggleGroup(CallEvent event) {
-    debugPrint('Toggle group (iOS): ${event.body}');
-    // TODO: Handle group
+  void _handleToggleGroup(CallEventActionCallToggleGroup event) {
+    debugPrint('Toggle group (iOS): ${event.id}');
   }
 
-  void _handleToggleAudioSession(CallEvent event) {
-    debugPrint('Toggle audio session (iOS): ${event.body}');
-    // TODO: Handle audio session
+  void _handleToggleAudioSession(CallEventActionCallToggleAudioSession event) {
+    debugPrint('Toggle audio session (iOS): active: ${event.isActive}');
   }
 
-  void _handleDevicePushTokenUpdate(CallEvent event) {
-    debugPrint('Device push token updated (iOS): ${event.body}');
-    // TODO: Send token to your server
+  void _handleDevicePushTokenUpdate(
+    CallEventActionDidUpdateDevicePushTokenVoip event,
+  ) {
+    debugPrint('Device push token updated (iOS)');
   }
 
-  void _handleCustomAction(CallEvent event) {
+  void _handleCustomAction(CallEventActionCallCustom event) {
     debugPrint('Custom action: ${event.body}');
-    // TODO: Handle custom action
   }
 }

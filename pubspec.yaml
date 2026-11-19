@@ -37,13 +37,13 @@ dependencies:
   get: ^4.7.2
   flutter_screenutil: ^5.9.3
   get_storage: ^2.1.1
-  google_fonts: ^6.2.1
+  google_fonts: ^8.2.1
   geolocator: ^14.0.1
-  geocoding: ^3.0.0
+  geocoding: ^5.0.0
   dio: ^5.8.0+1
-  network_info_plus: ^6.1.4
-  share_plus: ^11.0.0
-  connectivity_plus: ^6.1.4
+  network_info_plus: ^8.2.1
+  share_plus: ^13.3.0
+  connectivity_plus: ^7.3.1
   badges: ^3.1.2
   shimmer: ^3.0.0
   cached_network_image: ^3.4.1
@@ -60,18 +60,20 @@ dependencies:
   agora_rtc_engine: ^6.5.2
   flutter_rating: ^2.0.2
   flutter_media_downloader: ^2.0.0
-  device_info_plus: ^10.0.1
+  device_info_plus: ^13.2.0
   agora_token_generator: ^1.0.0
   animate_do:
   video_player: ^2.10.0
   web_socket_channel: ^3.0.3
   emoji_picker_flutter: ^4.3.0
   phone_form_field: ^10.0.1
-  firebase_core: ^3.15.1
-  firebase_messaging: ^15.2.10
-  flutter_local_notifications: ^19.5.0
+  firebase_core: ^4.13.0
+  firebase_messaging: ^16.5.0
+  flutter_local_notifications: ^22.3.0
   flutter_callkit_incoming: ^3.0.0
   uuid: ^4.5.2
+  flutter_background_service: ^5.1.0
+  audioplayers: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -83,7 +85,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
   change_app_package_name: ^1.5.0
 
@@ -121,6 +123,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/sound.mp3
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

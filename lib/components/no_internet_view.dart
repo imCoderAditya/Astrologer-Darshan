@@ -15,9 +15,10 @@ class NoInternetWidget extends StatelessWidget {
 
   Future<void> _retryLoadUrl(BuildContext context) async {
     final connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult != ConnectivityResult.none) {
+    if (!connectivityResult.contains(ConnectivityResult.none)) {
       controller?.loadUrl(urlRequest: URLRequest(url: WebUri(url)));
     } else {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Still no internet connection")),
       );

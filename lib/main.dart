@@ -1,5 +1,4 @@
-
-
+import 'package:astrology/app/services/background/app_background_service.dart';
 import 'package:astrology/app/services/firebase/firebase_services.dart';
 import 'package:astrology/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,15 +14,13 @@ import 'app/routes/app_pages.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // ✅ register background handler
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await GetStorage.init();
-
+  await AppBackgroundService.initializeService();
   await FirebaseServices.firebaseToken();
   await FirebaseServices.instance.init();
-
   runApp(MyApp());
 }
 

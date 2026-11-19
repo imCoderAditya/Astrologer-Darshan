@@ -126,35 +126,61 @@ class OtpVerifyView extends GetView<OtpVerifyController> {
 
         SizedBox(height: 12.h),
 
-        // Subtitle with phone number
+        // Subtitle with phone number and edit option
         Obx(
-          () => RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: TextStyle(
-                fontSize: 16.sp,
-                color:
-                    isDarkMode
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                height: 1.5,
-              ),
-              children: [
-                const TextSpan(
-                  text: 'We\'ve sent a 6-digit verification code to\n',
+          () => Column(
+            children: [
+              Text(
+                'We\'ve sent a 6-digit verification code to',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  color:
+                      isDarkMode
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                 ),
-                TextSpan(
-                  text:
-                      controller.phoneNumber.value.isNotEmpty
-                          ? "+91 ${controller.phoneNumber.value}"
-                          : '+91 XXXXXXXXXX',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryColor,
+              ),
+              SizedBox(height: 8.h),
+              InkWell(
+                onTap: controller.editPhoneNumber,
+                borderRadius: BorderRadius.circular(20.r),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(
+                      color: AppColors.primaryColor.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        controller.phoneNumber.value.isNotEmpty
+                            ? "+91 ${controller.phoneNumber.value}"
+                            : '+91 XXXXXXXXXX',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Icon(
+                        Icons.edit_outlined,
+                        size: 16.sp,
+                        color: AppColors.primaryColor,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],

@@ -15,7 +15,22 @@ class VoiceCallView extends StatefulWidget {
 }
 
 class _VoiceCallViewState extends State<VoiceCallView> {
-  final VoiceCallController controller = Get.put(VoiceCallController());
+  late final VoiceCallController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.isRegistered<VoiceCallController>()
+        ? Get.find<VoiceCallController>()
+        : Get.put(VoiceCallController());
+
+    final chName = widget.channelName ?? widget.session?.sessionId?.toString();
+    if (chName != null && chName.trim().isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.startCall(chName);
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -25,7 +40,6 @@ class _VoiceCallViewState extends State<VoiceCallView> {
 
   @override
   Widget build(BuildContext context) {
-    controller.channelName.value = widget.channelName ?? "";
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(

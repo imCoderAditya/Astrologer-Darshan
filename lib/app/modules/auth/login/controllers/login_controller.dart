@@ -49,7 +49,7 @@ class LoginController extends GetxController {
 
       if (response != null && response.statusCode == 200) {
         if (response.data["Type"] == "Registered") {
-          SnackBarUiView.showSuccess(message: response.data["Message"] ?? "");
+          // SnackBarUiView.showSuccess(message: response.data["Message"] ?? "");
           Get.toNamed(
             Routes.OTP_VERIFY,
             arguments: {"phoneNumber": phoneController.value.nsn},
